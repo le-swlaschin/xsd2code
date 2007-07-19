@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Test" targetNamespace="http://tempuri.org/Test.xsd" elementFormDefault="qualified" xmlns="http://tempuri.org/Test.xsd" xmlns:mstns="http://tempuri.org/Test.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:NameSpace1="http://weblogs.asp.net/cazzu" xmlns:NameSpace2="http://www.axilog.fr">
+  <xs:element name="Dvdtheque">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="dvds" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Titre" type="xs:string" nillable="true" />
+              <xs:element name="Acteurs">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Nom" type="xs:string" />
+                    <xs:element name="prenom" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
