@@ -1,6 +1,9 @@
 
-Auteur : Pascal Cabanel.
-Date   : 14 juin 2007.
+Xsd2Code : http://www.codeplex.com/Xsd2Code
+Auteur   : Pascal.Cabanel@free.fr
+Blog     : http://pcabanel.over-blog.com/
+Date     : 14 juin 2007.
+Licence  : GPL2
 
 Description :
 -------------

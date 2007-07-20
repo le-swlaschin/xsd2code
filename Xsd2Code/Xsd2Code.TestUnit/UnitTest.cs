@@ -19,7 +19,7 @@ namespace Xsd2Code.TestUnit
     public class UnitTest
     {
         private string NameSpace = "XSDCodeGen";
-        private string DirOutput = @"c:\temp\";
+        private string DirOutput = ""; //@"c:\temp\";
 
         public UnitTest()
         {

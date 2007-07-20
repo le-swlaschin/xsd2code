@@ -16,7 +16,7 @@ namespace Xsd2Code
         {
             if (args.Length != 4)
             {
-                Console.WriteLine("Usage: XsdGenerator xsdfile namespace outputfile [cs|vb]");
+                Console.WriteLine("Usage: Xsd2Code xsdfile namespace outputfile [cs|vb]");
                 return;
             }
 
