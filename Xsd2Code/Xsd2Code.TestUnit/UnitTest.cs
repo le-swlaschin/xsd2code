@@ -1,14 +1,8 @@
-using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using Xsd2Code.TestUnit.Properties;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xsd2Code.Library;
 
 namespace Xsd2Code.TestUnit
 {
@@ -18,37 +12,8 @@ namespace Xsd2Code.TestUnit
     [TestClass]
     public class UnitTest
     {
-        private string NameSpace = "XSDCodeGen";
-        private string DirOutput = ""; //@"c:\temp\";
-
-        public UnitTest()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
+        private readonly string NameSpace = "XSDCodeGen";
+        private readonly string DirOutput = "";
 
         [TestMethod]
         public void XSDCodeGen()

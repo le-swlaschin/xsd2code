@@ -1,11 +1,8 @@
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Data;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
+using Xsd2Code.Library;
 
 namespace Xsd2Code
 {
@@ -21,7 +18,9 @@ namespace Xsd2Code
             }
 
             // Récupère le namespace du schéma
-            CodeNamespace ns = Processor.Process(args[0], args[1]);
+            try
+            {
+                CodeNamespace ns = Processor.Process(args[0], args[1]);
 
             // Création du provider de génération de code
             CodeDomProvider provider;
@@ -30,15 +29,18 @@ namespace Xsd2Code
             else if (args[3] == "vb")
                 provider = new Microsoft.VisualBasic.VBCodeProvider();
             else
-                throw new ArgumentException("language invalide", args[3]);
+                throw new ArgumentException("invalid language", args[3]);
 
             // Ecriture dans le fichier de sortie
             using (StreamWriter sw = new StreamWriter(args[2], false))
             {
                 provider.GenerateCodeFromNamespace(ns, sw, new CodeGeneratorOptions());
             }
-            Console.WriteLine("Finished");
-            Console.Read();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
         }
     }
 }

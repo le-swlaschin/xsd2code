@@ -1,12 +1,11 @@
 using System;
 using System.CodeDom;
 using System.Collections;
-using System.Xml.Schema;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Xml.Serialization;
 using System.Reflection;
-namespace Xsd2Code.Extensions
+using System.Xml.Schema;
+
+namespace Xsd2Code.Library.Extensions
 {
     /// <summary>
     /// Convertion des array properties en collection
@@ -22,14 +21,14 @@ namespace Xsd2Code.Extensions
             {
                 if (type.IsClass || type.IsStruct)
                 {
+                    bool AddedToConstructor = false;
                     CodeConstructor ctor = ProcessClass(type);
-
                     foreach (CodeTypeMember member in type.Members)
                     {
                         #region Traitement des Property
                         if (member is CodeMemberProperty)
                         {
-                            ProcessProperty(type, member,code);
+                            ProcessProperty(type, member);
                         }
                         #endregion
 
@@ -37,11 +36,12 @@ namespace Xsd2Code.Extensions
 
                         if (member is CodeMemberField)
                         {
-                            ProcessField(member, ctor, code);
+                            ProcessField(member, ctor, code, ref AddedToConstructor);
                         }
                         #endregion
                     }
-                    type.Members.Add(ctor);
+                    if (AddedToConstructor)
+                        type.Members.Add(ctor);
 
                     #region Ajout de public event PropertyChangedEventHandler PropertyChanged = null;
                     CodeMemberEvent cme = new CodeMemberEvent();
@@ -81,7 +81,7 @@ namespace Xsd2Code.Extensions
         /// <summary>
         /// Traitement des Fields. Ajout attribut non visible dans l'IDE, Change Array par type générique
         /// </summary>
-        private static void ProcessField(CodeTypeMember member, CodeConstructor ctor, CodeNamespace ns)
+        private static void ProcessField(CodeTypeMember member, CodeMemberMethod ctor, CodeNamespace ns, ref bool AddedToConstructor)
         {
             CodeMemberField field = (CodeMemberField)member;
 
@@ -108,17 +108,17 @@ namespace Xsd2Code.Extensions
             if ((isCollectionType ||/*(!isCollectionType || */(((declaration != null) && declaration.IsClass) && ((declaration.TypeAttributes & TypeAttributes.Abstract) != TypeAttributes.Abstract))))
             {
                 ctor.Statements.Insert(0, CreateLazyInitializationCodeStatements(field.Name, field.Type));
+                AddedToConstructor = true;
             }
             #endregion
         }
         /// <summary>
         /// Génération de code pour l'allocation d'un objet
         /// </summary>
-        /// <param name="prop"></param>
         /// <returns></returns>
         private static CodeConditionStatement CreateLazyInitializationCodeStatements(string Name, CodeTypeReference Type)
         {
-            CodeAssignStatement statement = null;
+            CodeAssignStatement statement;
             statement = new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), Name), new CodeObjectCreateExpression(Type, new CodeExpression[0]));
             return new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), Name), CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(null)), new CodeStatement[] { statement });
         }
@@ -143,18 +143,15 @@ namespace Xsd2Code.Extensions
         /// Traitement des property. Change les Array par des types génériques.
         /// Ajout dans le get l'appel à OnPropertyChanged.
         /// </summary>
-        private static void ProcessProperty(CodeTypeDeclaration type, CodeTypeMember member, CodeNamespace ns)
+        private static void ProcessProperty(CodeTypeDeclaration type, CodeTypeMember member)
         {
             CodeMemberProperty prop = (CodeMemberProperty)member;
-            
+
             // Change Data[] par un type générique
             if (prop.Type.ArrayElementType != null)
             {
                 prop.Type = new CodeTypeReference("List<" + prop.Type.BaseType + ">");
             }
-            
-            // Allocation des objet de type classe
-            bool isCollectionType = prop.Type.ArrayElementType != null;
 
             // Ajoute au getter l'appel à OnPropertyChanged
             if (type.BaseTypes.IndexOf(new CodeTypeReference(typeof(CollectionBase))) == -1)

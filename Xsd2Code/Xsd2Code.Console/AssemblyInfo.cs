@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 //
@@ -10,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("XSD2Code")]
 [assembly: AssemblyDescription("Générateur de classe de données pour WPF")]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany("Axilog")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct( "" )]
-[assembly: AssemblyCopyright("Axilog")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]		
 
@@ -57,4 +56,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDelaySign( false )]
 [assembly: AssemblyKeyFile( "" )]
 [assembly: AssemblyKeyName( "" )]
-[assembly: ComVisibleAttribute(false)]
+[assembly: ComVisible(false)]

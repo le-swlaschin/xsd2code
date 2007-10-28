@@ -1,19 +1,17 @@
-using System;
 using System.CodeDom;
-using System.CodeDom.Compiler;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Xml.XPath;
-using Xsd2Code.Extensions;
+using Xsd2Code.Library.Extensions;
 
-namespace Xsd2Code
+namespace Xsd2Code.Library
 {
     public sealed class Processor
     {
         public const string ExtensionNamespace = "http://www.axilog.fr";
-        private static XPathExpression Extensions;
+        private static readonly XPathExpression Extensions;
 
         static Processor()
         {
@@ -43,7 +41,9 @@ namespace Xsd2Code
             using (FileStream fs = new FileStream(xsdFile, FileMode.Open))
             {
                 xsd = XmlSchema.Read(fs, null);
+#pragma warning disable 612,618
                 xsd.Compile(null);
+#pragma warning restore 612,618
             }
 
             XmlSchemas schemas = new XmlSchemas();
