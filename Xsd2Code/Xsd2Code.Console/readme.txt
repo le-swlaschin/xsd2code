@@ -15,3 +15,10 @@ Usage :
 -------
  Xsd2Gen.exe xsdfile namespace outputfile [cs|vb]
 
+ChangeLog :
+-----------
+28 octobre 2007
+- Remove empty constructor.
+- Secure code if invalid XSD.
+20 juillet 2007
+- Add test unit
