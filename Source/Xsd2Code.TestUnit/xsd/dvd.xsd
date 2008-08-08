@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Dvd" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <xs:include schemaLocation="Actor.xsd"/>
+
+  <xs:element name="DvdCollection">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="dvds" maxOccurs="unbounded">
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Actors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Actor" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="dvds">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="xs:string" nillable="true">
+          <xs:annotation>
+            <xs:documentation>
+              States in the Pacific Northwest of US
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="style" type="xs:string" />
+        <xs:element ref="Actor" maxOccurs="unbounded" />
+        <xs:element name="show" type="xs:boolean" nillable="true" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
