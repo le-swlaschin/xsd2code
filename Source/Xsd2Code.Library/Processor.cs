@@ -33,25 +33,14 @@ namespace Xsd2Code
 
         private Processor() { }
 
-        /// <summary>
-        /// Processes the schema.
-        /// </summary>
-        /// <param name="xsdFile">The full path to the WXS file to process.</param>
-        /// <param name="targetNamespace">The namespace to put generated classes in.</param>
-        /// <returns>The CodeDom tree generated from the schema.</returns>
-        public static CodeNamespace Process(string xsdFile, string targetNamespace)
-        {
-            return Process(xsdFile, targetNamespace, Xsd2Code.Library.CollectionType.List, true, false);
-        }
-
-        internal static CodeNamespace Process(string xsdFile, string targetNamespace, Xsd2Code.Library.CollectionType AColType, bool AUseIPropertyNotifyChanged, bool AHidePrivateFieldInIde)
+        internal static CodeNamespace Process(string xsdFile, string targetNamespace, Xsd2Code.Library.GenerateCodeType ACodeType,  Xsd2Code.Library.CollectionType AColType, bool AUseIPropertyNotifyChanged, bool AHidePrivateFieldInIde)
         {
             // Charge le schéma
             XmlSchema xsd;
             GenrationContext.CollectionObjectType = AColType;
             GenrationContext.EnableDataBinding = AUseIPropertyNotifyChanged;
             GenrationContext.HidePrivateFieldInIde = AHidePrivateFieldInIde;
-
+            GenrationContext.Language = ACodeType;
             using (FileStream fs = new FileStream(xsdFile, FileMode.Open))
             {
                 xsd = XmlSchema.Read(fs, null);

@@ -64,17 +64,29 @@ namespace Xsd2Code.Library.Extensions
                         cme.Attributes = MemberAttributes.Final | MemberAttributes.Public;
                         cme.Name = "PropertyChanged";
                         cme.Type = new CodeTypeReference(typeof(PropertyChangedEventHandler));
+                        cme.ImplementationTypes.Add(typeof(INotifyPropertyChanged));
                         type.Members.Add(cme);
+
+                        // Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
                         #endregion
 
                         #region Ajout de private void OnPropertyChanged(string info) {...}
                         CodeMemberMethod PropChanged = new CodeMemberMethod();
                         PropChanged.Name = "OnPropertyChanged";
                         PropChanged.Parameters.Add(new CodeParameterDeclarationExpression(typeof(String), "info"));
-                        PropChanged.Statements.Add(new CodeExpressionStatement(new CodeSnippetExpression("PropertyChangedEventHandler handler = PropertyChanged")));
-                        CodeExpressionStatement cs1 = new CodeExpressionStatement(new CodeSnippetExpression("handler(this, new PropertyChangedEventArgs(info))"));
-                        CodeStatement[] statements = new CodeExpressionStatement[] { cs1 };
-                        PropChanged.Statements.Add(new CodeConditionStatement(new CodeSnippetExpression("handler != null"), statements));
+
+                        if (GenrationContext.Language == GenerateCodeType.CSharp)
+                        {
+                            PropChanged.Statements.Add(new CodeExpressionStatement(new CodeSnippetExpression("PropertyChangedEventHandler handler = PropertyChanged")));
+                            CodeExpressionStatement cs1 = new CodeExpressionStatement(new CodeSnippetExpression("handler(this, new PropertyChangedEventArgs(info))"));
+                            CodeStatement[] statements = new CodeExpressionStatement[] { cs1 };
+                            PropChanged.Statements.Add(new CodeConditionStatement(new CodeSnippetExpression("handler != null"), statements));
+                        }
+                        else
+                        {
+                            PropChanged.Statements.Add(new CodeExpressionStatement(new CodeSnippetExpression("RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(info))")));
+                        }
+
                         type.Members.Add(PropChanged);
                         #endregion
                     }
@@ -148,10 +160,24 @@ namespace Xsd2Code.Library.Extensions
                 switch (GenrationContext.CollectionObjectType)
                 {
                     case CollectionType.List:
-                        field.Type = new CodeTypeReference("List <" + field.Type.BaseType + ">");
+                        if (GenrationContext.Language == GenerateCodeType.CSharp)
+                        {
+                            field.Type = new CodeTypeReference("List <" + field.Type.BaseType + ">");
+                        }
+                        else
+                        {
+                            field.Type = new CodeTypeReference("List (Of " + field.Type.BaseType + ")");
+                        }
                         break;
                     case CollectionType.ObservableCollection:
-                        field.Type = new CodeTypeReference("ObservableCollection <" + field.Type.BaseType + ">");
+                        if (GenrationContext.Language == GenerateCodeType.CSharp)
+                        {
+                            field.Type = new CodeTypeReference("ObservableCollection <" + field.Type.BaseType + ">");
+                        }
+                        else
+                        {
+                            field.Type = new CodeTypeReference("ObservableCollection (Of " + field.Type.BaseType + ")");
+                        }
                         break;
                     default:
                         break;
@@ -210,10 +236,24 @@ namespace Xsd2Code.Library.Extensions
                 switch (GenrationContext.CollectionObjectType)
                 {
                     case CollectionType.List:
-                        prop.Type = new CodeTypeReference("List<" + prop.Type.BaseType + ">");
+                        if (GenrationContext.Language == GenerateCodeType.CSharp)
+                        {
+                            prop.Type = new CodeTypeReference("List <" + prop.Type.BaseType + ">");
+                        }
+                        else
+                        {
+                            prop.Type = new CodeTypeReference("List (Of " + prop.Type.BaseType + ")");
+                        }
                         break;
                     case CollectionType.ObservableCollection:
-                        prop.Type = new CodeTypeReference("ObservableCollection<" + prop.Type.BaseType + ">");
+                        if (GenrationContext.Language == GenerateCodeType.CSharp)
+                        {
+                            prop.Type = new CodeTypeReference("ObservableCollection <" + prop.Type.BaseType + ">");
+                        }
+                        else
+                        {
+                            prop.Type = new CodeTypeReference("ObservableCollection (Of " + prop.Type.BaseType + ")");
+                        }
                         break;
                     default:
                         break;

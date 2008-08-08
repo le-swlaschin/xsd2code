@@ -9,5 +9,6 @@ namespace Xsd2Code.Library
         public static CollectionType CollectionObjectType;
         public static bool EnableDataBinding;
         public static bool HidePrivateFieldInIde;
+        public static GenerateCodeType Language;
     }
 }
