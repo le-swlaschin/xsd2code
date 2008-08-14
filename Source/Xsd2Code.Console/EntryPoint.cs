@@ -41,8 +41,8 @@ namespace Xsd2Code
             string XSDFile = args[0];
             string NameSpace = args[1];
             string OutputFile = args[2];
-            GenerateCodeType generateCodeType = OptionsContext.ToGenerateCodeType(args[3]);
-            CollectionType collectionType = OptionsContext.ToCollectionType(args[4]);
+            GenerationLanguage generateCodeType = GeneratorContext.ToGenerateCodeType(args[3]);
+            CollectionType collectionType = GeneratorContext.ToCollectionType(args[4]);
 
             bool enableDataBinding = false;
             if (args.Length > 5)
@@ -52,7 +52,7 @@ namespace Xsd2Code
             if (args.Length > 6)
                 HidePrivateFieldInIDE = args[6] == "HideInIde";
 
-            Xsd2CodeGenerator gen = new Xsd2CodeGenerator(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE);
+            GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false);
             string ErrorMessage = "";
             if (!gen.Process(out ErrorMessage))
             {

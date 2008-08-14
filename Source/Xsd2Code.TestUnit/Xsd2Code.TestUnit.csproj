@@ -50,6 +50,9 @@
     <Compile Include="xsd\dvd.cs">
       <DependentUpon>dvd.xsd</DependentUpon>
     </Compile>
+    <Compile Include="xsd\Hierarchical.cs">
+      <DependentUpon>Hierarchical.xsd</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -62,11 +65,15 @@
       </SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Include="xsd\Actor.xsd" />
+    <EmbeddedResource Include="xsd\Actor.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Include="xsd\Circular.xsd" />
     <None Include="xsd\dvd.xsx">
       <DependentUpon>dvd.xsd</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="xsd\Hierarchical.xsd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xsd2Code.Library\Xsd2Code.Library.csproj">

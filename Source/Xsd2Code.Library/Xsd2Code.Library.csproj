@@ -82,6 +82,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -93,19 +94,19 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Extensions\XSD2CodeExtension.cs">
+    <Compile Include="GeneratorExtension.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenrationContext.cs" />
+    <Compile Include="GeneratorContext.cs" />
+    <Compile Include="Helpers\CodeDomHelper.cs" />
     <Compile Include="ICodeExtension.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="OptionsContext.cs" />
-    <Compile Include="Processor.cs">
+    <Compile Include="Generator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="XmlHerper.cs" />
-    <Compile Include="Xsd2CodeGenerator.cs" />
+    <Compile Include="Helpers\XmlHelper.cs" />
+    <Compile Include="GeneratorFacade.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

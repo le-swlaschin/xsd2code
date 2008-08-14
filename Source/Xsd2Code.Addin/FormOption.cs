@@ -1,25 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using Xsd2Code.Library;
-using System.IO;
+﻿
 
 namespace Xsd2Code.Addin
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Data;
+    using System.Drawing;
+    using System.Text;
+    using System.Windows.Forms;
+    using Xsd2Code.Library;
+    using System.IO;
+    using Xsd2Code.Helpers;
+
     public partial class FormOption : Form
     {
         #region Private Field
         private string _InputFile;
         private string _NameSpace;
-        private GenerateCodeType _GenerateCodeType;
+        private GenerationLanguage _GenerateCodeType;
         private CollectionType _CollectionType;
         private string _OutputFile;
         private bool _UseIPropertyNotifyChanged;
         private bool _HidePrivateFieldInIDE;
+        private bool _EnableSummaryComment;
         #endregion
 
         #region Property
@@ -45,7 +49,7 @@ namespace Xsd2Code.Addin
             }
 
         }
-        public GenerateCodeType GenerateCodeType
+        public GenerationLanguage GenerateCodeType
         {
             get { return _GenerateCodeType; }
             set
@@ -85,6 +89,16 @@ namespace Xsd2Code.Addin
             }
         }
 
+        public bool EnableSummaryComment
+        {
+            get { return _EnableSummaryComment; }
+            set
+            {
+                _EnableSummaryComment = value;
+                chkEnableSummaryComment.Checked = _EnableSummaryComment;
+            }
+        }
+
         #endregion
 
         #region cTor
@@ -97,8 +111,8 @@ namespace Xsd2Code.Addin
             cbxCollection.Items.Add(CollectionType.List.ToString());
             cbxCollection.Items.Add(CollectionType.ObservableCollection.ToString());
             cbxCollection.Items.Add(CollectionType.Array.ToString());
-            cbxCodeType.Items.Add(GenerateCodeType.CSharp.ToString());
-            cbxCodeType.Items.Add(GenerateCodeType.VisualBasic.ToString());
+            cbxCodeType.Items.Add(GenerationLanguage.CSharp.ToString());
+            cbxCodeType.Items.Add(GenerationLanguage.VisualBasic.ToString());
         }
         #endregion
 
@@ -139,11 +153,12 @@ namespace Xsd2Code.Addin
                 string optionLine = streamReader.ReadLine();
                 if (optionLine != null)
                 {
-                    NameSpace = XmlHerper.ExtractStrFromXML(optionLine, OptionsContext.NameSpaceTag);
-                    CollectionType = OptionsContext.ToCollectionType(XmlHerper.ExtractStrFromXML(optionLine, OptionsContext.CollectionTag));
-                    GenerateCodeType = OptionsContext.ToGenerateCodeType(XmlHerper.ExtractStrFromXML(optionLine, OptionsContext.codeTypeTag));
-                    UseIPropertyNotifyChanged = OptionsContext.ToBoolean(XmlHerper.ExtractStrFromXML(optionLine, OptionsContext.EnableDataBindingTag));
-                    HidePrivateFieldInIDE = OptionsContext.ToBoolean(XmlHerper.ExtractStrFromXML(optionLine, OptionsContext.EnableDataBindingTag));
+                    NameSpace = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.NameSpaceTag);
+                    CollectionType = GeneratorContext.ToCollectionType(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CollectionTag));
+                    GenerateCodeType = GeneratorContext.ToGenerateCodeType(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CodeTypeTag));
+                    UseIPropertyNotifyChanged = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableDataBindingTag));
+                    HidePrivateFieldInIDE = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.HidePrivateFieldTag));
+                    EnableSummaryComment = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableSummaryCommentTag));
                 }
             }
             #endregion
@@ -198,19 +213,33 @@ namespace Xsd2Code.Addin
             if (cbxCollection.Text == CollectionType.ObservableCollection.ToString())
                 _CollectionType = CollectionType.ObservableCollection;
 
-            if (cbxCodeType.Text == GenerateCodeType.CSharp.ToString())
-                _GenerateCodeType = GenerateCodeType.CSharp;
+            if (cbxCodeType.Text == GenerationLanguage.CSharp.ToString())
+                _GenerateCodeType = GenerationLanguage.CSharp;
 
-            if (cbxCodeType.Text == GenerateCodeType.VisualBasic.ToString())
-                _GenerateCodeType = GenerateCodeType.VisualBasic;
+            if (cbxCodeType.Text == GenerationLanguage.VisualBasic.ToString())
+                _GenerateCodeType = GenerationLanguage.VisualBasic;
 
             _UseIPropertyNotifyChanged = chkIPropertyNotifyChanged.Checked;
             _HidePrivateFieldInIDE = chkHideInIDE.Checked;
+            _EnableSummaryComment = chkEnableSummaryComment.Checked;
             #endregion
 
             this.DialogResult = DialogResult.OK;
             Close();
         }
         #endregion
+
+        /// <summary>
+        /// Close form if press esc.
+        /// </summary>
+        /// <param name="sender">Object sender</param>
+        /// <param name="e">EventArgs param</param>
+        private void FormOption_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Escape)
+            {
+                Close();
+            }
+        }
     }
 }

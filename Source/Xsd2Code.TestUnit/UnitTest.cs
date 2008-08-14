@@ -20,7 +20,7 @@ namespace Xsd2Code.TestUnit
     public class UnitTest
     {
         private string NameSpace = "XSDCodeGen";
-        private string DirOutput = ""; //@"c:\temp\";
+        private string DirOutput = @"c:\temp\";
 
         public UnitTest()
         {
@@ -52,18 +52,63 @@ namespace Xsd2Code.TestUnit
         #endregion
 
         [TestMethod]
-        public void XSDCodeGen()
+        public void Circular()
         {
             // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput+"dvd.xsd", false))
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Circular.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Circular);
+            }
+
+            string FileName = DirOutput + "Circular.xsd";
+            string ErrorMessage = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
+            if (!xsdGen.Process(out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
+        }
+
+        [TestMethod]
+        public void Dvd()
+        {
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Dvd.xsd", false))
             {
                 sw.Write(Xsd2Code.TestUnit.Properties.Resources.dvd);
             }
 
-            string FileName = DirOutput + "dvd.xsd";
+            // Get the code namespace for the schema.
+
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Actor.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Actor);
+            }
+
+            string FileName = DirOutput + "Dvd.xsd";
             string ErrorMessage = "";
-            Xsd2CodeGenerator xsdGen = new Xsd2CodeGenerator(FileName, NameSpace, GenerateCodeType.CSharp, CollectionType.List, true, true);
-            xsdGen.Process(out ErrorMessage);
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
+            if (!xsdGen.Process(out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
+        }
+        [TestMethod]
+        public void Hierarchical()
+        {
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Hierarchical.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Hierarchical);
+            }
+
+            string FileName = DirOutput + "Hierarchical.xsd";
+            string ErrorMessage = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
+            if (!xsdGen.Process(out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
         }
     }
 }

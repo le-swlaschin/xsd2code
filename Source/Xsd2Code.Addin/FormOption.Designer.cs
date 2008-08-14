@@ -40,6 +40,7 @@
             this.cbxCodeType = new System.Windows.Forms.ComboBox();
             this.cbxCollection = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.chkEnableSummaryComment = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -49,7 +50,7 @@
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Controls.Add(this.btnGenerate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 180);
+            this.panel1.Location = new System.Drawing.Point(0, 203);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(431, 32);
             this.panel1.TabIndex = 2;
@@ -76,11 +77,12 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkEnableSummaryComment);
             this.groupBox1.Controls.Add(this.chkHideInIDE);
             this.groupBox1.Controls.Add(this.chkIPropertyNotifyChanged);
             this.groupBox1.Location = new System.Drawing.Point(12, 97);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(407, 73);
+            this.groupBox1.Size = new System.Drawing.Size(407, 87);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
@@ -157,11 +159,21 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Collection :";
             // 
+            // chkEnableSummaryComment
+            // 
+            this.chkEnableSummaryComment.AutoSize = true;
+            this.chkEnableSummaryComment.Location = new System.Drawing.Point(6, 64);
+            this.chkEnableSummaryComment.Name = "chkEnableSummaryComment";
+            this.chkEnableSummaryComment.Size = new System.Drawing.Size(295, 17);
+            this.chkEnableSummaryComment.TabIndex = 2;
+            this.chkEnableSummaryComment.Text = "Generate summary comment from XmlSchema annotation";
+            this.chkEnableSummaryComment.UseVisualStyleBackColor = true;
+            // 
             // FormOption
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(431, 212);
+            this.ClientSize = new System.Drawing.Size(431, 235);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.cbxCollection);
             this.Controls.Add(this.cbxCodeType);
@@ -175,6 +187,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Xsd2Code Generator";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormOption_KeyPress);
             this.panel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -197,6 +210,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox chkIPropertyNotifyChanged;
         private System.Windows.Forms.CheckBox chkHideInIDE;
+        private System.Windows.Forms.CheckBox chkEnableSummaryComment;
 
     }
 }
