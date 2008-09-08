@@ -461,10 +461,11 @@ namespace Xsd2Code.Library.Extensions
                             setValueCondition[0] = propAssignStatment;
                             setValueCondition[1] = propChange;
 
+                            
                             // ---------------------------------------------
                             // if ((xxxField.Equals(value) != true)) { ... }
                             // ---------------------------------------------
-                            CodeConditionStatement condStatmentCond = new CodeConditionStatement(
+                            CodeConditionStatement condStatmentCondEquals = new CodeConditionStatement(
                                                                           new CodeBinaryOperatorExpression(
                                                                               new CodeMethodInvokeExpression(
                                                                                   new CodeFieldReferenceExpression(
@@ -476,7 +477,13 @@ namespace Xsd2Code.Library.Extensions
                                                                              new CodePrimitiveExpression(true)),
                                                                              setValueCondition);
 
-                            prop.SetStatements[0] = condStatmentCond;
+                            // ---------------------------------------------
+                            // if ((xxxField != null)) { ... }
+                            // ---------------------------------------------
+                            CodeConditionStatement condStatmentCondNotNull = new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), cfreL.FieldName), CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null)), new CodeStatement[] { condStatmentCondEquals }, setValueCondition);
+
+
+                            prop.SetStatements[0] = condStatmentCondNotNull;
                         }
                         else
                         {
