@@ -24,6 +24,8 @@ namespace Xsd2Code.Addin
         private bool _UseIPropertyNotifyChanged;
         private bool _HidePrivateFieldInIDE;
         private bool _EnableSummaryComment;
+        private List<string> _CustomUsings = new List<string>();
+        private string _CollectionBase;
         #endregion
 
         #region Property
@@ -99,6 +101,25 @@ namespace Xsd2Code.Addin
             }
         }
 
+        public string CollectionBase
+        {
+            get { return _CollectionBase; }
+            set
+            {
+                _CollectionBase = value;
+                txtCollectionBase.Text = _CollectionBase;
+            }
+        }
+
+        public List<string> CustomUsings
+        {
+            get { return _CustomUsings; }
+            set
+            {
+                _CustomUsings = value;
+            }
+        }
+
         #endregion
 
         #region cTor
@@ -110,6 +131,7 @@ namespace Xsd2Code.Addin
             InitializeComponent();
             cbxCollection.Items.Add(CollectionType.List.ToString());
             cbxCollection.Items.Add(CollectionType.ObservableCollection.ToString());
+            cbxCollection.Items.Add(CollectionType.DefinedType.ToString());
             cbxCollection.Items.Add(CollectionType.Array.ToString());
             cbxCodeType.Items.Add(GenerationLanguage.CSharp.ToString());
             cbxCodeType.Items.Add(GenerationLanguage.VisualBasic.ToString());
@@ -159,6 +181,17 @@ namespace Xsd2Code.Addin
                     UseIPropertyNotifyChanged = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableDataBindingTag));
                     HidePrivateFieldInIDE = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.HidePrivateFieldTag));
                     EnableSummaryComment = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableSummaryCommentTag));
+                    String[] usingList = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CustomUsingsTag).Split(';');
+                    foreach (var item in usingList)
+                    {
+                        if (item.Length > 0)
+                        {
+                            _CustomUsings.Add(item);
+                            lslUsing.Items.Add(item);
+                        }
+                    }
+                    
+                    CollectionBase = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CollectionBaseTag);
                 }
             }
             #endregion
@@ -199,6 +232,13 @@ namespace Xsd2Code.Addin
                 return;
             }
 
+            if (cbxCollection.Text == CollectionType.DefinedType.ToString())
+                if (string.IsNullOrEmpty(txtCollectionBase.Text))
+                {
+                    MessageBox.Show("you must specify the custom collection base type");
+                    return;
+                }
+
             #endregion
 
             #region SetProperty
@@ -213,6 +253,9 @@ namespace Xsd2Code.Addin
             if (cbxCollection.Text == CollectionType.ObservableCollection.ToString())
                 _CollectionType = CollectionType.ObservableCollection;
 
+            if (cbxCollection.Text == CollectionType.DefinedType.ToString())
+                _CollectionType = CollectionType.DefinedType;
+
             if (cbxCodeType.Text == GenerationLanguage.CSharp.ToString())
                 _GenerateCodeType = GenerationLanguage.CSharp;
 
@@ -222,6 +265,12 @@ namespace Xsd2Code.Addin
             _UseIPropertyNotifyChanged = chkIPropertyNotifyChanged.Checked;
             _HidePrivateFieldInIDE = chkHideInIDE.Checked;
             _EnableSummaryComment = chkEnableSummaryComment.Checked;
+            _CollectionBase = txtCollectionBase.Text;
+            _CustomUsings.Clear();
+            foreach (var strUsing in lslUsing.Items)
+            {
+                _CustomUsings.Add((string)strUsing);
+            }
             #endregion
 
             this.DialogResult = DialogResult.OK;
@@ -240,6 +289,56 @@ namespace Xsd2Code.Addin
             {
                 Close();
             }
+        }
+
+        private void cbxCollection_TextChanged(object sender, EventArgs e)
+        {
+            txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
+        }
+
+        private void cbxCollection_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
+        }
+
+        private void cbxCollection_SelectedValueChanged(object sender, EventArgs e)
+        {
+            txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
+        }
+
+        private void cbxCollection_TextUpdate(object sender, EventArgs e)
+        {
+            txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
+        }
+
+        private void cbxCollection_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
+        }
+        /// <summary>
+        /// Remove selectd element.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lslUsing.SelectedIndex != -1)
+            {
+                lslUsing.Items.RemoveAt(lslUsing.SelectedIndex);
+            }
+        }
+        /// <summary>
+        /// Add new custom using
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAddUsing_Click(object sender, EventArgs e)
+        {
+            if (txtUsings.Text.Length > 0)
+            {
+                lslUsing.Items.Add(txtUsings.Text);
+            }
+            txtUsings.Clear();
         }
     }
 }

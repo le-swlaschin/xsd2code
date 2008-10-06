@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by eric vantroeyen (AXILOG) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" id="Actor">
 	<xs:element name="Actor">
 		<xs:annotation>
 			<xs:documentation>
-        Actor class include firstname and lastname
+        Actor pépé class include firstname and lastname (ûàéçè).
       </xs:documentation>
 		</xs:annotation>
 		<xs:complexType>

@@ -9,6 +9,7 @@ namespace Xsd2Code.Library.Extensions
     using System;
     using System.CodeDom;
     using System.Collections;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Reflection;
     using System.Xml.Schema;
@@ -22,6 +23,8 @@ namespace Xsd2Code.Library.Extensions
     /// </summary>
     public class GeneratorExtension : ICodeExtension
     {
+        private static SortedList<string, string> __collectionTypes = new SortedList<string, string>();
+
         /// <summary>
         /// Process method for cs or vb CodeDom generation
         /// </summary>
@@ -29,6 +32,8 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="schema">XmlSchema to generate</param>
         public void Process(CodeNamespace code, XmlSchema schema)
         {
+            __collectionTypes.Clear();
+
             CodeTypeDeclaration[] types = new CodeTypeDeclaration[code.Types.Count];
             code.Types.CopyTo(types, 0);
 
@@ -132,6 +137,21 @@ namespace Xsd2Code.Library.Extensions
                         #endregion
                     }
                 }
+            }
+
+            foreach (string collName in __collectionTypes.Keys)
+            {
+                CodeTypeDeclaration ctd = new CodeTypeDeclaration(collName);
+                ctd.IsClass = true;
+                ctd.BaseTypes.Add(GeneratorContext.CollectionBase + "<" + __collectionTypes[collName] + ">");
+                ctd.IsPartial = true;
+
+                bool newCTor = false;
+                CodeConstructor ctor = this.GetConstructor(ctd, ref newCTor);
+
+                ctd.Members.Add(ctor);
+
+                code.Types.Add(ctd);
             }
         }
 
@@ -461,7 +481,7 @@ namespace Xsd2Code.Library.Extensions
                             setValueCondition[0] = propAssignStatment;
                             setValueCondition[1] = propChange;
 
-                            
+
                             // ---------------------------------------------
                             // if ((xxxField.Equals(value) != true)) { ... }
                             // ---------------------------------------------
@@ -529,22 +549,39 @@ namespace Xsd2Code.Library.Extensions
                 case CollectionType.List:
                     if (GeneratorContext.Language == GenerationLanguage.CSharp)
                     {
-                        collTypeRef = new CodeTypeReference("List <" + baseType + ">");
+                        collTypeRef = new CodeTypeReference("List<" + baseType + ">");
                     }
                     else
                     {
-                        collTypeRef = new CodeTypeReference("List (Of " + baseType + ")");
+                        collTypeRef = new CodeTypeReference("List(Of [" + baseType + "])");
                     }
 
                     break;
                 case CollectionType.ObservableCollection:
                     if (GeneratorContext.Language == GenerationLanguage.CSharp)
                     {
-                        collTypeRef = new CodeTypeReference("ObservableCollection <" + baseType + ">");
+                        collTypeRef = new CodeTypeReference("ObservableCollection<" + baseType + ">");
                     }
                     else
                     {
-                        collTypeRef = new CodeTypeReference("ObservableCollection (Of " + baseType + ")");
+                        collTypeRef = new CodeTypeReference("ObservableCollection(Of [" + baseType + "])");
+                    }
+
+                    break;
+
+                case CollectionType.DefinedType:
+                    string typname= baseType.Replace(".",string.Empty) + "Collection";
+
+                    if (!__collectionTypes.Keys.Contains(typname))
+                        __collectionTypes.Add(typname, baseType);
+
+                    if (GeneratorContext.Language == GenerationLanguage.CSharp)
+                    {
+                        collTypeRef = new CodeTypeReference(typname);
+                    }
+                    else
+                    {
+                        collTypeRef = new CodeTypeReference(typname);
                     }
 
                     break;

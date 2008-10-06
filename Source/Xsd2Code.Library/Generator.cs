@@ -39,7 +39,7 @@ namespace Xsd2Code
         /// <param name="enableSummaryComment">Generate summary comment from schema annotation</param>
         /// <param name="errorMessage">Output error messsage</param>
         /// <returns>if sucess, represents a namespace declaration else the return value is null</returns>
-        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, out string errorMessage)
+        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, out string errorMessage)
         {
             errorMessage = "";
             try
@@ -51,6 +51,8 @@ namespace Xsd2Code
                 GeneratorContext.HidePrivateFieldInIde = hidePrivate;
                 GeneratorContext.Language = language;
                 GeneratorContext.EnableSummaryComment = enableSummaryComment;
+                GeneratorContext.CustomUsings = customUsings;
+                GeneratorContext.CollectionBase = collectionBase;
 
                 using (FileStream fs = new FileStream(xsdFile, FileMode.Open))
                 {
@@ -72,6 +74,12 @@ namespace Xsd2Code
                 ns.Imports.Add(new CodeNamespaceImport("System.Collections"));
                 ns.Imports.Add(new CodeNamespaceImport("System.Xml.Schema"));
                 ns.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
+
+                if (!string.IsNullOrEmpty(customUsings))
+                {
+                    foreach (string s in customUsings.Split(';'))
+                        ns.Imports.Add(new CodeNamespaceImport(s));
+                }
 
                 switch (GeneratorContext.CollectionObjectType)
                 {

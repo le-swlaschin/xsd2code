@@ -51,6 +51,16 @@ namespace Xsd2Code.Library
         /// </summary>
         public const string EnableSummaryCommentTag = "EnableSummaryComment";
 
+        /// <summary>
+        /// List of custom using/import types (, separated)
+        /// </summary>
+        public const string CustomUsingsTag = "CustomUsings";
+
+        /// <summary>
+        /// Base generic type for collections when CollectionType is DefinedType
+        /// </summary>
+        public const string CollectionBaseTag = "CollectionBase";
+
         #region property
         /// <summary>
         /// Gets or sets collection type to use for code generation
@@ -96,6 +106,24 @@ namespace Xsd2Code.Library
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets collection base
+        /// </summary>
+        public static string CollectionBase
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets custom usings
+        /// </summary>
+        public static string CustomUsings
+        {
+            get;
+            set;
+        }
         #endregion
 
         #region Method
@@ -120,6 +148,11 @@ namespace Xsd2Code.Library
             if (p == CollectionType.ObservableCollection.ToString())
             {
                 returnValue = CollectionType.ObservableCollection;
+            }
+
+            if (p == CollectionType.DefinedType.ToString())
+            {
+                returnValue = CollectionType.DefinedType;
             }
 
             return returnValue;

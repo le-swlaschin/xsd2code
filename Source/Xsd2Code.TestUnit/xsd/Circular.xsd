@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by eric vantroeyen (AXILOG) -->
 <xs:schema targetNamespace="http://tempuri.org/EtudeData.xsd" xmlns:NameSpace1="http://www.axilog.fr" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mstns="http://tempuri.org/EtudeData.xsd" xmlns="http://tempuri.org/EtudeData.xsd" elementFormDefault="qualified" id="EtudeData">
   <xs:element name="ROOT">
     <xs:annotation>

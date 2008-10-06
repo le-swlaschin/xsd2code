@@ -51,7 +51,12 @@ namespace Xsd2Code.Library
         /// <summary>
         /// Generic list for notifications when items get added, removed, or when the whole list is refreshed
         /// </summary>
-        ObservableCollection
+        ObservableCollection,
+
+        /// <summary>
+        /// Defined type for each specialized collection with designer and base files
+        /// </summary>
+        DefinedType
     }
     #endregion
 
@@ -100,6 +105,16 @@ namespace Xsd2Code.Library
         /// Indicates if generate summary comment
         /// </summary>
         private bool enableSummaryCommentField;
+
+        /// <summary>
+        /// List of custom usings to include in the file
+        /// </summary>
+        private string customUsingsField;
+
+        /// <summary>
+        /// Name of the generic type to use for collections
+        /// </summary>
+        private string collectionBaseField;
         #endregion
 
         #region Class constructor
@@ -113,7 +128,7 @@ namespace Xsd2Code.Library
         /// <param name="enableDataBinding">Indicates whether the generation implement the change notification</param>
         /// <param name="hidePrivate">Indicates if generate EditorBrowsableState.Never attribute</param>
         /// <param name="enableSummaryComment">Enable summary comment from XmlSchema annotation</param>
-        public GeneratorFacade(string inputFile, string nameSpace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment)
+        public GeneratorFacade(string inputFile, string nameSpace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase)
         {
             this.inputFileField = inputFile;
             this.nameSpaceField = nameSpace;
@@ -122,6 +137,8 @@ namespace Xsd2Code.Library
             this.enableDataBindingField = enableDataBinding;
             this.hidePrivateField = hidePrivate;
             this.enableSummaryCommentField = enableSummaryComment;
+            this.customUsingsField = customUsings;
+            this.collectionBaseField = collectionBase;
 
             switch (language)
             {
@@ -176,10 +193,11 @@ namespace Xsd2Code.Library
         /// </summary>
         /// <param name="errorMessage">Output error message if return false else empty string.</param>
         /// <returns>true if sucess or false.</returns>
-        public bool Process(out string errorMessage)
+        public bool Process(out string OutputFileName, out string errorMessage)
         {
             CodeDomProvider provider;
             errorMessage = "";
+            OutputFileName = "";
 
             #region Change CurrentDir for include schema resolution.
             string savedCurrentDir = Directory.GetCurrentDirectory();
@@ -213,7 +231,7 @@ namespace Xsd2Code.Library
                     }
 
                     CodeGeneratorOptions codeOption = new CodeGeneratorOptions();
-                    CodeNamespace ns = Generator.Process(this.inputFileField, this.nameSpaceField, this.languageField, this.collectionField, this.enableDataBindingField, this.hidePrivateField, this.enableSummaryCommentField, out errorMessage);
+                    CodeNamespace ns = Generator.Process(this.inputFileField, this.nameSpaceField, this.languageField, this.collectionField, this.enableDataBindingField, this.hidePrivateField, this.enableSummaryCommentField,this.customUsingsField,this.collectionBaseField, out errorMessage);
                     if (ns == null)
                     {
                         return false;
@@ -248,8 +266,9 @@ namespace Xsd2Code.Library
                         return false;
                     }
                 }
+                OutputFileName = this.outputFileField;
 
-                #region Insert tag for futur generation
+                #region Insert tag for future generation
                 StreamWriter swend = new StreamWriter(this.outputFileField, false);
                 string commentStr;
                 commentStr = this.languageField == GenerationLanguage.CSharp ? "// " : "'' ";
@@ -268,6 +287,8 @@ namespace Xsd2Code.Library
                 optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.EnableDataBindingTag, this.enableDataBindingField.ToString());
                 optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.HidePrivateFieldTag, this.hidePrivateField.ToString());
                 optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.EnableSummaryCommentTag, this.enableSummaryCommentField.ToString());
+                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CustomUsingsTag, this.customUsingsField.ToString());
+                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CollectionBaseTag, this.collectionBaseField.ToString());
 
                 swend.WriteLine(optionsLine);
                 swend.WriteLine(string.Format("{0} <auto-generated>", commentStr));

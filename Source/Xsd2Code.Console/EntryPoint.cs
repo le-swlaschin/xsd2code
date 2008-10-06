@@ -52,9 +52,18 @@ namespace Xsd2Code
             if (args.Length > 6)
                 HidePrivateFieldInIDE = args[6] == "HideInIde";
 
-            GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false);
+            string customUsings = string.Empty;
+            if (args.Length > 7)
+                customUsings = args[7];
+
+            string collectionBase = string.Empty;
+            if (args.Length > 8)
+                collectionBase = args[8];
+
+            GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false,customUsings,collectionBase);
             string ErrorMessage = "";
-            if (!gen.Process(out ErrorMessage))
+            string OutputFileName = "";
+            if (!gen.Process(out OutputFileName, out ErrorMessage))
             {
                 Console.WriteLine(ErrorMessage);
                 return;

@@ -14,7 +14,7 @@ using Xsd2Code.Library;
 namespace Xsd2Code.TestUnit
 {
     /// <summary>
-    /// Summary description for UnitTest1
+    /// Summary description for UnitTest1 (איû)
     /// </summary>
     [TestClass]
     public class UnitTest
@@ -62,8 +62,10 @@ namespace Xsd2Code.TestUnit
 
             string FileName = DirOutput + "Circular.xsd";
             string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
-            if (!xsdGen.Process(out ErrorMessage))
+            string OutputFileName = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
+            
+            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
@@ -87,8 +89,9 @@ namespace Xsd2Code.TestUnit
 
             string FileName = DirOutput + "Dvd.xsd";
             string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
-            if (!xsdGen.Process(out ErrorMessage))
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
+            string OutputFileName;
+            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
@@ -104,8 +107,9 @@ namespace Xsd2Code.TestUnit
 
             string FileName = DirOutput + "Hierarchical.xsd";
             string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true);
-            if (!xsdGen.Process(out ErrorMessage))
+            string OutputFileName = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
+            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
