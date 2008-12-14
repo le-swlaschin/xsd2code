@@ -26,6 +26,11 @@ namespace Xsd2Code.Addin
         private bool _EnableSummaryComment;
         private List<string> _CustomUsings = new List<string>();
         private string _CollectionBase;
+        private bool _IncludeSerializeMethod;
+        private string _SerializeMethodName;
+        private string _DeserializeMethodName;
+        private string _SaveTofileMethodName;
+        private string _LoadFromFileMethodName;
         #endregion
 
         #region Property
@@ -49,7 +54,6 @@ namespace Xsd2Code.Addin
                 _NameSpace = value;
                 txtNameSpace.Text = value;
             }
-
         }
         public GenerationLanguage GenerateCodeType
         {
@@ -91,6 +95,16 @@ namespace Xsd2Code.Addin
             }
         }
 
+        public bool IncludeSerializeMethod
+        {
+            get { return _IncludeSerializeMethod; }
+            set
+            {
+                _IncludeSerializeMethod = value;
+                chkSerializeMethod.Checked = _IncludeSerializeMethod;
+            }
+        }
+
         public bool EnableSummaryComment
         {
             get { return _EnableSummaryComment; }
@@ -120,6 +134,45 @@ namespace Xsd2Code.Addin
             }
         }
 
+        public string SerializeMethodName
+        {
+            get { return _SerializeMethodName; }
+            set
+            {
+                _SerializeMethodName = value;
+                txtSerializeMethodName.Text = _SerializeMethodName;
+            }
+        }
+
+        public string DeserializeMethodName
+        {
+            get { return _DeserializeMethodName; }
+            set
+            {
+                _DeserializeMethodName = value;
+                txtDeserializeMethodName.Text = _DeserializeMethodName;
+            }
+        }
+
+
+        public string SaveTofileMethodName
+        {
+            get { return _SaveTofileMethodName; }
+            set
+            {
+                _SaveTofileMethodName = value;
+                txtSaveToFileMethodName.Text = _SaveTofileMethodName;
+            }
+        }
+        public string LoadFromFileMethodName
+        {
+            get { return _LoadFromFileMethodName; }
+            set
+            {
+                _LoadFromFileMethodName = value;
+                txtLoadFromFileMethodName.Text = _LoadFromFileMethodName;
+            }
+        }
         #endregion
 
         #region cTor
@@ -129,12 +182,16 @@ namespace Xsd2Code.Addin
         public FormOption()
         {
             InitializeComponent();
+            SerializeMethodName = "Serialize";
+            DeserializeMethodName = "Deserialize";
+
             cbxCollection.Items.Add(CollectionType.List.ToString());
             cbxCollection.Items.Add(CollectionType.ObservableCollection.ToString());
             cbxCollection.Items.Add(CollectionType.DefinedType.ToString());
             cbxCollection.Items.Add(CollectionType.Array.ToString());
             cbxCodeType.Items.Add(GenerationLanguage.CSharp.ToString());
             cbxCodeType.Items.Add(GenerationLanguage.VisualBasic.ToString());
+            cbxCodeType.Items.Add(GenerationLanguage.VisualCpp.ToString());
         }
         #endregion
 
@@ -144,6 +201,7 @@ namespace Xsd2Code.Addin
         /// </summary>
         public void Init(string XSDFilePath)
         {
+            // TODO:Change this to default project code langage.
             #region Search generationFile
             _OutputFile = string.Empty;
             string csFileName = XSDFilePath.Replace(".xsd", ".cs");
@@ -155,10 +213,19 @@ namespace Xsd2Code.Addin
             else
             {
                 string vbFileName = XSDFilePath.Replace(".xsd", ".vb");
-                FileInfo vbFile = new FileInfo(csFileName);
-                if (CsFile.Exists)
+                FileInfo vbFile = new FileInfo(vbFileName);
+                if (vbFile.Exists)
                 {
-                    OutputFile = csFileName;
+                    OutputFile = vbFileName;
+                }
+                else
+                {
+                    string cppFileName = XSDFilePath.Replace(".xsd", ".cpp");
+                    FileInfo cppFile = new FileInfo(cppFileName);
+                    if (cppFile.Exists)
+                    {
+                        OutputFile = cppFileName;
+                    }
                 }
             }
             if (OutputFile.Length == 0)
@@ -169,6 +236,7 @@ namespace Xsd2Code.Addin
             #region Try to get Last options
             using (TextReader streamReader = new StreamReader(OutputFile))
             {
+                // TODO:Change this to search method
                 streamReader.ReadLine();
                 streamReader.ReadLine();
                 streamReader.ReadLine();
@@ -181,6 +249,32 @@ namespace Xsd2Code.Addin
                     UseIPropertyNotifyChanged = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableDataBindingTag));
                     HidePrivateFieldInIDE = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.HidePrivateFieldTag));
                     EnableSummaryComment = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableSummaryCommentTag));
+                    IncludeSerializeMethod = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.IncludeSerializeMethodTag));
+
+                    string str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.SerializeMethodNameTag);
+                    if (str.Length > 0)
+                    {
+                        SerializeMethodName = str;
+                    }
+
+                    str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.DeserializeMethodNameTag);
+                    if (str.Length > 0)
+                    {
+                        DeserializeMethodName = str;
+                    }
+                    
+                    str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.SaveToFileMethodNameTag);
+                    if (str.Length > 0)
+                    {
+                        SaveTofileMethodName = str;
+                    }
+
+                    str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.LoadFromFileMethodNameTag);
+                    if (str.Length > 0)
+                    {
+                        LoadFromFileMethodName = str;
+                    }
+
                     String[] usingList = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CustomUsingsTag).Split(';');
                     foreach (var item in usingList)
                     {
@@ -190,12 +284,11 @@ namespace Xsd2Code.Addin
                             lslUsing.Items.Add(item);
                         }
                     }
-                    
+
                     CollectionBase = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CollectionBaseTag);
                 }
             }
             #endregion
-
         }
         /// <summary>
         /// Cancel the validation
@@ -217,28 +310,61 @@ namespace Xsd2Code.Addin
             if (txtNameSpace.Text.Length == 0)
             {
                 MessageBox.Show("you must specify the NameSpace");
+                txtNameSpace.Focus();
                 return;
             }
 
             if (cbxCollection.Text.Length == 0)
             {
                 MessageBox.Show("you must specify the collection type");
+                cbxCollection.Focus();
                 return;
             }
 
             if (cbxCodeType.Text.Length == 0)
             {
                 MessageBox.Show("you must specify the code type");
+                cbxCodeType.Focus();
                 return;
             }
 
             if (cbxCollection.Text == CollectionType.DefinedType.ToString())
+            {
                 if (string.IsNullOrEmpty(txtCollectionBase.Text))
                 {
                     MessageBox.Show("you must specify the custom collection base type");
+                    txtCollectionBase.Focus();
                     return;
                 }
+            }
 
+            if (chkSerializeMethod.Checked)
+            {
+                if (string.IsNullOrEmpty(txtSerializeMethodName.Text))
+                {
+                    MessageBox.Show("you must specify the Serialize method name.");
+                    txtSerializeMethodName.Focus();
+                    return;
+                }
+                if (string.IsNullOrEmpty(txtDeserializeMethodName.Text))
+                {
+                    MessageBox.Show("you must specify the Deserialize method name.");
+                    txtDeserializeMethodName.Focus();
+                    return;
+                }
+                if (string.IsNullOrEmpty(txtSaveToFileMethodName.Text))
+                {
+                    MessageBox.Show("you must specify the save to xml file method name.");
+                    txtSaveToFileMethodName.Focus();
+                    return;
+                }
+                if (string.IsNullOrEmpty(txtLoadFromFileMethodName.Text))
+                {
+                    MessageBox.Show("you must specify the load from xml file method name.");
+                    txtLoadFromFileMethodName.Focus();
+                    return;
+                }
+            }
             #endregion
 
             #region SetProperty
@@ -262,10 +388,18 @@ namespace Xsd2Code.Addin
             if (cbxCodeType.Text == GenerationLanguage.VisualBasic.ToString())
                 _GenerateCodeType = GenerationLanguage.VisualBasic;
 
+            if (cbxCodeType.Text == GenerationLanguage.VisualCpp.ToString())
+                _GenerateCodeType = GenerationLanguage.VisualCpp;
+
             _UseIPropertyNotifyChanged = chkIPropertyNotifyChanged.Checked;
             _HidePrivateFieldInIDE = chkHideInIDE.Checked;
             _EnableSummaryComment = chkEnableSummaryComment.Checked;
+            _IncludeSerializeMethod = chkSerializeMethod.Checked;
             _CollectionBase = txtCollectionBase.Text;
+            _SerializeMethodName = txtSerializeMethodName.Text;
+            _DeserializeMethodName = txtDeserializeMethodName.Text;
+            _SaveTofileMethodName = txtSaveToFileMethodName.Text;
+            _LoadFromFileMethodName = txtLoadFromFileMethodName.Text;
             _CustomUsings.Clear();
             foreach (var strUsing in lslUsing.Items)
             {
@@ -285,12 +419,18 @@ namespace Xsd2Code.Addin
         /// <param name="e">EventArgs param</param>
         private void FormOption_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Escape)
+            int ascii = Convert.ToInt16(e.KeyChar);
+            if (ascii == 27)
             {
                 Close();
             }
         }
 
+        /// <summary>
+        /// Text change event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbxCollection_TextChanged(object sender, EventArgs e)
         {
             txtCollectionBase.Enabled = (cbxCollection.Text == CollectionType.DefinedType.ToString());
@@ -339,6 +479,36 @@ namespace Xsd2Code.Addin
                 lslUsing.Items.Add(txtUsings.Text);
             }
             txtUsings.Clear();
+        }
+        /// <summary>
+        /// Enable disable SerializeMethodName.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void chkSerializeMethod_CheckedChanged(object sender, EventArgs e)
+        {
+            txtSerializeMethodName.Enabled = chkSerializeMethod.Checked;
+            txtDeserializeMethodName.Enabled = chkSerializeMethod.Checked;
+            txtSaveToFileMethodName.Enabled = chkSerializeMethod.Checked;
+            txtLoadFromFileMethodName.Enabled = chkSerializeMethod.Checked;
+        }
+
+        /// <summary>
+        /// Filter input
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ValidateInput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            int ascii = Convert.ToInt16(e.KeyChar);
+            if ((ascii >= 65 && ascii <= 90) || (ascii >= 97 && ascii <= 122) || (ascii == 8))
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.Handled = true;
+            }
         }
     }
 }

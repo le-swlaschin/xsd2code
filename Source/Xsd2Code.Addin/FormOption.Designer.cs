@@ -33,6 +33,16 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnGenerate = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.txtLoadFromFileMethodName = new System.Windows.Forms.TextBox();
+            this.txtSaveToFileMethodName = new System.Windows.Forms.TextBox();
+            this.lblLoadFromFile = new System.Windows.Forms.Label();
+            this.lblSaveToFile = new System.Windows.Forms.Label();
+            this.txtDeserializeMethodName = new System.Windows.Forms.TextBox();
+            this.txtSerializeMethodName = new System.Windows.Forms.TextBox();
+            this.lblDeserialize = new System.Windows.Forms.Label();
+            this.lblSerialize = new System.Windows.Forms.Label();
+            this.chkSerializeMethod = new System.Windows.Forms.CheckBox();
             this.chkEnableSummaryComment = new System.Windows.Forms.CheckBox();
             this.chkHideInIDE = new System.Windows.Forms.CheckBox();
             this.chkIPropertyNotifyChanged = new System.Windows.Forms.CheckBox();
@@ -62,7 +72,7 @@
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Controls.Add(this.btnGenerate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 354);
+            this.panel1.Location = new System.Drawing.Point(0, 487);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(456, 32);
             this.panel1.TabIndex = 2;
@@ -90,15 +100,128 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.panel2);
+            this.groupBox1.Controls.Add(this.txtLoadFromFileMethodName);
+            this.groupBox1.Controls.Add(this.txtSaveToFileMethodName);
+            this.groupBox1.Controls.Add(this.lblLoadFromFile);
+            this.groupBox1.Controls.Add(this.lblSaveToFile);
+            this.groupBox1.Controls.Add(this.txtDeserializeMethodName);
+            this.groupBox1.Controls.Add(this.txtSerializeMethodName);
+            this.groupBox1.Controls.Add(this.lblDeserialize);
+            this.groupBox1.Controls.Add(this.lblSerialize);
+            this.groupBox1.Controls.Add(this.chkSerializeMethod);
             this.groupBox1.Controls.Add(this.chkEnableSummaryComment);
             this.groupBox1.Controls.Add(this.chkHideInIDE);
             this.groupBox1.Controls.Add(this.chkIPropertyNotifyChanged);
-            this.groupBox1.Location = new System.Drawing.Point(15, 256);
+            this.groupBox1.Location = new System.Drawing.Point(15, 259);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(429, 87);
+            this.groupBox1.Size = new System.Drawing.Size(429, 217);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Location = new System.Drawing.Point(21, 107);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(2, 100);
+            this.panel2.TabIndex = 25;
+            // 
+            // txtLoadFromFileMethodName
+            // 
+            this.txtLoadFromFileMethodName.Enabled = false;
+            this.txtLoadFromFileMethodName.Location = new System.Drawing.Point(188, 187);
+            this.txtLoadFromFileMethodName.MaxLength = 50;
+            this.txtLoadFromFileMethodName.Name = "txtLoadFromFileMethodName";
+            this.txtLoadFromFileMethodName.Size = new System.Drawing.Size(236, 20);
+            this.txtLoadFromFileMethodName.TabIndex = 24;
+            this.txtLoadFromFileMethodName.Text = "LoadFromFile";
+            this.txtLoadFromFileMethodName.WordWrap = false;
+            this.txtLoadFromFileMethodName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateInput_KeyPress);
+            // 
+            // txtSaveToFileMethodName
+            // 
+            this.txtSaveToFileMethodName.Enabled = false;
+            this.txtSaveToFileMethodName.Location = new System.Drawing.Point(188, 161);
+            this.txtSaveToFileMethodName.MaxLength = 50;
+            this.txtSaveToFileMethodName.Name = "txtSaveToFileMethodName";
+            this.txtSaveToFileMethodName.Size = new System.Drawing.Size(236, 20);
+            this.txtSaveToFileMethodName.TabIndex = 23;
+            this.txtSaveToFileMethodName.Text = "SaveToFile";
+            this.txtSaveToFileMethodName.WordWrap = false;
+            this.txtSaveToFileMethodName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateInput_KeyPress);
+            // 
+            // lblLoadFromFile
+            // 
+            this.lblLoadFromFile.AutoSize = true;
+            this.lblLoadFromFile.Location = new System.Drawing.Point(35, 190);
+            this.lblLoadFromFile.Name = "lblLoadFromFile";
+            this.lblLoadFromFile.Size = new System.Drawing.Size(143, 13);
+            this.lblLoadFromFile.TabIndex = 22;
+            this.lblLoadFromFile.Text = "Load from file method name :";
+            // 
+            // lblSaveToFile
+            // 
+            this.lblSaveToFile.AutoSize = true;
+            this.lblSaveToFile.Location = new System.Drawing.Point(35, 164);
+            this.lblSaveToFile.Name = "lblSaveToFile";
+            this.lblSaveToFile.Size = new System.Drawing.Size(133, 13);
+            this.lblSaveToFile.TabIndex = 21;
+            this.lblSaveToFile.Text = "Save to file method name :";
+            // 
+            // txtDeserializeMethodName
+            // 
+            this.txtDeserializeMethodName.Enabled = false;
+            this.txtDeserializeMethodName.Location = new System.Drawing.Point(188, 136);
+            this.txtDeserializeMethodName.MaxLength = 50;
+            this.txtDeserializeMethodName.Name = "txtDeserializeMethodName";
+            this.txtDeserializeMethodName.Size = new System.Drawing.Size(235, 20);
+            this.txtDeserializeMethodName.TabIndex = 19;
+            this.txtDeserializeMethodName.Text = "Deserialize";
+            this.txtDeserializeMethodName.WordWrap = false;
+            this.txtDeserializeMethodName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateInput_KeyPress);
+            // 
+            // txtSerializeMethodName
+            // 
+            this.txtSerializeMethodName.Enabled = false;
+            this.txtSerializeMethodName.Location = new System.Drawing.Point(188, 110);
+            this.txtSerializeMethodName.MaxLength = 50;
+            this.txtSerializeMethodName.Name = "txtSerializeMethodName";
+            this.txtSerializeMethodName.Size = new System.Drawing.Size(235, 20);
+            this.txtSerializeMethodName.TabIndex = 18;
+            this.txtSerializeMethodName.Text = "Serialize";
+            this.txtSerializeMethodName.WordWrap = false;
+            this.txtSerializeMethodName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateInput_KeyPress);
+            // 
+            // lblDeserialize
+            // 
+            this.lblDeserialize.AutoSize = true;
+            this.lblDeserialize.Location = new System.Drawing.Point(35, 139);
+            this.lblDeserialize.Name = "lblDeserialize";
+            this.lblDeserialize.Size = new System.Drawing.Size(131, 13);
+            this.lblDeserialize.TabIndex = 17;
+            this.lblDeserialize.Text = "Deserialize method name :";
+            // 
+            // lblSerialize
+            // 
+            this.lblSerialize.AutoSize = true;
+            this.lblSerialize.Location = new System.Drawing.Point(35, 113);
+            this.lblSerialize.Name = "lblSerialize";
+            this.lblSerialize.Size = new System.Drawing.Size(119, 13);
+            this.lblSerialize.TabIndex = 16;
+            this.lblSerialize.Text = "Serialize method name :";
+            // 
+            // chkSerializeMethod
+            // 
+            this.chkSerializeMethod.AutoSize = true;
+            this.chkSerializeMethod.Location = new System.Drawing.Point(17, 88);
+            this.chkSerializeMethod.Name = "chkSerializeMethod";
+            this.chkSerializeMethod.Size = new System.Drawing.Size(202, 17);
+            this.chkSerializeMethod.TabIndex = 3;
+            this.chkSerializeMethod.Text = "Generate serialize/deserialize method";
+            this.chkSerializeMethod.UseVisualStyleBackColor = true;
+            this.chkSerializeMethod.CheckedChanged += new System.EventHandler(this.chkSerializeMethod_CheckedChanged);
             // 
             // chkEnableSummaryComment
             // 
@@ -181,7 +304,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 22);
+            this.label3.Location = new System.Drawing.Point(14, 25);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(59, 13);
             this.label3.TabIndex = 9;
@@ -203,7 +326,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(10, 49);
+            this.label5.Location = new System.Drawing.Point(14, 52);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(83, 13);
             this.label5.TabIndex = 14;
@@ -231,7 +354,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(25, 234);
+            this.label4.Location = new System.Drawing.Point(29, 234);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(83, 13);
             this.label4.TabIndex = 15;
@@ -242,9 +365,9 @@
             this.lslUsing.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lslUsing.ContextMenuStrip = this.popUsing;
             this.lslUsing.FormattingEnabled = true;
-            this.lslUsing.Location = new System.Drawing.Point(116, 156);
+            this.lslUsing.Location = new System.Drawing.Point(28, 156);
             this.lslUsing.Name = "lslUsing";
-            this.lslUsing.Size = new System.Drawing.Size(322, 67);
+            this.lslUsing.Size = new System.Drawing.Size(410, 67);
             this.lslUsing.TabIndex = 17;
             // 
             // popUsing
@@ -276,13 +399,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(456, 386);
+            this.ClientSize = new System.Drawing.Size(456, 519);
             this.Controls.Add(this.lslUsing);
             this.Controls.Add(this.btnAddUsing);
             this.Controls.Add(this.txtUsings);
             this.Controls.Add(this.Collection);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.cbxCodeType);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtNameSpace);
             this.Controls.Add(this.lblNameSpace);
@@ -292,7 +415,7 @@
             this.Name = "FormOption";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Xsd2Code Generator";
+            this.Text = "Xsd2Code Generator 2.6";
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormOption_KeyPress);
             this.panel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
@@ -329,6 +452,16 @@
         private System.Windows.Forms.ContextMenuStrip popUsing;
         private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem;
         private System.Windows.Forms.Button btnAddUsing;
+        private System.Windows.Forms.TextBox txtDeserializeMethodName;
+        private System.Windows.Forms.TextBox txtSerializeMethodName;
+        private System.Windows.Forms.Label lblDeserialize;
+        private System.Windows.Forms.Label lblSerialize;
+        private System.Windows.Forms.CheckBox chkSerializeMethod;
+        private System.Windows.Forms.TextBox txtLoadFromFileMethodName;
+        private System.Windows.Forms.TextBox txtSaveToFileMethodName;
+        private System.Windows.Forms.Label lblLoadFromFile;
+        private System.Windows.Forms.Label lblSaveToFile;
+        private System.Windows.Forms.Panel panel2;
 
     }
 }

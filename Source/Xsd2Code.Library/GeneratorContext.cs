@@ -4,12 +4,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-//-----------------------------------------------------------------------
-// <copyright file="GeneratorContext.cs" company="Xsd2Code">
-//     copyright Pascal Cabanel.
-// </copyright>
-//-----------------------------------------------------------------------
-
 namespace Xsd2Code.Library
 {
     using System;
@@ -61,6 +55,31 @@ namespace Xsd2Code.Library
         /// </summary>
         public const string CollectionBaseTag = "CollectionBase";
 
+        /// <summary>
+        /// Enable serialize/deserialize generation methode
+        /// </summary>
+        public const string IncludeSerializeMethodTag = "IncludeSerializeMethod";
+
+        /// <summary>
+        /// Name of Serialize method
+        /// </summary>
+        public const string SerializeMethodNameTag = "SerializeMethodName";
+
+        /// <summary>
+        /// Name of Deserialize method
+        /// </summary>
+        public const string DeserializeMethodNameTag = "DeserializeMethodName";
+
+        /// <summary>
+        /// Name of Serialize method
+        /// </summary>
+        public const string SaveToFileMethodNameTag = "SaveToFileMethodName";
+
+        /// <summary>
+        /// Name of Deserialize method
+        /// </summary>
+        public const string LoadFromFileMethodNameTag = "LoadFromFileMethodName";
+
         #region property
         /// <summary>
         /// Gets or sets collection type to use for code generation
@@ -81,6 +100,33 @@ namespace Xsd2Code.Library
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether serialize/deserialize method support
+        /// </summary>
+        public static bool IncludeSerializeMethod
+        {
+            get;
+            set;
+        }
+           
+        /// <summary>
+        /// Gets or sets a value indicating the name of Serialize method.
+        /// </summary>
+        public static string SerializeMethodName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating the name of Deserialize method.
+        /// </summary>
+        public static string DeserializeMethodName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
         /// </summary>
         public static bool HidePrivateFieldInIde
@@ -88,7 +134,25 @@ namespace Xsd2Code.Library
             get;
             set;
         }
-        
+
+        /// <summary>
+        /// Gets or sets a value indicating the name of Serialize method.
+        /// </summary>
+        public static string SaveToFileMethodName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating the name of SaveToFile method.
+        /// </summary>
+        public static string LoadFromFileMethodName
+        {
+            get;
+            set;
+        }
+      
         /// <summary>
         /// Gets or sets a value indicating whether if generate summary documentation
         /// </summary>

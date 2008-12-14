@@ -17,13 +17,18 @@ namespace Xsd2Code.Library.Extensions
     using System.Xml;
     using System.Configuration;
     using Xsd2Code.Library.Helpers;
+    using System.Xml.Serialization;
+    using System.IO;
 
     /// <summary>
     /// Convertion des array properties en collection
     /// </summary>
     public class GeneratorExtension : ICodeExtension
     {
-        private static SortedList<string, string> __collectionTypes = new SortedList<string, string>();
+        /// <summary>
+        /// Sorted list for custom collection
+        /// </summary>
+        private static SortedList<string, string> collectionTypesField = new SortedList<string, string>();
 
         /// <summary>
         /// Process method for cs or vb CodeDom generation
@@ -32,7 +37,7 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="schema">XmlSchema to generate</param>
         public void Process(CodeNamespace code, XmlSchema schema)
         {
-            __collectionTypes.Clear();
+            collectionTypesField.Clear();
 
             CodeTypeDeclaration[] types = new CodeTypeDeclaration[code.Types.Count];
             code.Types.CopyTo(types, 0);
@@ -104,7 +109,6 @@ namespace Xsd2Code.Library.Extensions
                         cme.Attributes = MemberAttributes.Final | MemberAttributes.Public;
                         cme.Name = "PropertyChanged";
                         cme.Type = new CodeTypeReference(typeof(PropertyChangedEventHandler));
-                        cme.ImplementationTypes.Add(typeof(INotifyPropertyChanged));
                         type.Members.Add(cme);
                         #endregion
 
@@ -121,7 +125,7 @@ namespace Xsd2Code.Library.Extensions
                         propChanged.Name = "OnPropertyChanged";
                         propChanged.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "info"));
 
-                        if (GeneratorContext.Language == GenerationLanguage.CSharp)
+                        if (GeneratorContext.Language == GenerationLanguage.CSharp || GeneratorContext.Language == GenerationLanguage.VisualCpp)
                         {
                             propChanged.Statements.Add(new CodeExpressionStatement(new CodeSnippetExpression("PropertyChangedEventHandler handler = PropertyChanged")));
                             CodeExpressionStatement cs1 = new CodeExpressionStatement(new CodeSnippetExpression("handler(this, new PropertyChangedEventArgs(info))"));
@@ -136,23 +140,58 @@ namespace Xsd2Code.Library.Extensions
                         type.Members.Add(propChanged);
                         #endregion
                     }
+
+                    if (GeneratorContext.IncludeSerializeMethod)
+                    {
+                        type.Members.Add(CodeDomHelper.GetSerializeCodeDomMethod(type));
+                        type.Members.Add(CodeDomHelper.GetDeserialize(type));
+                        type.Members.Add(CodeDomHelper.GetSaveToFileCodeDomMethod(type));
+                        type.Members.Add(CodeDomHelper.GetLoadFromFileCodeDomMethod(type));
+                    }
+
+                    #region Clone
+                    /* Prepare for next release 2.8!
+                    CodeMemberMethod cloneMethod = new CodeMemberMethod();
+                    cloneMethod.Attributes = MemberAttributes.Public;
+                    cloneMethod.Name = "Clone";
+                    cloneMethod.ReturnType = new CodeTypeReference(typeof(object));
+
+                    cloneMethod.Statements.Add(new CodeVariableDeclarationStatement(
+                    new CodeTypeReference(type.Name), "cloneObject", new CodeObjectCreateExpression(new CodeTypeReference(type.Name))));
+
+                    foreach (CodeTypeMember member in type.Members)
+                    {
+                        #region Process Fields
+                        if (member is CodeMemberProperty)
+                        {
+                            CodeMemberProperty cmp = member as CodeMemberProperty;
+                            CodeAssignStatement cdtAssignStmt = new CodeAssignStatement(new CodeSnippetExpression(string.Format("cloneObject.{0}", member.Name)), new CodeFieldReferenceExpression( new CodeThisReferenceExpression(), member.Name));
+                            cloneMethod.Statements.Add(cdtAssignStmt);
+                        }
+                        #endregion
+                    }
+                    cloneMethod.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("cloneObject")));
+                    type.Members.Add(cloneMethod);
+                    */
+                    #endregion Clone
                 }
             }
 
-            foreach (string collName in __collectionTypes.Keys)
+            #region Custom Collection
+            foreach (string collName in collectionTypesField.Keys)
             {
                 CodeTypeDeclaration ctd = new CodeTypeDeclaration(collName);
                 ctd.IsClass = true;
-                ctd.BaseTypes.Add(GeneratorContext.CollectionBase + "<" + __collectionTypes[collName] + ">");
+                ctd.BaseTypes.Add(GeneratorContext.CollectionBase + "<" + collectionTypesField[collName] + ">");
                 ctd.IsPartial = true;
 
                 bool newCTor = false;
                 CodeConstructor ctor = this.GetConstructor(ctd, ref newCTor);
 
                 ctd.Members.Add(ctor);
-
                 code.Types.Add(ctd);
             }
+            #endregion
         }
 
         /// <summary>
@@ -448,6 +487,7 @@ namespace Xsd2Code.Library.Extensions
             #endregion
 
             CodeMemberProperty prop = (CodeMemberProperty)member;
+
             if (prop.Type.ArrayElementType != null)
             {
                 CodeTypeReference colType = GetCollectionType(prop.Type.BaseType);
@@ -467,8 +507,10 @@ namespace Xsd2Code.Library.Extensions
                     // if (handler != null) {
                     //    OnPropertyChanged("Name");
                     // -----------------------------
-                    CodeExpressionStatement propChange = new CodeExpressionStatement(new CodeSnippetExpression("OnPropertyChanged(\"" + prop.Name + "\")"));
-
+                    //CodeExpressionStatement propChange = new CodeExpressionStatement(new CodeSnippetExpression("OnPropertyChanged(\"" + prop.Name + "\")"));
+                    //CodeMethodInvokeExpression canDeserialize = CodeDomHelper.GetInvokeMethod("xmlSerializer", "CanDeserialize", new CodeExpression[] { new CodeSnippetExpression("xmlTextReader") });
+                    CodeMethodInvokeExpression propChange = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "OnPropertyChanged"), new CodeExpression[] { new CodeSnippetExpression("\"" + prop.Name + "\"") });
+                    
                     CodeAssignStatement propAssignStatment = prop.SetStatements[0] as CodeAssignStatement;
                     if (propAssignStatment != null)
                     {
@@ -477,10 +519,14 @@ namespace Xsd2Code.Library.Extensions
 
                         if (cfreL != null)
                         {
+                            CodeStatementCollection setValueCondition = new CodeStatementCollection();
+                            setValueCondition.Add(propAssignStatment);
+                            setValueCondition.Add(propChange);
+                            /*
                             CodeStatement[] setValueCondition = new CodeStatement[2];
                             setValueCondition[0] = propAssignStatment;
                             setValueCondition[1] = propChange;
-
+                            */
 
                             // ---------------------------------------------
                             // if ((xxxField.Equals(value) != true)) { ... }
@@ -495,15 +541,25 @@ namespace Xsd2Code.Library.Extensions
                                                                                    cfreR),
                                                                              CodeBinaryOperatorType.IdentityInequality,
                                                                              new CodePrimitiveExpression(true)),
-                                                                             setValueCondition);
+                                                                             CodeDomHelper.CodeStmtColToArray(setValueCondition));
 
                             // ---------------------------------------------
                             // if ((xxxField != null)) { ... }
                             // ---------------------------------------------
-                            CodeConditionStatement condStatmentCondNotNull = new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), cfreL.FieldName), CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null)), new CodeStatement[] { condStatmentCondEquals }, setValueCondition);
+                            CodeConditionStatement condStatmentCondNotNull = new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), cfreL.FieldName), CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null)), new CodeStatement[] { condStatmentCondEquals }, CodeDomHelper.CodeStmtColToArray(setValueCondition));
 
+                            CodeMemberProperty property = member as CodeMemberProperty;
 
-                            prop.SetStatements[0] = condStatmentCondNotNull;
+                            if (property.Type.BaseType != new CodeTypeReference(typeof(long)).BaseType &&
+                                property.Type.BaseType != new CodeTypeReference(typeof(int)).BaseType &&
+                                property.Type.BaseType != new CodeTypeReference(typeof(bool)).BaseType)
+                            {
+                                prop.SetStatements[0] = condStatmentCondNotNull;
+                            }
+                            else
+                            {
+                                prop.SetStatements[0] = condStatmentCondEquals;
+                            }
                         }
                         else
                         {
@@ -547,43 +603,22 @@ namespace Xsd2Code.Library.Extensions
             switch (GeneratorContext.CollectionObjectType)
             {
                 case CollectionType.List:
-                    if (GeneratorContext.Language == GenerationLanguage.CSharp)
-                    {
-                        collTypeRef = new CodeTypeReference("List<" + baseType + ">");
-                    }
-                    else
-                    {
-                        collTypeRef = new CodeTypeReference("List(Of [" + baseType + "])");
-                    }
-
+                    collTypeRef = new CodeTypeReference("List", new CodeTypeReference[] { new CodeTypeReference(baseType) });
                     break;
-                case CollectionType.ObservableCollection:
-                    if (GeneratorContext.Language == GenerationLanguage.CSharp)
-                    {
-                        collTypeRef = new CodeTypeReference("ObservableCollection<" + baseType + ">");
-                    }
-                    else
-                    {
-                        collTypeRef = new CodeTypeReference("ObservableCollection(Of [" + baseType + "])");
-                    }
 
+                case CollectionType.ObservableCollection:
+                    collTypeRef = new CodeTypeReference("ObservableCollection", new CodeTypeReference[] { new CodeTypeReference(baseType) });
                     break;
 
                 case CollectionType.DefinedType:
-                    string typname= baseType.Replace(".",string.Empty) + "Collection";
+                    string typname = baseType.Replace(".", string.Empty) + "Collection";
 
-                    if (!__collectionTypes.Keys.Contains(typname))
-                        __collectionTypes.Add(typname, baseType);
-
-                    if (GeneratorContext.Language == GenerationLanguage.CSharp)
+                    if (!collectionTypesField.Keys.Contains(typname))
                     {
-                        collTypeRef = new CodeTypeReference(typname);
-                    }
-                    else
-                    {
-                        collTypeRef = new CodeTypeReference(typname);
+                        collectionTypesField.Add(typname, baseType);
                     }
 
+                    collTypeRef = new CodeTypeReference(typname);
                     break;
             }
 

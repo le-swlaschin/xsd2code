@@ -28,18 +28,25 @@ namespace Xsd2Code
         public const string ExtensionNamespace = "http://www.myxaml.fr";
 
         /// <summary>
-        /// Process code generation
+        /// Processes the specified XSD file.
         /// </summary>
-        /// <param name="xsdFile">Full xsd file path</param>
-        /// <param name="targetNamespace">taget namespace</param>
-        /// <param name="language">generation language</param>
-        /// <param name="collectionType">collection type</param>
-        /// <param name="enableDataBinding">Indicates whether the generation implement the change notification</param>
-        /// <param name="hidePrivate">Indicates if generate EditorBrowsableState.Never attribute</param>
-        /// <param name="enableSummaryComment">Generate summary comment from schema annotation</param>
-        /// <param name="errorMessage">Output error messsage</param>
-        /// <returns>if sucess, represents a namespace declaration else the return value is null</returns>
-        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, out string errorMessage)
+        /// <param name="xsdFile">The XSD file.</param>
+        /// <param name="targetNamespace">The target namespace.</param>
+        /// <param name="language">The language.</param>
+        /// <param name="collectionType">Type of the collection.</param>
+        /// <param name="enableDataBinding">if set to <c>true</c> [enable data binding].</param>
+        /// <param name="hidePrivate">if set to <c>true</c> [hide private].</param>
+        /// <param name="enableSummaryComment">if set to <c>true</c> [enable summary comment].</param>
+        /// <param name="customUsings">The custom usings.</param>
+        /// <param name="collectionBase">The collection base.</param>
+        /// <param name="includeSerializeMethod">if set to <c>true</c> [include serialize method].</param>
+        /// <param name="serializeMethodName">Name of the serialize method.</param>
+        /// <param name="deserializeMethodName">Name of the deserialize method.</param>
+        /// <param name="saveToFileMethodName">Name of the save to file method.</param>
+        /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns>result CodeNamespace</returns>
+        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, out string errorMessage)
         {
             errorMessage = "";
             try
@@ -53,8 +60,13 @@ namespace Xsd2Code
                 GeneratorContext.EnableSummaryComment = enableSummaryComment;
                 GeneratorContext.CustomUsings = customUsings;
                 GeneratorContext.CollectionBase = collectionBase;
+                GeneratorContext.IncludeSerializeMethod = includeSerializeMethod;
+                GeneratorContext.SerializeMethodName = serializeMethodName;
+                GeneratorContext.DeserializeMethodName = deserializeMethodName;
+                GeneratorContext.SaveToFileMethodName = saveToFileMethodName;
+                GeneratorContext.LoadFromFileMethodName = loadFromFileMethodName;
 
-                using (FileStream fs = new FileStream(xsdFile, FileMode.Open))
+                using (FileStream fs = new FileStream(xsdFile, FileMode.Open, FileAccess.Read))
                 {
                     xsd = XmlSchema.Read(fs, null);
                     XmlSchemaSet schemaSet = new XmlSchemaSet();
@@ -78,7 +90,14 @@ namespace Xsd2Code
                 if (!string.IsNullOrEmpty(customUsings))
                 {
                     foreach (string s in customUsings.Split(';'))
+                    {
                         ns.Imports.Add(new CodeNamespaceImport(s));
+                    }
+                }
+
+                if (GeneratorContext.IncludeSerializeMethod)
+                {
+                    ns.Imports.Add(new CodeNamespaceImport("System.IO"));
                 }
 
                 switch (GeneratorContext.CollectionObjectType)
@@ -100,7 +119,6 @@ namespace Xsd2Code
                 XmlCodeExporter exporter = new XmlCodeExporter(ns);
                 
                 XmlSchemaImporter importer = new XmlSchemaImporter(schemas);
-
                 foreach (XmlSchemaElement element in xsd.Elements.Values)
                 {
                     XmlTypeMapping mapping = importer.ImportTypeMapping(element.QualifiedName);
@@ -113,6 +131,7 @@ namespace Xsd2Code
                 GeneratorExtension ext = new GeneratorExtension();
                 ext.Process(ns, xsd);
                 #endregion Execute extensions
+
                 return ns;
             }
             catch (Exception e)

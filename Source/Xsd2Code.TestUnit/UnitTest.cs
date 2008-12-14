@@ -19,7 +19,7 @@ namespace Xsd2Code.TestUnit
     [TestClass]
     public class UnitTest
     {
-        private string NameSpace = "XSDCodeGen";
+        private string NameSpace = "Xsd2Code.TestUnit";
         private string DirOutput = @"c:\temp\";
 
         public UnitTest()
@@ -63,14 +63,14 @@ namespace Xsd2Code.TestUnit
             string FileName = DirOutput + "Circular.xsd";
             string ErrorMessage = "";
             string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
-            
-            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty);
+
+            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
         }
-
+        
         [TestMethod]
         public void Dvd()
         {
@@ -81,7 +81,6 @@ namespace Xsd2Code.TestUnit
             }
 
             // Get the code namespace for the schema.
-
             using (StreamWriter sw = new StreamWriter(DirOutput + "Actor.xsd", false))
             {
                 sw.Write(Xsd2Code.TestUnit.Properties.Resources.Actor);
@@ -89,9 +88,9 @@ namespace Xsd2Code.TestUnit
 
             string FileName = DirOutput + "Dvd.xsd";
             string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile");
             string OutputFileName;
-            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
@@ -108,11 +107,80 @@ namespace Xsd2Code.TestUnit
             string FileName = DirOutput + "Hierarchical.xsd";
             string ErrorMessage = "";
             string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty);
-            if (!xsdGen.Process(out OutputFileName, out ErrorMessage))
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty);
+            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
+        }
+        
+        [TestMethod]
+        
+        public void Serialize()
+        {
+            DvdCollection dvdCol = GetDvd();
+            string dvdColStr1 = dvdCol.Serialize();
+
+            DvdCollection dvdColFromXml;
+            Exception exception;
+            bool sucess = DvdCollection.Deserialize(dvdColStr1, out dvdColFromXml, out exception);
+            if (sucess)
+            {
+                string dvdColStr2 = dvdColFromXml.Serialize();
+                if (!dvdColStr1.Equals(dvdColStr2))
+                {
+                    Assert.Fail("dvdColFromXml is not equal after Deserialize");
+                }
+            }
+            else
+            {
+                Assert.Fail(exception.Message);
+            }
+        }
+
+        [TestMethod]
+        public void Persistent()
+        {
+            DvdCollection dvdCol = GetDvd();
+            Exception exception;
+            if (!dvdCol.SaveToFile(@"c:\temp\savedvd.xml", out exception))
+            {
+                Assert.Fail(string.Format("Failed to save file. {0}", exception.Message));
+            }
+
+            DvdCollection loadedDvdCollection;
+            Exception e;
+            if (!DvdCollection.LoadFromFile(@"c:\temp\savedvd.xml", out loadedDvdCollection, out e))
+            {
+                Assert.Fail(string.Format("Failed to load file. {0}", e.Message));
+            }
+
+            string xmlBegin = dvdCol.Serialize();
+            string xmlEnd = loadedDvdCollection.Serialize();
+
+            if (!xmlBegin.Equals(xmlEnd))
+            {
+                Assert.Fail(string.Format("xmlBegin and xmlEnd are not equal after LoadFromFile"));
+            }
+        }
+        
+        [TestMethod]
+        public void InvalidLoadFromFile()
+        {
+            DvdCollection loadedDvdCollection;
+            Exception e;
+            DvdCollection.LoadFromFile(@"c:\tempo\savedvd.xml", out loadedDvdCollection, out e);
+        }
+        
+        private static DvdCollection GetDvd()
+        {
+            DvdCollection dvdCol = new DvdCollection();
+            dvd newdvd = new dvd();
+            newdvd.Title = "Matrix";
+            newdvd.Style = Styles.Action;
+            newdvd.Actor.Add(new Actor { firstname = "Thomas", lastname = "Anderson" });
+            dvdCol.Dvds.Add(newdvd);
+            return dvdCol;
         }
     }
 }

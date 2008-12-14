@@ -108,7 +108,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Xsd2Code.Addin.AddIn">
+    <Content Include="Xsd2Code.AddIn.AddIn">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -1,41 +1,46 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" id="Dvd">
-	<xs:include schemaLocation="Actor.xsd"/>
-	<xs:element name="DvdCollection">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="dvds" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="Actors">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="Actor" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="dvds">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="title" type="xs:string" nillable="true">
-					<xs:annotation>
-						<xs:documentation>
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio (http://www.liquid-technologies.com)-->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" id="Dvd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="Actor.xsd" />
+  <xs:element name="DvdCollection">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element name="Dvds" type="dvd" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Actors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="Actor" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="dvd">
+    <xs:sequence>
+      <xs:element name="Title" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
               Gets or sets the title of dvd.
             </xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="style" type="xs:string"/>
-				<xs:element ref="Actor" maxOccurs="unbounded">
-					<xs:annotation>
-						<xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Style" type="Styles" />
+      <xs:element maxOccurs="unbounded" ref="Actor">
+        <xs:annotation>
+          <xs:documentation>
               Represent the actor list
               The list include Firstname and last name of the actor.
             </xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="show" type="xs:boolean" nillable="true"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="PublishYear" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="Styles">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Action" />
+      <xs:enumeration value="Fiction" />
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>
