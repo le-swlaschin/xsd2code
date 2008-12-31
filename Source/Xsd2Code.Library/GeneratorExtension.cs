@@ -207,7 +207,7 @@ namespace Xsd2Code.Library.Extensions
                 XmlSchemaElement xmlElement = item as XmlSchemaElement;
                 if (xmlElement != null)
                 {
-                    XmlSchemaElement xmlSubElement = SearchElement(type, xmlElement, string.Empty);
+                    XmlSchemaElement xmlSubElement = SearchElement(type, xmlElement, string.Empty, string.Empty);
                     if (xmlSubElement != null)
                     {
                         return xmlSubElement;
@@ -237,9 +237,12 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">Element to search</param>
         /// <param name="xmlElement">Current element</param>
-        /// <param name="parentsName">Name of parent element</param>
-        /// <returns>return found XmlSchemaElement or null value</returns>
-        private static XmlSchemaElement SearchElement(CodeTypeDeclaration type, XmlSchemaElement xmlElement, string parentsName)
+        /// <param name="CurrentElementName">Name of the current element.</param>
+        /// <param name="HierarchicalElementName">Name of the hierarchical element.</param>
+        /// <returns>
+        /// return found XmlSchemaElement or null value
+        /// </returns>
+        private static XmlSchemaElement SearchElement(CodeTypeDeclaration type, XmlSchemaElement xmlElement, string CurrentElementName, string HierarchicalElementName)
         {
             bool found = false;
             if (type.IsClass)
@@ -250,7 +253,7 @@ namespace Xsd2Code.Library.Extensions
                 }
                 else
                 {
-                    if (type.Name.Equals(parentsName + xmlElement.Name) ||
+                    if (type.Name.Equals(HierarchicalElementName + xmlElement.Name) ||
                         (type.Name.Equals(xmlElement.Name)))
                     {
                         found = true;
@@ -282,12 +285,13 @@ namespace Xsd2Code.Library.Extensions
                             XmlSchemaElement currentItem = item as XmlSchemaElement;
                             if (currentItem != null)
                             {
-                                if (parentsName == xmlElement.QualifiedName.Name)
+                                if (HierarchicalElementName == xmlElement.QualifiedName.Name ||
+                                    CurrentElementName == xmlElement.QualifiedName.Name)
                                 {
                                     return null;
                                 }
 
-                                XmlSchemaElement subItem = SearchElement(type, currentItem, parentsName + xmlElement.QualifiedName.Name);
+                                XmlSchemaElement subItem = SearchElement(type, currentItem, xmlElement.QualifiedName.Name, HierarchicalElementName + xmlElement.QualifiedName.Name);
                                 if (subItem != null)
                                 {
                                     return subItem;

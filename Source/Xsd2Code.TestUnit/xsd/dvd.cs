@@ -483,14 +483,13 @@ namespace Xsd2Code.TestUnit
             }
             set
             {
-                if ((this.styleField != null))
+
+                if ((styleField.Equals(value) != true))
                 {
-                    if ((styleField.Equals(value) != true))
-                    {
-                        this.styleField = value;
-                        this.OnPropertyChanged("Style");
-                    }
+                    this.styleField = value;
+                    this.OnPropertyChanged("Style");
                 }
+
                 else
                 {
                     this.styleField = value;

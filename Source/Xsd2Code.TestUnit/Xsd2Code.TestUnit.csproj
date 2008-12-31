@@ -71,6 +71,7 @@
       <DependentUpon>dvd.xsd</DependentUpon>
     </None>
     <None Include="xsd\Hierarchical.xsd" />
+    <None Include="xsd\StackOverFlow.xsd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xsd2Code.Library\Xsd2Code.Library.csproj">

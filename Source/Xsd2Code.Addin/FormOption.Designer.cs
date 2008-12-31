@@ -33,6 +33,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnGenerate = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ckhDisableDebug = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.txtLoadFromFileMethodName = new System.Windows.Forms.TextBox();
             this.txtSaveToFileMethodName = new System.Windows.Forms.TextBox();
@@ -72,7 +73,7 @@
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Controls.Add(this.btnGenerate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 487);
+            this.panel1.Location = new System.Drawing.Point(0, 505);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(456, 32);
             this.panel1.TabIndex = 2;
@@ -100,6 +101,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.ckhDisableDebug);
             this.groupBox1.Controls.Add(this.panel2);
             this.groupBox1.Controls.Add(this.txtLoadFromFileMethodName);
             this.groupBox1.Controls.Add(this.txtSaveToFileMethodName);
@@ -115,15 +117,25 @@
             this.groupBox1.Controls.Add(this.chkIPropertyNotifyChanged);
             this.groupBox1.Location = new System.Drawing.Point(15, 259);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(429, 217);
+            this.groupBox1.Size = new System.Drawing.Size(429, 240);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
             // 
+            // ckhDisableDebug
+            // 
+            this.ckhDisableDebug.AutoSize = true;
+            this.ckhDisableDebug.Location = new System.Drawing.Point(17, 87);
+            this.ckhDisableDebug.Name = "ckhDisableDebug";
+            this.ckhDisableDebug.Size = new System.Drawing.Size(186, 17);
+            this.ckhDisableDebug.TabIndex = 26;
+            this.ckhDisableDebug.Text = "Disable debug in generated code.";
+            this.ckhDisableDebug.UseVisualStyleBackColor = true;
+            // 
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Location = new System.Drawing.Point(21, 107);
+            this.panel2.Location = new System.Drawing.Point(21, 130);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(2, 100);
             this.panel2.TabIndex = 25;
@@ -131,7 +143,7 @@
             // txtLoadFromFileMethodName
             // 
             this.txtLoadFromFileMethodName.Enabled = false;
-            this.txtLoadFromFileMethodName.Location = new System.Drawing.Point(188, 187);
+            this.txtLoadFromFileMethodName.Location = new System.Drawing.Point(188, 210);
             this.txtLoadFromFileMethodName.MaxLength = 50;
             this.txtLoadFromFileMethodName.Name = "txtLoadFromFileMethodName";
             this.txtLoadFromFileMethodName.Size = new System.Drawing.Size(236, 20);
@@ -143,7 +155,7 @@
             // txtSaveToFileMethodName
             // 
             this.txtSaveToFileMethodName.Enabled = false;
-            this.txtSaveToFileMethodName.Location = new System.Drawing.Point(188, 161);
+            this.txtSaveToFileMethodName.Location = new System.Drawing.Point(188, 184);
             this.txtSaveToFileMethodName.MaxLength = 50;
             this.txtSaveToFileMethodName.Name = "txtSaveToFileMethodName";
             this.txtSaveToFileMethodName.Size = new System.Drawing.Size(236, 20);
@@ -155,7 +167,7 @@
             // lblLoadFromFile
             // 
             this.lblLoadFromFile.AutoSize = true;
-            this.lblLoadFromFile.Location = new System.Drawing.Point(35, 190);
+            this.lblLoadFromFile.Location = new System.Drawing.Point(35, 213);
             this.lblLoadFromFile.Name = "lblLoadFromFile";
             this.lblLoadFromFile.Size = new System.Drawing.Size(143, 13);
             this.lblLoadFromFile.TabIndex = 22;
@@ -164,7 +176,7 @@
             // lblSaveToFile
             // 
             this.lblSaveToFile.AutoSize = true;
-            this.lblSaveToFile.Location = new System.Drawing.Point(35, 164);
+            this.lblSaveToFile.Location = new System.Drawing.Point(35, 187);
             this.lblSaveToFile.Name = "lblSaveToFile";
             this.lblSaveToFile.Size = new System.Drawing.Size(133, 13);
             this.lblSaveToFile.TabIndex = 21;
@@ -173,7 +185,7 @@
             // txtDeserializeMethodName
             // 
             this.txtDeserializeMethodName.Enabled = false;
-            this.txtDeserializeMethodName.Location = new System.Drawing.Point(188, 136);
+            this.txtDeserializeMethodName.Location = new System.Drawing.Point(188, 159);
             this.txtDeserializeMethodName.MaxLength = 50;
             this.txtDeserializeMethodName.Name = "txtDeserializeMethodName";
             this.txtDeserializeMethodName.Size = new System.Drawing.Size(235, 20);
@@ -185,7 +197,7 @@
             // txtSerializeMethodName
             // 
             this.txtSerializeMethodName.Enabled = false;
-            this.txtSerializeMethodName.Location = new System.Drawing.Point(188, 110);
+            this.txtSerializeMethodName.Location = new System.Drawing.Point(188, 133);
             this.txtSerializeMethodName.MaxLength = 50;
             this.txtSerializeMethodName.Name = "txtSerializeMethodName";
             this.txtSerializeMethodName.Size = new System.Drawing.Size(235, 20);
@@ -197,7 +209,7 @@
             // lblDeserialize
             // 
             this.lblDeserialize.AutoSize = true;
-            this.lblDeserialize.Location = new System.Drawing.Point(35, 139);
+            this.lblDeserialize.Location = new System.Drawing.Point(35, 162);
             this.lblDeserialize.Name = "lblDeserialize";
             this.lblDeserialize.Size = new System.Drawing.Size(131, 13);
             this.lblDeserialize.TabIndex = 17;
@@ -206,7 +218,7 @@
             // lblSerialize
             // 
             this.lblSerialize.AutoSize = true;
-            this.lblSerialize.Location = new System.Drawing.Point(35, 113);
+            this.lblSerialize.Location = new System.Drawing.Point(35, 136);
             this.lblSerialize.Name = "lblSerialize";
             this.lblSerialize.Size = new System.Drawing.Size(119, 13);
             this.lblSerialize.TabIndex = 16;
@@ -215,7 +227,7 @@
             // chkSerializeMethod
             // 
             this.chkSerializeMethod.AutoSize = true;
-            this.chkSerializeMethod.Location = new System.Drawing.Point(17, 88);
+            this.chkSerializeMethod.Location = new System.Drawing.Point(17, 111);
             this.chkSerializeMethod.Name = "chkSerializeMethod";
             this.chkSerializeMethod.Size = new System.Drawing.Size(202, 17);
             this.chkSerializeMethod.TabIndex = 3;
@@ -399,7 +411,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(456, 519);
+            this.ClientSize = new System.Drawing.Size(456, 537);
             this.Controls.Add(this.lslUsing);
             this.Controls.Add(this.btnAddUsing);
             this.Controls.Add(this.txtUsings);
@@ -415,7 +427,7 @@
             this.Name = "FormOption";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Xsd2Code Generator 2.6";
+            this.Text = "Xsd2Code Generator 2.6.2";
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormOption_KeyPress);
             this.panel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
@@ -462,6 +474,7 @@
         private System.Windows.Forms.Label lblLoadFromFile;
         private System.Windows.Forms.Label lblSaveToFile;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.CheckBox ckhDisableDebug;
 
     }
 }

@@ -31,6 +31,7 @@ namespace Xsd2Code.Addin
         private string _DeserializeMethodName;
         private string _SaveTofileMethodName;
         private string _LoadFromFileMethodName;
+        private bool _DisableDebug;
         #endregion
 
         #region Property
@@ -95,6 +96,15 @@ namespace Xsd2Code.Addin
             }
         }
 
+        public bool DisableDebug
+        {
+            get { return _DisableDebug; }
+            set
+            {
+                _DisableDebug = value;
+                ckhDisableDebug.Checked = _DisableDebug;
+            }
+        }
         public bool IncludeSerializeMethod
         {
             get { return _IncludeSerializeMethod; }
@@ -250,6 +260,7 @@ namespace Xsd2Code.Addin
                     HidePrivateFieldInIDE = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.HidePrivateFieldTag));
                     EnableSummaryComment = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.EnableSummaryCommentTag));
                     IncludeSerializeMethod = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.IncludeSerializeMethodTag));
+                    DisableDebug = GeneratorContext.ToBoolean(XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.DisableDebugTag));
 
                     string str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.SerializeMethodNameTag);
                     if (str.Length > 0)
@@ -262,7 +273,7 @@ namespace Xsd2Code.Addin
                     {
                         DeserializeMethodName = str;
                     }
-                    
+
                     str = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.SaveToFileMethodNameTag);
                     if (str.Length > 0)
                     {
@@ -400,6 +411,8 @@ namespace Xsd2Code.Addin
             _DeserializeMethodName = txtDeserializeMethodName.Text;
             _SaveTofileMethodName = txtSaveToFileMethodName.Text;
             _LoadFromFileMethodName = txtLoadFromFileMethodName.Text;
+            _DisableDebug = ckhDisableDebug.Checked;
+
             _CustomUsings.Clear();
             foreach (var strUsing in lslUsing.Items)
             {

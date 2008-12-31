@@ -63,7 +63,27 @@ namespace Xsd2Code.TestUnit
             string FileName = DirOutput + "Circular.xsd";
             string ErrorMessage = "";
             string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty);
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
+
+            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
+        }
+
+        [TestMethod]
+        public void StackOverFlow()
+        {
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "StackOverFlow.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.StackOverFlow);
+            }
+
+            string FileName = DirOutput + "StackOverFlow.xsd";
+            string ErrorMessage = "";
+            string OutputFileName = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
 
             if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
@@ -88,7 +108,32 @@ namespace Xsd2Code.TestUnit
 
             string FileName = DirOutput + "Dvd.xsd";
             string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile");
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
+            string OutputFileName;
+            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
+        }
+
+        [TestMethod]
+        public void AlowDebug()
+        {
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Dvd.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.dvd);
+            }
+
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Actor.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Actor);
+            }
+
+            string FileName = DirOutput + "Dvd.xsd";
+            string ErrorMessage = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", true);
             string OutputFileName;
             if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
@@ -107,7 +152,7 @@ namespace Xsd2Code.TestUnit
             string FileName = DirOutput + "Hierarchical.xsd";
             string ErrorMessage = "";
             string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty);
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
             if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);

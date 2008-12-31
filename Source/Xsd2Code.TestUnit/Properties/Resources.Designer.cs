@@ -61,20 +61,18 @@ namespace Xsd2Code.TestUnit.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; elementFormDefault=&quot;qualified&quot; attributeFormDefault=&quot;unqualified&quot; id=&quot;Actor&quot;&gt;
-        ///	&lt;xs:element name=&quot;Actor&quot;&gt;
-        ///		&lt;xs:annotation&gt;
-        ///			&lt;xs:documentation&gt;
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;!--Created with Liquid XML Studio (http://www.liquid-technologies.com)--&gt;
+        ///&lt;xs:schema attributeFormDefault=&quot;unqualified&quot; elementFormDefault=&quot;qualified&quot; id=&quot;Actor&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;xs:element name=&quot;Actor&quot;&gt;
+        ///    &lt;xs:annotation&gt;
+        ///      &lt;xs:documentation&gt;
         ///        Actor pépé class include firstname and lastname (ûàéçè).
         ///      &lt;/xs:documentation&gt;
-        ///		&lt;/xs:annotation&gt;
-        ///		&lt;xs:complexType&gt;
-        ///			&lt;xs:sequence&gt;
-        ///				&lt;xs:element name=&quot;firstname&quot; type=&quot;xs:string&quot;&gt;
-        ///					&lt;xs:annotation&gt;
-        ///						&lt;xs:documentation&gt;
-        ///              Get [rest of string was truncated]&quot;;.
+        ///    &lt;/xs:annotation&gt;
+        ///    &lt;xs:complexType&gt;
+        ///      &lt;xs:sequence&gt;
+        ///        &lt;xs:element name=&quot;f [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Actor {
             get {
@@ -100,20 +98,18 @@ namespace Xsd2Code.TestUnit.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; elementFormDefault=&quot;qualified&quot; attributeFormDefault=&quot;unqualified&quot; id=&quot;Dvd&quot;&gt;
-        ///	&lt;xs:include schemaLocation=&quot;Actor.xsd&quot;/&gt;
-        ///	&lt;xs:element name=&quot;DvdCollection&quot;&gt;
-        ///		&lt;xs:complexType&gt;
-        ///			&lt;xs:sequence&gt;
-        ///				&lt;xs:element ref=&quot;dvds&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-        ///			&lt;/xs:sequence&gt;
-        ///		&lt;/xs:complexType&gt;
-        ///	&lt;/xs:element&gt;
-        ///	&lt;xs:element name=&quot;Actors&quot;&gt;
-        ///		&lt;xs:complexType&gt;
-        ///			&lt;xs:sequence&gt;
-        ///				&lt;xs:element ref=&quot;Actor&quot; maxOccurs=&quot;unbounded [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;!--Created with Liquid XML Studio (http://www.liquid-technologies.com)--&gt;
+        ///&lt;xs:schema attributeFormDefault=&quot;unqualified&quot; elementFormDefault=&quot;qualified&quot; id=&quot;Dvd&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;xs:include schemaLocation=&quot;Actor.xsd&quot; /&gt;
+        ///  &lt;xs:element name=&quot;DvdCollection&quot;&gt;
+        ///    &lt;xs:complexType&gt;
+        ///      &lt;xs:sequence maxOccurs=&quot;unbounded&quot;&gt;
+        ///        &lt;xs:element name=&quot;Dvds&quot; type=&quot;dvd&quot; /&gt;
+        ///      &lt;/xs:sequence&gt;
+        ///    &lt;/xs:complexType&gt;
+        ///  &lt;/xs:element&gt;
+        ///  &lt;xs:e [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dvd {
             get {
@@ -137,6 +133,23 @@ namespace Xsd2Code.TestUnit.Properties {
         internal static string Hierarchical {
             get {
                 return ResourceManager.GetString("Hierarchical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;!--Created with Liquid XML Studio - FREE Community Edition (http://www.liquid-technologies.com)--&gt;
+        ///&lt;xs:schema xmlns:mstns=&quot;http://tempuri.org/XMLSchema1.xsd&quot; elementFormDefault=&quot;qualified&quot; targetNamespace=&quot;http://tempuri.org/XMLSchema1.xsd&quot; id=&quot;XMLSchema1&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;xs:element name=&quot;MyWrapper&quot;&gt;
+        ///    &lt;xs:complexType&gt;
+        ///      &lt;xs:sequence&gt;
+        ///        &lt;xs:element name=&quot;MyElement&quot; type=&quot;mstns:MyType&quot; /&gt;
+        ///      &lt;/xs:sequence&gt;
+        ///    &lt;/x [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string StackOverFlow {
+            get {
+                return ResourceManager.GetString("StackOverFlow", resourceCulture);
             }
         }
     }

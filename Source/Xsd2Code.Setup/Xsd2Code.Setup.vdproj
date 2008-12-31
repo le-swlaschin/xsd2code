@@ -509,7 +509,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=2.1.3252.38665, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=2.1.3287.23355, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_921995CDDEA433F79255ADE9F7D8A3C7"
@@ -724,15 +724,15 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Xsd2Code 2.6"
+        "ProductName" = "8:Xsd2Code 2.6.1"
         "ProductCode" = "8:{23C16CCC-6132-4FCF-8207-ED80EF1EBBF3}"
-        "PackageCode" = "8:{80E622FE-6D2A-42FA-8266-5D25C9C707C1}"
+        "PackageCode" = "8:{36CC7731-49E4-4F19-BB63-327551F1FB9A}"
         "UpgradeCode" = "8:{DE6ED713-B452-4D2F-A8D1-A3287FBD2A48}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.6"
+        "ProductVersion" = "8:2.6.1"
         "Manufacturer" = "8:Pascal CABANEL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

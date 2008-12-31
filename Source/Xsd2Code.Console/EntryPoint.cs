@@ -22,8 +22,8 @@ namespace Xsd2Code
                 Console.WriteLine("Xsd2Code.exe <schema>.xsd namespace <destination>.cs [CS|VB] [Array|List|ObservableCollection] [enableDataBinding|noDataBinding] [ShowPrivateInIde|HidePrivateInIde]");
 
                 Console.WriteLine("");
-                Console.WriteLine("[CS|VB]");
-                Console.WriteLine("    The language to use for the generated code. Choose from 'CS', 'VB', 'JS'");
+                Console.WriteLine("[CS|VB|CPP]");
+                Console.WriteLine("    The language to use for the generated code. Choose from 'CS', 'VB', 'CPP'");
 
                 Console.WriteLine("");
                 Console.WriteLine("[Array|List|ObservableCollection]");
@@ -60,7 +60,7 @@ namespace Xsd2Code
             if (args.Length > 8)
                 collectionBase = args[8];
 
-            GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false, customUsings, collectionBase, false, string.Empty, string.Empty, string.Empty, string.Empty);
+            GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false, customUsings, collectionBase, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
             string ErrorMessage = "";
             string OutputFileName = "";
             if (!gen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))

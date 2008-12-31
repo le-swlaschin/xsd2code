@@ -41,6 +41,11 @@ namespace Xsd2Code.Library
         public const string HidePrivateFieldTag = "HidePrivateFieldInIDE";
 
         /// <summary>
+        /// Disable debug in genetated code.
+        /// </summary>
+        public const string DisableDebugTag = "DisableDebug";
+
+        /// <summary>
         /// Generate summary documentation
         /// </summary>
         public const string EnableSummaryCommentTag = "EnableSummaryComment";
@@ -107,7 +112,7 @@ namespace Xsd2Code.Library
             get;
             set;
         }
-           
+
         /// <summary>
         /// Gets or sets a value indicating the name of Serialize method.
         /// </summary>
@@ -145,6 +150,16 @@ namespace Xsd2Code.Library
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether [disable debug].
+        /// </summary>
+        /// <value><c>true</c> if [disable debug]; otherwise, <c>false</c>.</value>
+        public static bool DisableDebug
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating the name of SaveToFile method.
         /// </summary>
         public static string LoadFromFileMethodName
@@ -152,7 +167,7 @@ namespace Xsd2Code.Library
             get;
             set;
         }
-      
+
         /// <summary>
         /// Gets or sets a value indicating whether if generate summary documentation
         /// </summary>
