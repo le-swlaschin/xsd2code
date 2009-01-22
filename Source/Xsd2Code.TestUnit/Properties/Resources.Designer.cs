@@ -118,6 +118,23 @@ namespace Xsd2Code.TestUnit.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;!--Created with Liquid XML Studio - FREE Community Edition (http://www.liquid-technologies.com)--&gt;
+        ///&lt;xs:schema xmlns:mstns=&quot;http://tempuri.org/Gender.xsd&quot; elementFormDefault=&quot;qualified&quot; targetNamespace=&quot;http://tempuri.org/Gender.xsd&quot; id=&quot;Gender&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;xs:element name=&quot;Root&quot;&gt;
+        ///    &lt;xs:complexType&gt;
+        ///      &lt;xs:sequence&gt;
+        ///        &lt;xs:element name=&quot;GenderElement&quot; type=&quot;mstns:ksgender&quot; /&gt;
+        ///      &lt;/xs:sequence&gt;
+        ///      &lt;xs:attribut [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Gender {
+            get {
+                return ResourceManager.GetString("Gender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; elementFormDefault=&quot;qualified&quot; attributeFormDefault=&quot;unqualified&quot;&gt;
         ///  &lt;xs:element name=&quot;Root&quot;&gt;

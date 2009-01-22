@@ -85,123 +85,15 @@ namespace Xsd2Code.Library
         /// </summary>
         public const string LoadFromFileMethodNameTag = "LoadFromFileMethodName";
 
+        #region Fields
+        private static GeneratorParams generatorParamsField = new GeneratorParams();
+
+        #endregion
         #region property
-        /// <summary>
-        /// Gets or sets collection type to use for code generation
-        /// </summary>
-        public static CollectionType CollectionObjectType
+        public static GeneratorParams GeneratorParams
         {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether if implement INotifyPropertyChanged
-        /// </summary>
-        public static bool EnableDataBinding
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether serialize/deserialize method support
-        /// </summary>
-        public static bool IncludeSerializeMethod
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating the name of Serialize method.
-        /// </summary>
-        public static string SerializeMethodName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating the name of Deserialize method.
-        /// </summary>
-        public static string DeserializeMethodName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
-        /// </summary>
-        public static bool HidePrivateFieldInIde
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating the name of Serialize method.
-        /// </summary>
-        public static string SaveToFileMethodName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether [disable debug].
-        /// </summary>
-        /// <value><c>true</c> if [disable debug]; otherwise, <c>false</c>.</value>
-        public static bool DisableDebug
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating the name of SaveToFile method.
-        /// </summary>
-        public static string LoadFromFileMethodName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether if generate summary documentation
-        /// </summary>
-        public static bool EnableSummaryComment
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets generation language
-        /// </summary>
-        public static GenerationLanguage Language
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets collection base
-        /// </summary>
-        public static string CollectionBase
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets custom usings
-        /// </summary>
-        public static string CustomUsings
-        {
-            get;
-            set;
+            get { return GeneratorContext.generatorParamsField; }
+            set { GeneratorContext.generatorParamsField = value; }
         }
         #endregion
 

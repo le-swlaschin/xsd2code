@@ -70,91 +70,10 @@ namespace Xsd2Code.Library
     /// </summary>
     public class GeneratorFacade
     {
-        #region Fields
-        /// <summary>
-        /// Full XSD file path
-        /// </summary>
-        private string inputFileField;
-
-        /// <summary>
-        /// Full cs or vb file path
-        /// </summary>
-        private string outputFileField;
-
-        /// <summary>
-        /// namespace to use for generation
-        /// </summary>
-        private string nameSpaceField;
-
-        /// <summary>
-        /// Language generation
-        /// </summary>
-        private GenerationLanguage languageField;
-
-        /// <summary>
-        /// Type of collection to use in generation
-        /// </summary>
-        private CollectionType collectionField;
-
-        /// <summary>
-        /// Indicate if use databinding
-        /// </summary>
-        private bool enableDataBindingField;
-
-        /// <summary>
-        /// Indicates if generate EditorBrowsableState.Never attribute
-        /// </summary>
-        private bool hidePrivateField;
-
-        /// <summary>
-        /// Indicates if generate summary comment
-        /// </summary>
-        private bool enableSummaryCommentField;
-
-        /// <summary>
-        /// List of custom usings to include in the file
-        /// </summary>
-        private string customUsingsField;
-
-        /// <summary>
-        /// Name of the generic type to use for collections
-        /// </summary>
-        private string collectionBaseField;
-
-        /// <summary>
-        /// Enable generation for serialize/deserialise method
-        /// </summary>
-        private bool includeSerializeMethodField;
-
-        /// <summary>
-        /// serialize method name
-        /// </summary>
-        private string serializeMethodNameField;
-
-        /// <summary>
-        /// serialize method name
-        /// </summary>
-        private string deserializeMethodNameField;
-
-        /// <summary>
-        /// serialize method name
-        /// </summary>
-        private string saveToFileMethodNameField;
-
-        /// <summary>
-        /// serialize method name
-        /// </summary>
-        private string loadFromFileMethodNameField;
-
-        /// <summary>
-        /// Disable debug into generated code
-        /// </summary>
-        private bool disableDebugField;
-
-        #endregion
+        private GeneratorParams generatorParamsField = new GeneratorParams();
+        private CodeDomProvider providerField;
 
         #region Class constructor
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GeneratorFacade"/> class.
         /// </summary>
@@ -175,113 +94,178 @@ namespace Xsd2Code.Library
         /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
         public GeneratorFacade(string inputFile, string nameSpace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, bool disableDebug)
         {
-            this.inputFileField = inputFile;
-            this.nameSpaceField = nameSpace;
-            this.languageField = language;
-            this.collectionField = collectionType;
-            this.enableDataBindingField = enableDataBinding;
-            this.hidePrivateField = hidePrivate;
-            this.enableSummaryCommentField = enableSummaryComment;
-            this.customUsingsField = customUsings;
-            this.collectionBaseField = collectionBase;
-            this.includeSerializeMethodField = includeSerializeMethod;
-            this.serializeMethodNameField = serializeMethodName;
-            this.deserializeMethodNameField = deserializeMethodName;
-            this.saveToFileMethodNameField = saveToFileMethodName;
-            this.loadFromFileMethodNameField = loadFromFileMethodName;
-            this.disableDebugField = disableDebug;
-
-            switch (language)
+            CodeDomProvider provider;
+            switch (this.generatorParamsField.Language)
             {
                 case GenerationLanguage.CSharp:
-                    this.outputFileField = inputFile.Replace(".xsd", ".cs");
+                    provider = new Microsoft.CSharp.CSharpCodeProvider();
                     break;
                 case GenerationLanguage.VisualBasic:
-                    this.outputFileField = inputFile.Replace(".xsd", ".vb");
+                    provider = new Microsoft.VisualBasic.VBCodeProvider();
                     break;
                 case GenerationLanguage.VisualCpp:
-                    this.outputFileField = inputFile.Replace(".xsd", ".cpp");
+                    provider = new Microsoft.VisualC.CppCodeProvider();
+                    break;
+                default:
+                    provider = new Microsoft.CSharp.CSharpCodeProvider();
                     break;
             }
+            Init(inputFile, nameSpace, provider, collectionType, enableDataBinding, hidePrivate, enableSummaryComment, customUsings, collectionBase, includeSerializeMethod, serializeMethodName, deserializeMethodName, saveToFileMethodName, loadFromFileMethodName, disableDebug);
+        }
+
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeneratorFacade"/> class.
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="nameSpace">The name space.</param>
+        /// <param name="provider">The provider.</param>
+        /// <param name="collectionType">Type of the collection.</param>
+        /// <param name="enableDataBinding">if set to <c>true</c> [enable data binding].</param>
+        /// <param name="hidePrivate">if set to <c>true</c> [hide private].</param>
+        /// <param name="enableSummaryComment">if set to <c>true</c> [enable summary comment].</param>
+        /// <param name="customUsings">The custom usings.</param>
+        /// <param name="collectionBase">The collection base.</param>
+        /// <param name="includeSerializeMethod">if set to <c>true</c> [include serialize method].</param>
+        /// <param name="serializeMethodName">Name of the serialize method.</param>
+        /// <param name="deserializeMethodName">Name of the deserialize method.</param>
+        /// <param name="saveToFileMethodName">Name of the save to file method.</param>
+        /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
+        /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
+        public GeneratorFacade(string inputFile, string nameSpace, CodeDomProvider provider, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, bool disableDebug)
+        {
+            Init(inputFile, nameSpace, provider, collectionType, enableDataBinding, hidePrivate, enableSummaryComment, customUsings, collectionBase, includeSerializeMethod, serializeMethodName, deserializeMethodName, saveToFileMethodName, loadFromFileMethodName, disableDebug);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeneratorFacade"/> class.
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="nameSpace">The name space.</param>
+        /// <param name="provider">The provider.</param>
+        /// <param name="collectionType">Type of the collection.</param>
+        /// <param name="enableDataBinding">if set to <c>true</c> [enable data binding].</param>
+        /// <param name="hidePrivate">if set to <c>true</c> [hide private].</param>
+        /// <param name="enableSummaryComment">if set to <c>true</c> [enable summary comment].</param>
+        /// <param name="customUsings">The custom usings.</param>
+        /// <param name="collectionBase">The collection base.</param>
+        /// <param name="includeSerializeMethod">if set to <c>true</c> [include serialize method].</param>
+        /// <param name="serializeMethodName">Name of the serialize method.</param>
+        /// <param name="deserializeMethodName">Name of the deserialize method.</param>
+        /// <param name="saveToFileMethodName">Name of the save to file method.</param>
+        /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
+        /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
+        public void Init(string inputFile, string nameSpace, CodeDomProvider provider, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, bool disableDebug)
+        {
+            this.generatorParamsField.InputFilePath = inputFile;
+            this.generatorParamsField.NameSpace = nameSpace;
+            this.generatorParamsField.CollectionObjectType = collectionType;
+            this.generatorParamsField.EnableDataBinding = enableDataBinding;
+            this.generatorParamsField.HidePrivateFieldInIde = hidePrivate;
+            this.generatorParamsField.EnableSummaryComment = enableSummaryComment;
+            this.generatorParamsField.CustomUsings = customUsings;
+            this.generatorParamsField.CollectionBase = collectionBase;
+            this.generatorParamsField.IncludeSerializeMethod = includeSerializeMethod;
+            this.generatorParamsField.SerializeMethodName = serializeMethodName;
+            this.generatorParamsField.DeserializeMethodName = deserializeMethodName;
+            this.generatorParamsField.SaveToFileMethodName = saveToFileMethodName;
+            this.generatorParamsField.LoadFromFileMethodName = loadFromFileMethodName;
+            this.generatorParamsField.DisableDebug = disableDebug;
+            this.providerField = provider;
+
+            string pbstrDefaultExtension = providerField.FileExtension;
+            if (pbstrDefaultExtension != null && pbstrDefaultExtension.Length > 0)
+            {
+                pbstrDefaultExtension = ".Designer." + pbstrDefaultExtension.TrimStart(".".ToCharArray());
+
+                if (provider.FileExtension.ToUpper() == ".CS")
+                    this.generatorParamsField.Language = GenerationLanguage.CSharp;
+
+                if (provider.FileExtension.ToUpper() == ".VB")
+                    this.generatorParamsField.Language = GenerationLanguage.VisualBasic;
+
+                if (provider.FileExtension.ToUpper() == ".CPP")
+                    this.generatorParamsField.Language = GenerationLanguage.VisualCpp;
+            }
+            this.generatorParamsField.OutputFilePath = inputFile.Replace(".xsd", pbstrDefaultExtension);
         }
         #endregion
 
         #region Property
-
-        /// <summary>
-        /// Gets full xsd file path
-        /// </summary>
-        public string InputFile
+        public GeneratorParams GeneratorParams
         {
-            get { return this.inputFileField; }
-        }
-
-        /// <summary>
-        /// Gets namespace to use for generation
-        /// </summary>
-        public string NameSpace
-        {
-            get { return this.nameSpaceField; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether [disable debug].
-        /// </summary>
-        /// <value><c>true</c> if [disable debug]; otherwise, <c>false</c>.</value>
-        public bool DisableDebug
-        {
-            get { return disableDebugField; }
-        }
-
-        /// <summary>
-        /// Gets language type for generation
-        /// </summary>
-        public GenerationLanguage Language
-        {
-            get { return this.languageField; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether if implement INotifyPropertyChanged
-        /// </summary>
-        public bool EnableDataBinding
-        {
-            get { return this.enableDataBindingField; }
-        }
-
-        /// <summary>
-        /// Gets or sets the output file.
-        /// </summary>
-        /// <value>The output file.</value>
-        public string OutputFile
-        {
-            get { return outputFileField; }
-            set { outputFileField = value; }
+            get { return generatorParamsField; }
+            set { generatorParamsField = value; }
         }
         #endregion
 
         #region Methods
 
+        private byte[] FileToByte(string path)
+        {
+            System.IO.FileInfo MonFichier = new System.IO.FileInfo(path);
+            System.IO.FileStream MonFileStream = MonFichier.OpenRead();
+            byte[] TableauDeBytes = new byte[MonFileStream.Length];
+            MonFileStream.Read(TableauDeBytes, 0, (int)MonFileStream.Length);
+            MonFileStream.Close();
+            return TableauDeBytes;
+        }
+
+        /// <summary>
+        /// Generates the specified buffer size.
+        /// </summary>
+        /// <param name="bufferSize">Size of the buffer.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
+        public byte[] Generate(out string errorMessage)
+        {
+            byte[] result = null;
+            string outputFilePath = Path.GetTempFileName();
+            if (!Process(outputFilePath, out errorMessage))
+            {
+                return null;
+            }
+            else
+            {
+                result = FileToByte(outputFilePath);
+                try
+                {
+                    File.Delete(outputFilePath);
+                }
+                catch { }
+                return result;
+            }
+        }
         /// <summary>
         /// Processes the code generation.
         /// </summary>
         /// <param name="outputFileName">Name of the output file.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns>true if sucess or false.</returns>
-        public bool ProcessCodeGeneration(out string outputFileName, out string errorMessage)
+        public bool Generate(out string outputFileName, out string errorMessage)
         {
-            CodeDomProvider provider;
+            outputFileName = this.generatorParamsField.OutputFilePath;
+            return Process(outputFileName, out errorMessage);
+        }
+
+        /// <summary>
+        /// Processes the specified file name.
+        /// </summary>
+        /// <param name="OutputFilePath">The output file path.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <returns></returns>
+        private bool Process(string OutputFilePath, out string errorMessage)
+        {
             errorMessage = "";
-            outputFileName = "";
 
             #region Change CurrentDir for include schema resolution.
             string savedCurrentDir = Directory.GetCurrentDirectory();
-            FileInfo fi = new FileInfo(this.inputFileField);
+            FileInfo fi = new FileInfo(this.generatorParamsField.InputFilePath);
             if (!fi.Exists)
             {
                 errorMessage = "Faild to generate code\n";
                 errorMessage += "Exception :\n";
-                errorMessage += string.Format("Input file {0} not exist", this.inputFileField);
+                errorMessage += string.Format("Input file {0} not exist", this.generatorParamsField.InputFilePath);
                 return false;
             }
 
@@ -292,32 +276,16 @@ namespace Xsd2Code.Library
             {
                 try
                 {
-                    switch (this.languageField)
-                    {
-                        case GenerationLanguage.CSharp:
-                            provider = new Microsoft.CSharp.CSharpCodeProvider();
-                            break;
-                        case GenerationLanguage.VisualBasic:
-                            provider = new Microsoft.VisualBasic.VBCodeProvider();
-                            break;
-                        case GenerationLanguage.VisualCpp:
-                            provider = new Microsoft.VisualC.CppCodeProvider();
-                            break;
-                        default:
-                            provider = new Microsoft.CSharp.CSharpCodeProvider();
-                            break;
-                    }
-
                     CodeGeneratorOptions codeOption = new CodeGeneratorOptions();
-                    CodeNamespace ns = Generator.Process(this.inputFileField, this.nameSpaceField, this.languageField, this.collectionField, this.enableDataBindingField, this.hidePrivateField, this.enableSummaryCommentField, this.customUsingsField, this.collectionBaseField, this.includeSerializeMethodField, this.serializeMethodNameField, this.deserializeMethodNameField, this.saveToFileMethodNameField, this.loadFromFileMethodNameField, out errorMessage);
+                    CodeNamespace ns = Generator.Process(this.generatorParamsField.InputFilePath, this.generatorParamsField.NameSpace, this.generatorParamsField.Language, this.generatorParamsField.CollectionObjectType, this.generatorParamsField.EnableDataBinding, this.generatorParamsField.HidePrivateFieldInIde, this.generatorParamsField.EnableSummaryComment, this.generatorParamsField.CustomUsings, this.generatorParamsField.CollectionBase, this.generatorParamsField.IncludeSerializeMethod, this.generatorParamsField.SerializeMethodName, this.generatorParamsField.DeserializeMethodName, this.generatorParamsField.SaveToFileMethodName, this.generatorParamsField.LoadFromFileMethodName, out errorMessage);
                     if (ns == null)
                     {
                         return false;
                     }
 
-                    using (StreamWriter sw = new StreamWriter(this.outputFileField + ".tmp", false))
+                    using (StreamWriter sw = new StreamWriter(OutputFilePath + ".tmp", false))
                     {
-                        provider.GenerateCodeFromNamespace(ns, sw, new CodeGeneratorOptions());
+                        providerField.GenerateCodeFromNamespace(ns, sw, new CodeGeneratorOptions());
                     }
                 }
                 catch (Exception e)
@@ -334,23 +302,21 @@ namespace Xsd2Code.Library
                     return false;
                 }
 
-                FileInfo outPutInfo = new FileInfo(this.outputFileField);
+                FileInfo outPutInfo = new FileInfo(OutputFilePath);
                 if (outPutInfo.Exists)
                 {
                     if ((outPutInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                     {
                         errorMessage = "Faild to generate code\n";
-                        errorMessage += this.outputFileField + " is write protect";
+                        errorMessage += OutputFilePath + " is write protect";
                         return false;
                     }
                 }
 
-                outputFileName = this.outputFileField;
-
                 #region Insert tag for future generation
-                StreamWriter swend = new StreamWriter(this.outputFileField, false);
+                StreamWriter swend = new StreamWriter(OutputFilePath, false);
                 string commentStr;
-                commentStr = this.languageField == GenerationLanguage.CSharp ? "// " : "'' ";
+                commentStr = this.generatorParamsField.Language == GenerationLanguage.CSharp ? "// " : "'' ";
 
                 Assembly currentAssembly = Assembly.GetExecutingAssembly();
                 AssemblyName currentAssemblyName = currentAssembly.GetName();
@@ -360,35 +326,21 @@ namespace Xsd2Code.Library
                 swend.WriteLine(string.Format("{0} <auto-generated>", commentStr));
                 swend.WriteLine(string.Format("{0}   Generated by Xsd2Code. Version {1}", commentStr, currentAssemblyName.Version.ToString()));
                 optionsLine += "  ";
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.NameSpaceTag, this.nameSpaceField);
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CollectionTag, this.collectionField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CodeTypeTag, this.languageField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.EnableDataBindingTag, this.enableDataBindingField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.HidePrivateFieldTag, this.hidePrivateField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.EnableSummaryCommentTag, this.enableSummaryCommentField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CustomUsingsTag, this.customUsingsField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.CollectionBaseTag, this.collectionBaseField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.IncludeSerializeMethodTag, this.includeSerializeMethodField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.SerializeMethodNameTag, this.serializeMethodNameField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.DeserializeMethodNameTag, this.deserializeMethodNameField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.SaveToFileMethodNameTag, this.saveToFileMethodNameField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.LoadFromFileMethodNameTag, this.loadFromFileMethodNameField.ToString());
-                optionsLine += XmlHelper.InsertXMLFromStr(GeneratorContext.DisableDebugTag, this.disableDebugField.ToString());
+                optionsLine = string.Format("{0}   {1}", commentStr, this.GeneratorParams.ToXmlTag());
                 swend.WriteLine(optionsLine);
                 swend.WriteLine(string.Format("{0} <auto-generated>", commentStr));
-
                 swend.WriteLine(string.Format("{0}------------------------------------------------------------------------------", commentStr));
                 #endregion
 
                 string line = "";
-                using (TextReader streamReader = new StreamReader(this.outputFileField + ".tmp"))
+                using (TextReader streamReader = new StreamReader(OutputFilePath + ".tmp"))
                 {
                     while ((line = streamReader.ReadLine()) != null)
                     {
                         if (line.Trim() != "[System.SerializableAttribute()]" &&
                             line.Trim() != "[System.ComponentModel.DesignerCategoryAttribute(\"code\")]")
                         {
-                            if (!this.disableDebugField)
+                            if (!this.generatorParamsField.DisableDebug)
                             {
                                 if (line.Trim() != "[System.Diagnostics.DebuggerStepThroughAttribute()]")
                                     swend.WriteLine(line);
@@ -402,7 +354,7 @@ namespace Xsd2Code.Library
                 }
 
                 swend.Close();
-                FileInfo tmp = new FileInfo(this.outputFileField + ".tmp");
+                FileInfo tmp = new FileInfo(OutputFilePath + ".tmp");
                 tmp.Delete();
             }
             finally

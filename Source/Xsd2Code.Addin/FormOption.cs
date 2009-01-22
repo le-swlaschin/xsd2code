@@ -214,7 +214,7 @@ namespace Xsd2Code.Addin
             // TODO:Change this to default project code langage.
             #region Search generationFile
             _OutputFile = string.Empty;
-            string csFileName = XSDFilePath.Replace(".xsd", ".cs");
+            string csFileName = XSDFilePath.Replace(".xsd", ".Designer.cs");
             FileInfo CsFile = new FileInfo(csFileName);
             if (CsFile.Exists)
             {
@@ -222,7 +222,7 @@ namespace Xsd2Code.Addin
             }
             else
             {
-                string vbFileName = XSDFilePath.Replace(".xsd", ".vb");
+                string vbFileName = XSDFilePath.Replace(".xsd", ".Designer.vb");
                 FileInfo vbFile = new FileInfo(vbFileName);
                 if (vbFile.Exists)
                 {
@@ -230,7 +230,7 @@ namespace Xsd2Code.Addin
                 }
                 else
                 {
-                    string cppFileName = XSDFilePath.Replace(".xsd", ".cpp");
+                    string cppFileName = XSDFilePath.Replace(".xsd", ".Designer.cpp");
                     FileInfo cppFile = new FileInfo(cppFileName);
                     if (cppFile.Exists)
                     {

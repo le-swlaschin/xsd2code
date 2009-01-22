@@ -63,7 +63,7 @@ namespace Xsd2Code
             GeneratorFacade gen = new GeneratorFacade(XSDFile, NameSpace, generateCodeType, collectionType, enableDataBinding, HidePrivateFieldInIDE, false, customUsings, collectionBase, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
             string ErrorMessage = "";
             string OutputFileName = "";
-            if (!gen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!gen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Console.WriteLine(ErrorMessage);
                 return;

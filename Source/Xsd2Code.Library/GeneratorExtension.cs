@@ -11,14 +11,15 @@ namespace Xsd2Code.Library.Extensions
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Reflection;
-    using System.Xml.Schema;
-    using Xsd2Code;
-    using System.Xml;
     using System.Configuration;
-    using Xsd2Code.Library.Helpers;
-    using System.Xml.Serialization;
     using System.IO;
+    using System.Reflection;
+    using System.Runtime.Serialization;
+    using System.Xml;
+    using System.Xml.Schema;
+    using System.Xml.Serialization;
+    using Xsd2Code;
+    using Xsd2Code.Library.Helpers;
 
     /// <summary>
     /// Convertion des array properties en collection
@@ -53,7 +54,7 @@ namespace Xsd2Code.Library.Extensions
 
                     #region Find item in XmlSchema for generate class documentation.
                     currentElement = null;
-                    if (GeneratorContext.EnableSummaryComment)
+                    if (GeneratorContext.GeneratorParams.EnableSummaryComment)
                     {
                         XmlSchemaElement xmlElement = SearchElementInSchema(type, schema);
                         if (xmlElement != null)
@@ -99,7 +100,7 @@ namespace Xsd2Code.Library.Extensions
                         type.Members.Add(ctor);
                     }
 
-                    if (GeneratorContext.EnableDataBinding)
+                    if (GeneratorContext.GeneratorParams.EnableDataBinding)
                     {
                         #region add public PropertyChangedEventHandler event
                         // -------------------------------------------------------------------------------
@@ -125,7 +126,7 @@ namespace Xsd2Code.Library.Extensions
                         propChanged.Name = "OnPropertyChanged";
                         propChanged.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "info"));
 
-                        if (GeneratorContext.Language == GenerationLanguage.CSharp || GeneratorContext.Language == GenerationLanguage.VisualCpp)
+                        if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp || GeneratorContext.GeneratorParams.Language == GenerationLanguage.VisualCpp)
                         {
                             propChanged.Statements.Add(new CodeExpressionStatement(new CodeSnippetExpression("PropertyChangedEventHandler handler = PropertyChanged")));
                             CodeExpressionStatement cs1 = new CodeExpressionStatement(new CodeSnippetExpression("handler(this, new PropertyChangedEventArgs(info))"));
@@ -141,7 +142,7 @@ namespace Xsd2Code.Library.Extensions
                         #endregion
                     }
 
-                    if (GeneratorContext.IncludeSerializeMethod)
+                    if (GeneratorContext.GeneratorParams.IncludeSerializeMethod)
                     {
                         type.Members.Add(CodeDomHelper.GetSerializeCodeDomMethod(type));
                         type.Members.Add(CodeDomHelper.GetDeserialize(type));
@@ -182,7 +183,7 @@ namespace Xsd2Code.Library.Extensions
             {
                 CodeTypeDeclaration ctd = new CodeTypeDeclaration(collName);
                 ctd.IsClass = true;
-                ctd.BaseTypes.Add(GeneratorContext.CollectionBase + "<" + collectionTypesField[collName] + ">");
+                ctd.BaseTypes.Add(GeneratorContext.GeneratorParams.CollectionBase + "<" + collectionTypesField[collName] + ">");
                 ctd.IsPartial = true;
 
                 bool newCTor = false;
@@ -340,14 +341,21 @@ namespace Xsd2Code.Library.Extensions
             // ---------------------------------------------
             if (member.Attributes == MemberAttributes.Private)
             {
-                if (GeneratorContext.HidePrivateFieldInIde)
+                if (GeneratorContext.GeneratorParams.HidePrivateFieldInIde)
                 {
                     CodeTypeReference attributeType = new CodeTypeReference(typeof(EditorBrowsableAttribute).Name.Replace("Attribute", string.Empty));
                     CodeAttributeArgument argument = new CodeAttributeArgument();
                     argument.Value = new CodePropertyReferenceExpression(new CodeSnippetExpression(typeof(EditorBrowsableState).Name), "Never");
                     field.CustomAttributes.Add(new CodeAttributeDeclaration(attributeType, new CodeAttributeArgument[] { argument }));
                 }
+
+                /*
+                CodeTypeReference attrib = new CodeTypeReference("DataMember");
+                field.CustomAttributes.Add(new CodeAttributeDeclaration(attrib));
+                */
             }
+
+            
             #endregion
 
             #region Change to generic collection type
@@ -372,7 +380,7 @@ namespace Xsd2Code.Library.Extensions
             //    this.nameField = new List<Name>();
             // }
             // ---------------------------------------
-            if (GeneratorContext.CollectionObjectType != CollectionType.Array)
+            if (GeneratorContext.GeneratorParams.CollectionObjectType != CollectionType.Array)
             {
                 CodeTypeDeclaration declaration = FindTypeInNamespace(field.Type.BaseType, ns);
                 if ((thisIsCollectionType || (((declaration != null) && declaration.IsClass) && ((declaration.TypeAttributes & TypeAttributes.Abstract) != TypeAttributes.Abstract))))
@@ -391,7 +399,7 @@ namespace Xsd2Code.Library.Extensions
         /// <returns>return CodeConstructor</returns>
         private static CodeConstructor ProcessClass(CodeTypeDeclaration type)
         {
-            if (GeneratorContext.EnableDataBinding)
+            if (GeneratorContext.GeneratorParams.EnableDataBinding)
             {
                 type.BaseTypes.Add(typeof(INotifyPropertyChanged));
             }
@@ -442,7 +450,7 @@ namespace Xsd2Code.Library.Extensions
         private static void ProcessProperty(CodeTypeDeclaration type, CodeTypeMember member, XmlSchemaElement xmlElement)
         {
             #region Find item in XmlSchema for summary documentation.
-            if (GeneratorContext.EnableSummaryComment)
+            if (GeneratorContext.GeneratorParams.EnableSummaryComment)
             {
                 if (xmlElement != null)
                 {
@@ -502,7 +510,7 @@ namespace Xsd2Code.Library.Extensions
             }
 
             // Add OnPropertyChanged in setter 
-            if (GeneratorContext.EnableDataBinding)
+            if (GeneratorContext.GeneratorParams.EnableDataBinding)
             {
                 #region Setter adaptaion for databinding
                 if (type.BaseTypes.IndexOf(new CodeTypeReference(typeof(CollectionBase))) == -1)
@@ -604,7 +612,7 @@ namespace Xsd2Code.Library.Extensions
         {
             #region Generic collection
             CodeTypeReference collTypeRef = null;
-            switch (GeneratorContext.CollectionObjectType)
+            switch (GeneratorContext.GeneratorParams.CollectionObjectType)
             {
                 case CollectionType.List:
                     collTypeRef = new CodeTypeReference("List", new CodeTypeReference[] { new CodeTypeReference(baseType) });
@@ -654,7 +662,7 @@ namespace Xsd2Code.Library.Extensions
                 ctor = ProcessClass(type);
             }
 
-            if (GeneratorContext.EnableSummaryComment)
+            if (GeneratorContext.GeneratorParams.EnableSummaryComment)
             {
                 CodeDomHelper.CreateSummaryComment(ctor.Comments, string.Format("{0} class constructor", ctor.Name));
             }

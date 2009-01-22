@@ -51,6 +51,9 @@ namespace Xsd2Code.TestUnit
         //
         #endregion
 
+        /// <summary>
+        /// Circulars this instance.
+        /// </summary>
         [TestMethod]
         public void Circular()
         {
@@ -65,12 +68,15 @@ namespace Xsd2Code.TestUnit
             string OutputFileName = "";
             GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
 
-            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
         }
 
+        /// <summary>
+        /// Stacks the over flow.
+        /// </summary>
         [TestMethod]
         public void StackOverFlow()
         {
@@ -85,12 +91,15 @@ namespace Xsd2Code.TestUnit
             string OutputFileName = "";
             GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
 
-            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
         }
-        
+
+        /// <summary>
+        /// DVDs this instance.
+        /// </summary>
         [TestMethod]
         public void Dvd()
         {
@@ -110,12 +119,47 @@ namespace Xsd2Code.TestUnit
             string ErrorMessage = "";
             GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
             string OutputFileName;
-            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
         }
 
+
+        /// <summary>
+        /// Genders this instance.
+        /// </summary>
+        [TestMethod]
+        public void Gender()
+        {
+            // Get the code namespace for the schema.
+            using (StreamWriter sw = new StreamWriter(DirOutput + "Gender.xsd", false))
+            {
+                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Gender);
+            }
+
+            string FileName = DirOutput + "Gender.xsd";
+            string ErrorMessage = "";
+            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, false, false, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
+            string OutputFileName;
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
+            {
+                Assert.Fail(ErrorMessage);
+            }
+
+            Root genderRoot = new Root();
+            genderRoot.GenderAttribute = ksgender.female;
+            genderRoot.GenderAttributeSpecified = true;
+            genderRoot.GenderElement = ksgender.female;
+            genderRoot.GenderIntAttribute = "toto";
+            Exception exp;
+            genderRoot.SaveToFile(@"c:\temp\gender.xml", out exp);
+            
+        }
+
+        /// <summary>
+        /// Alows the debug.
+        /// </summary>
         [TestMethod]
         public void AlowDebug()
         {
@@ -135,7 +179,7 @@ namespace Xsd2Code.TestUnit
             string ErrorMessage = "";
             GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", true);
             string OutputFileName;
-            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }
@@ -153,7 +197,7 @@ namespace Xsd2Code.TestUnit
             string ErrorMessage = "";
             string OutputFileName = "";
             GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, string.Empty, string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
-            if (!xsdGen.ProcessCodeGeneration(out OutputFileName, out ErrorMessage))
+            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
             {
                 Assert.Fail(ErrorMessage);
             }

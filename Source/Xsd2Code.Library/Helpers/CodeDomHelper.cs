@@ -129,7 +129,7 @@ namespace Xsd2Code.Library.Helpers
         {
             CodeMemberMethod deserializeMethod = new CodeMemberMethod();
             deserializeMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            deserializeMethod.Name = GeneratorContext.DeserializeMethodName;
+            deserializeMethod.Name = GeneratorContext.GeneratorParams.DeserializeMethodName;
 
             deserializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "xml"));
             CodeParameterDeclarationExpression param = new CodeParameterDeclarationExpression(type.Name, "obj");
@@ -209,7 +209,7 @@ namespace Xsd2Code.Library.Helpers
         {
             CodeMemberMethod serializeMethod = new CodeMemberMethod();
             serializeMethod.Attributes = MemberAttributes.Public;
-            serializeMethod.Name = GeneratorContext.SerializeMethodName;
+            serializeMethod.Name = GeneratorContext.GeneratorParams.SerializeMethodName;
 
             // --------------------------------------------------------------------------
             // System.Xml.Serialization.XmlSerializer xmlSerializer = 
@@ -260,7 +260,7 @@ namespace Xsd2Code.Library.Helpers
             #region Method declaration
             CodeMemberMethod loadFromFileMethod = new CodeMemberMethod();
             loadFromFileMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            loadFromFileMethod.Name = GeneratorContext.LoadFromFileMethodName;
+            loadFromFileMethod.Name = GeneratorContext.GeneratorParams.LoadFromFileMethodName;
 
             loadFromFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
             CodeParameterDeclarationExpression param = new CodeParameterDeclarationExpression(type.Name, "obj");
@@ -308,7 +308,7 @@ namespace Xsd2Code.Library.Helpers
             CodeDirectionExpression objParam = new CodeDirectionExpression(FieldDirection.Out, new CodeFieldReferenceExpression(null, "obj"));
             CodeDirectionExpression expParam = new CodeDirectionExpression(FieldDirection.Out, new CodeFieldReferenceExpression(null, "exception"));
 
-            CodeMethodInvokeExpression deserializeInvoke = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(null, GeneratorContext.DeserializeMethodName), new CodeExpression[] { xmlStringParam, objParam, expParam });
+            CodeMethodInvokeExpression deserializeInvoke = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(null, GeneratorContext.GeneratorParams.DeserializeMethodName), new CodeExpression[] { xmlStringParam, objParam, expParam });
             CodeMethodReturnStatement rstmts = new CodeMethodReturnStatement(deserializeInvoke);
             tryStatmanentsCol.Add(rstmts);
             #endregion
@@ -368,7 +368,7 @@ namespace Xsd2Code.Library.Helpers
         {
             CodeMemberMethod saveToFileMethod = new CodeMemberMethod();
             saveToFileMethod.Attributes = MemberAttributes.Public;
-            saveToFileMethod.Name = GeneratorContext.SaveToFileMethodName;
+            saveToFileMethod.Name = GeneratorContext.GeneratorParams.SaveToFileMethodName;
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
 
             CodeParameterDeclarationExpression paramException = new CodeParameterDeclarationExpression(typeof(Exception), "exception");
@@ -386,7 +386,7 @@ namespace Xsd2Code.Library.Helpers
             // ------------------------------
             // string xmlString = Serialize();
             // -------------------------------
-            CodeMethodInvokeExpression serializeMethodInvoke = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(null, GeneratorContext.SerializeMethodName));
+            CodeMethodInvokeExpression serializeMethodInvoke = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(null, GeneratorContext.GeneratorParams.SerializeMethodName));
             CodeVariableDeclarationStatement xmlString = new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(string)), "xmlString", serializeMethodInvoke);
             tryExpression.Add(xmlString);
 

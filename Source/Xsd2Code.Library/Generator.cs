@@ -53,18 +53,18 @@ namespace Xsd2Code
             {
                 #region Set generation context
                 XmlSchema xsd;
-                GeneratorContext.CollectionObjectType = collectionType;
-                GeneratorContext.EnableDataBinding = enableDataBinding;
-                GeneratorContext.HidePrivateFieldInIde = hidePrivate;
-                GeneratorContext.Language = language;
-                GeneratorContext.EnableSummaryComment = enableSummaryComment;
-                GeneratorContext.CustomUsings = customUsings;
-                GeneratorContext.CollectionBase = collectionBase;
-                GeneratorContext.IncludeSerializeMethod = includeSerializeMethod;
-                GeneratorContext.SerializeMethodName = serializeMethodName;
-                GeneratorContext.DeserializeMethodName = deserializeMethodName;
-                GeneratorContext.SaveToFileMethodName = saveToFileMethodName;
-                GeneratorContext.LoadFromFileMethodName = loadFromFileMethodName;
+                GeneratorContext.GeneratorParams.CollectionObjectType = collectionType;
+                GeneratorContext.GeneratorParams.EnableDataBinding = enableDataBinding;
+                GeneratorContext.GeneratorParams.HidePrivateFieldInIde = hidePrivate;
+                GeneratorContext.GeneratorParams.Language = language;
+                GeneratorContext.GeneratorParams.EnableSummaryComment = enableSummaryComment;
+                GeneratorContext.GeneratorParams.CustomUsings = customUsings;
+                GeneratorContext.GeneratorParams.CollectionBase = collectionBase;
+                GeneratorContext.GeneratorParams.IncludeSerializeMethod = includeSerializeMethod;
+                GeneratorContext.GeneratorParams.SerializeMethodName = serializeMethodName;
+                GeneratorContext.GeneratorParams.DeserializeMethodName = deserializeMethodName;
+                GeneratorContext.GeneratorParams.SaveToFileMethodName = saveToFileMethodName;
+                GeneratorContext.GeneratorParams.LoadFromFileMethodName = loadFromFileMethodName;
 
                 using (FileStream fs = new FileStream(xsdFile, FileMode.Open, FileAccess.Read))
                 {
@@ -95,12 +95,12 @@ namespace Xsd2Code
                     }
                 }
 
-                if (GeneratorContext.IncludeSerializeMethod)
+                if (GeneratorContext.GeneratorParams.IncludeSerializeMethod)
                 {
                     ns.Imports.Add(new CodeNamespaceImport("System.IO"));
                 }
 
-                switch (GeneratorContext.CollectionObjectType)
+                switch (GeneratorContext.GeneratorParams.CollectionObjectType)
                 {
                     case CollectionType.List:
                         ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));

@@ -12,9 +12,11 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Xsd2Code.Setup", "Xsd2Code.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xsd2Code.SetupLibrary", "Xsd2Code.SetupLibrary\Xsd2Code.SetupLibrary.csproj", "{FA90BBEB-8D22-4568-8742-718D7FA355AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xsd2Code.CustomTool", "Xsd2Code.CustomTool\Xsd2Code.CustomTool.csproj", "{7CD3B99F-0999-4054-80ED-B0977D723AFD}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 8
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -36,6 +38,9 @@ Global
 		SccProjectUniqueName6 = Xsd2Code.SetupLibrary\\Xsd2Code.SetupLibrary.csproj
 		SccProjectName6 = Xsd2Code.SetupLibrary
 		SccLocalPath6 = Xsd2Code.SetupLibrary
+		SccProjectUniqueName7 = Xsd2Code.CustomTool\\Xsd2Code.CustomTool.csproj
+		SccProjectName7 = Xsd2Code.CustomTool
+		SccLocalPath7 = Xsd2Code.CustomTool
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +69,10 @@ Global
 		{FA90BBEB-8D22-4568-8742-718D7FA355AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA90BBEB-8D22-4568-8742-718D7FA355AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA90BBEB-8D22-4568-8742-718D7FA355AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CD3B99F-0999-4054-80ED-B0977D723AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CD3B99F-0999-4054-80ED-B0977D723AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CD3B99F-0999-4054-80ED-B0977D723AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CD3B99F-0999-4054-80ED-B0977D723AFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
