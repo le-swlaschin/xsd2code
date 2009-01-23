@@ -66,16 +66,21 @@ namespace Xsd2Code
                 GeneratorContext.GeneratorParams.SaveToFileMethodName = saveToFileMethodName;
                 GeneratorContext.GeneratorParams.LoadFromFileMethodName = loadFromFileMethodName;
 
+                XmlSchemas schemas = new XmlSchemas();
                 using (FileStream fs = new FileStream(xsdFile, FileMode.Open, FileAccess.Read))
                 {
                     xsd = XmlSchema.Read(fs, null);
                     XmlSchemaSet schemaSet = new XmlSchemaSet();
                     schemaSet.Add(xsd);
                     schemaSet.Compile();
+
+                    foreach (XmlSchema schema in schemaSet.Schemas())
+                    {
+                        schemas.Add(schema);
+                    }
                 }
 
-                XmlSchemas schemas = new XmlSchemas();
-                schemas.Add(xsd);
+                
                 #endregion
 
                 #region namespace
