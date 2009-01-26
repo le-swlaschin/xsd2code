@@ -109,6 +109,7 @@
     </Compile>
     <Compile Include="Helpers\XmlHelper.cs" />
     <Compile Include="GeneratorFacade.cs" />
+    <Compile Include="NamespaceParam.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />

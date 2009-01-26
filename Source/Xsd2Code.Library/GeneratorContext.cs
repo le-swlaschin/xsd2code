@@ -157,12 +157,11 @@ namespace Xsd2Code.Library
         /// <returns>booean result</returns>
         public static bool ToBoolean(string p)
         {
-            bool res = true;
-            if (p == bool.FalseString)
+            bool res = false;
+            if (p == bool.TrueString)
             {
-                res = false;
+                res = true;
             }
-
             return res;
         }
         #endregion

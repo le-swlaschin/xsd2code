@@ -51,12 +51,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_237AB4F7A0FE364F175B8F9540479067"
         "OwnerKey" = "8:_9FE8EA0636EB116FD6658FBB09DFE95D"
         "MsmSig" = "8:_UNDEFINED"
@@ -201,14 +195,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
-        "OwnerKey" = "8:_51017AA7B3EE30EF47900F2B4CA8D0B0"
+        "MsmKey" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
         "OwnerKey" = "8:_43143199410A44EBBF1E69F608989EB1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
+        "OwnerKey" = "8:_51017AA7B3EE30EF47900F2B4CA8D0B0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -346,6 +346,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_64620B4D54084669B540372A4082535D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -401,12 +407,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_51017AA7B3EE30EF47900F2B4CA8D0B0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -696,26 +696,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1787AA4CEFF3475BBDAB2B073A0D0177"
-            {
-            "SourcePath" = "8:C:\\Users\\pc\\Desktop\\xsd2CodeBanner.jpg"
-            "TargetName" = "8:xsd2CodeBanner.jpg"
-            "Tag" = "8:"
-            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_237AB4F7A0FE364F175B8F9540479067"
             {
             "SourcePath" = "8:dte90.olb"
@@ -740,7 +720,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=2.1.3311.1805, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=2.1.3313.25970, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_2686AF1DB7F2A5254FC2F8572257C80C"
@@ -1022,6 +1002,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7AF8E2F3BE8F4E97998788BF368F6289"
+            {
+            "SourcePath" = "8:banner.jpg"
+            "TargetName" = "8:banner.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7C1C744ED59FEBA62D93B1D1B4A93FF0"
@@ -1349,7 +1349,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Xsd2Code 2.8"
         "ProductCode" = "8:{23C16CCC-6132-4FCF-8207-ED80EF1EBBF3}"
-        "PackageCode" = "8:{681D1630-4925-44F1-AD64-B28FF66E9C14}"
+        "PackageCode" = "8:{FDACF6E1-014D-44E1-888A-6A3C87A672EB}"
         "UpgradeCode" = "8:{DE6ED713-B452-4D2F-A8D1-A3287FBD2A48}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -1773,7 +1773,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
+                            "Value" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "UpdateText"
@@ -1818,7 +1818,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
+                            "Value" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1867,7 +1867,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
+                            "Value" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -1903,7 +1903,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
+                            "Value" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1978,7 +1978,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_1787AA4CEFF3475BBDAB2B073A0D0177"
+                            "Value" = "8:_7AF8E2F3BE8F4E97998788BF368F6289"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"

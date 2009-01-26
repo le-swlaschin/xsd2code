@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Xsd2Code.Library;
+using System.Collections.Generic;
 
 namespace Xsd2Code
 {
@@ -52,9 +53,7 @@ namespace Xsd2Code
             if (args.Length > 6)
                 HidePrivateFieldInIDE = args[6] == "HideInIde";
 
-            string customUsings = string.Empty;
-            if (args.Length > 7)
-                customUsings = args[7];
+            List<NamespaceParam> customUsings = new List<NamespaceParam>();
 
             string collectionBase = string.Empty;
             if (args.Length > 8)

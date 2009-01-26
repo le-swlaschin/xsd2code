@@ -16,6 +16,7 @@ namespace Xsd2Code
     using System.Xml.XPath;
     using Xsd2Code.Library.Extensions;
     using Xsd2Code.Library;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Generator process
@@ -46,7 +47,7 @@ namespace Xsd2Code
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns>result CodeNamespace</returns>
-        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, string customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, out string errorMessage)
+        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, List<NamespaceParam> customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, out string errorMessage)
         {
             errorMessage = "";
             try
@@ -92,14 +93,13 @@ namespace Xsd2Code
                 ns.Imports.Add(new CodeNamespaceImport("System.Xml.Schema"));
                 ns.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
 
-                if (!string.IsNullOrEmpty(customUsings))
+                if (customUsings != null)
                 {
-                    foreach (string s in customUsings.Split(';'))
+                    foreach (var item in customUsings)
                     {
-                        ns.Imports.Add(new CodeNamespaceImport(s));
+                        ns.Imports.Add(new CodeNamespaceImport(item.NameSpace));
                     }
                 }
-
                 if (GeneratorContext.GeneratorParams.IncludeSerializeMethod)
                 {
                     ns.Imports.Add(new CodeNamespaceImport("System.IO"));

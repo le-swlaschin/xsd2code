@@ -51,7 +51,20 @@
             if (wszInputFilePath == null)
                 throw new ArgumentNullException(wszInputFilePath);
 
-            GeneratorFacade xsdGen = new GeneratorFacade(wszInputFilePath, wszDefaultNamespace, provider, CollectionType.List, true, true, true, string.Empty, string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
+            GeneratorParams generatorParams;
+            GeneratorParams generatorParamsfromFile = GeneratorParams.LoadFromFile(wszInputFilePath);
+            if (generatorParamsfromFile != null)
+                generatorParams = generatorParamsfromFile;
+            else
+                generatorParams = new GeneratorParams();
+
+            GeneratorFacade xsdGen = new GeneratorFacade(wszInputFilePath, wszDefaultNamespace, provider, generatorParams.CollectionObjectType,
+                                       generatorParams.EnableDataBinding, generatorParams.HidePrivateFieldInIde,
+                                       generatorParams.EnableSummaryComment, generatorParams.CustomUsings,
+                                       generatorParams.CollectionBase, generatorParams.IncludeSerializeMethod,
+                                       generatorParams.SerializeMethodName, generatorParams.DeserializeMethodName,
+                                       generatorParams.SaveToFileMethodName, generatorParams.LoadFromFileMethodName,
+                                       generatorParams.DisableDebug);
 
             string ErrorMessage;
             byte[] generatedStuff = xsdGen.Generate(out ErrorMessage);
