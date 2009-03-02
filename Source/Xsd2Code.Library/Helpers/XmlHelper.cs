@@ -4,17 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Xsd2Code.Helpers
+namespace Xsd2Code.Library.Helpers
 {
-    using System;
-    using System.Collections;
-    using System.Text;
-    using System.Xml;
-    using System.Xml.Schema;
-    using System.Xml.Serialization;
-    using System.IO;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Helper to find pseudo xml tag.
     /// </summary>
@@ -26,26 +17,17 @@ namespace Xsd2Code.Helpers
         /// <param name="xmlStream">xml data string</param>
         /// <param name="tag">Tag name in xml</param>
         /// <returns>return tag value</returns>
-        public static string ExtractStrFromXML(string xmlStream, string tag)
+        public static string ExtractStrFromXML(this string xmlStream, string tag)
         {
-            int startpos;
-            int endpos;
-            int lenght;
-            string upperData;
-
-            upperData = xmlStream.ToUpper();
+            string upperData = xmlStream.ToUpper();
             tag = tag.ToUpper();
-            startpos = upperData.IndexOf("<" + tag + ">") + 2 + tag.Length;
-            endpos = upperData.IndexOf("</" + tag + ">");
-            lenght = endpos - startpos;
+            int startpos = upperData.IndexOf("<" + tag + ">") + 2 + tag.Length;
+            int endpos = upperData.IndexOf("</" + tag + ">");
+            int lenght = endpos - startpos;
             if (lenght > 0)
-            {
                 return xmlStream.Substring(startpos, lenght);
-            }
-            else
-            {
-                return "";
-            }
+            
+            return string.Empty;
         }
 
         /// <summary>
