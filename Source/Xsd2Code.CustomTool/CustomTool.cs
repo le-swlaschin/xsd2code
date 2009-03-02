@@ -1,18 +1,29 @@
-﻿namespace Xsd2Code.CustomTool
-{
-    using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.Collections.Generic;
-    using System.Runtime.InteropServices;
-    using System.Text;
-    using Microsoft.VisualStudio;
-    using Microsoft.VisualStudio.Designer.Interfaces;
-    using Microsoft.VisualStudio.OLE.Interop;
-    using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Shell.Interop;
-    using Xsd2Code.Library;
+﻿using System;
+using System.CodeDom.Compiler;
+using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Designer.Interfaces;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Xsd2Code.Library;
+using IServiceProvider=Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
+namespace Xsd2Code.CustomTool
+{
+    /// <summary>
+    /// Implementation of the Xsd2Code custom tool for VisualStudio
+    /// <para>Usage:</para>
+    /// <para>     Specify Xsd2CodeCustomTool in the CustomTool proprty of an XSD file within Visual Studio</para>
+    /// </summary>
+    /// <remarks>
+    /// 
+    /// Revision history:
+    /// 
+    ///     Modified 2009-02-20 by Ruslan Urban
+    ///     Changed signature of the GeneratorFacade class constructor
+    /// 
+    /// </remarks>
     [Guid("9E6FCB59-E3EF-4bbe-966C-30AC92A44DF6")]
     public class Xsd2CodeCustomTool : IVsSingleFileGenerator, IObjectWithSite
     {
@@ -24,10 +35,10 @@
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
             pbstrDefaultExtension = this.provider.FileExtension;
-            if (pbstrDefaultExtension != null && pbstrDefaultExtension.Length > 0)
-            {
+            
+            if (!string.IsNullOrEmpty(pbstrDefaultExtension))
                 pbstrDefaultExtension = ".Designer." + pbstrDefaultExtension.TrimStart(".".ToCharArray());
-            }
+            
             return 0;
         }
 
@@ -51,23 +62,15 @@
             if (wszInputFilePath == null)
                 throw new ArgumentNullException(wszInputFilePath);
 
-            GeneratorParams generatorParams;
-            GeneratorParams generatorParamsfromFile = GeneratorParams.LoadFromFile(wszInputFilePath);
-            if (generatorParamsfromFile != null)
-                generatorParams = generatorParamsfromFile;
-            else
-                generatorParams = new GeneratorParams();
+            var generatorParams = GeneratorParams.LoadFromFile(wszInputFilePath) ?? new GeneratorParams();
 
-            GeneratorFacade xsdGen = new GeneratorFacade(wszInputFilePath, wszDefaultNamespace, provider, generatorParams.CollectionObjectType,
-                                       generatorParams.EnableDataBinding, generatorParams.HidePrivateFieldInIde,
-                                       generatorParams.EnableSummaryComment, generatorParams.CustomUsings,
-                                       generatorParams.CollectionBase, generatorParams.IncludeSerializeMethod,
-                                       generatorParams.SerializeMethodName, generatorParams.DeserializeMethodName,
-                                       generatorParams.SaveToFileMethodName, generatorParams.LoadFromFileMethodName,
-                                       generatorParams.DisableDebug);
+            generatorParams.InputFilePath = wszInputFilePath;
+            generatorParams.NameSpace = wszDefaultNamespace;
 
-            string ErrorMessage;
-            byte[] generatedStuff = xsdGen.Generate(out ErrorMessage);
+            var xsdGen = new GeneratorFacade(this.provider, generatorParams);
+
+            var result = xsdGen.GenerateBytes();
+            var generatedStuff = result.Entity;
 
             if (generatedStuff == null)
             {
@@ -79,7 +82,7 @@
             // Copie du flux en mémoire pour que Visual Studio puisse le récupérer
             rgbOutputFileContents[0] = Marshal.AllocCoTaskMem(generatedStuff.Length);
             Marshal.Copy(generatedStuff, 0, rgbOutputFileContents[0], generatedStuff.Length);
-            pcbOutput = (uint)generatedStuff.Length;
+            pcbOutput = (uint) generatedStuff.Length;
 
             return 0;
         }
@@ -87,6 +90,7 @@
         #endregion
 
         #region IObjectWithSite Members
+
         /// <summary>
         /// </summary>
         /// <param name="riid"></param>
@@ -97,8 +101,11 @@
                 throw new COMException("Aucun site", VSConstants.E_FAIL);
 
             // Créer un pointeur d'interface
-            IntPtr pUnknownPointer = Marshal.GetIUnknownForObject(site);
+            IntPtr pUnknownPointer = Marshal.GetIUnknownForObject(this.site);
+
+// ReSharper disable RedundantAssignment
             IntPtr intPointer = IntPtr.Zero;
+// ReSharper restore RedundantAssignment
 
             // Demande de pointeur de l'interface pUnknownPointer
             Marshal.QueryInterface(pUnknownPointer, ref riid, out intPointer);
@@ -114,26 +121,23 @@
         /// <param name="pUnkSite"></param>
         public void SetSite(object pUnkSite)
         {
-            ServiceProvider serviceProvider;
-
             this.site = pUnkSite;
 
             //Créer un fournisseur de service du site
-            serviceProvider = new ServiceProvider(site as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+            var serviceProvider = new ServiceProvider(this.site as IServiceProvider);
 
             //Récupéreur le service SVSMDCodeDomProvider
-            IVSMDCodeDomProvider p = serviceProvider.GetService(typeof(SVSMDCodeDomProvider)) as IVSMDCodeDomProvider;
+            var p = serviceProvider.GetService(typeof (SVSMDCodeDomProvider)) as IVSMDCodeDomProvider;
 
             if (p != null)
-            {
                 this.provider = p.CodeDomProvider as CodeDomProvider;
-            }
             else
             {
                 //Ici, aucun langage n'a pu être déterminé
                 this.provider = CodeDomProvider.CreateProvider("C#");
             }
         }
+
         #endregion
     }
 }

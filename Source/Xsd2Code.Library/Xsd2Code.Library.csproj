@@ -31,6 +31,7 @@
     <SccProvider>SAK</SccProvider>
     <OldToolsVersion>2.0</OldToolsVersion>
     <SignAssembly>true</SignAssembly>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -84,8 +85,14 @@
       <Name>System</Name>
     </Reference>
     <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data">
       <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
@@ -95,12 +102,22 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CodeBase.cs" />
+    <Compile Include="CodeDomProviderFactory.cs" />
+    <Compile Include="CollectionType.cs" />
+    <Compile Include="GenerationLanguage.cs" />
     <Compile Include="GeneratorExtension.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GeneratorContext.cs" />
     <Compile Include="GeneratorParams.cs" />
     <Compile Include="Helpers\CodeDomHelper.cs" />
+    <Compile Include="Helpers\Message.cs" />
+    <Compile Include="Helpers\Messages.cs" />
+    <Compile Include="Helpers\MessageSubtype.cs" />
+    <Compile Include="Helpers\MessageType.cs" />
+    <Compile Include="Helpers\Result.cs" />
+    <Compile Include="Helpers\Utility.cs" />
     <Compile Include="ICodeExtension.cs">
       <SubType>Code</SubType>
     </Compile>

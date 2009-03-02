@@ -1,26 +1,23 @@
-//-----------------------------------------------------------------------
-// <copyright file="Generator.cs" company="Xsd2Code">
-//     copyright Pascal Cabanel.
-// </copyright>
-//-----------------------------------------------------------------------
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using Xsd2Code.Library.Helpers;
 
-namespace Xsd2Code
+namespace Xsd2Code.Library
 {
-    using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.IO;
-    using System.Xml;
-    using System.Xml.Schema;
-    using System.Xml.Serialization;
-    using System.Xml.XPath;
-    using Xsd2Code.Library.Extensions;
-    using Xsd2Code.Library;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Generator process
+    /// Generator class
     /// </summary>
+    /// <remarks>
+    /// Revision history:
+    /// 
+    ///     Modified 2009-02-20 by Ruslan Urban
+    ///     Changed signature of the GeneratorFacade class constructor
+    /// 
+    /// </remarks>
     public sealed class Generator
     {
         /// <summary>
@@ -45,47 +42,55 @@ namespace Xsd2Code
         /// <param name="deserializeMethodName">Name of the deserialize method.</param>
         /// <param name="saveToFileMethodName">Name of the save to file method.</param>
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
-        /// <param name="errorMessage">The error message.</param>
+        /// <param name="generateCloneMethod"></param>
+        /// <param name="codeBase"></param>
         /// <returns>result CodeNamespace</returns>
-        internal static CodeNamespace Process(string xsdFile, string targetNamespace, GenerationLanguage language, CollectionType collectionType, bool enableDataBinding, bool hidePrivate, bool enableSummaryComment, List<NamespaceParam> customUsings, string collectionBase, bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName, string saveToFileMethodName, string loadFromFileMethodName, out string errorMessage)
+        [Obsolete("Do not use", true)]
+        internal static Result<CodeNamespace> Process(string xsdFile, string targetNamespace,
+                                                      GenerationLanguage language,
+                                                      CollectionType collectionType, bool enableDataBinding,
+                                                      bool hidePrivate,
+                                                      bool enableSummaryComment, List<NamespaceParam> customUsings,
+                                                      string collectionBase, bool includeSerializeMethod,
+                                                      string serializeMethodName, string deserializeMethodName,
+                                                      string saveToFileMethodName, string loadFromFileMethodName,
+                                                      bool generateCloneMethod, CodeBase codeBase)
         {
-            errorMessage = "";
+            var generatorParams = new GeneratorParams
+                                      {
+                                          CollectionObjectType = collectionType,
+                                          EnableDataBinding = enableDataBinding,
+                                          HidePrivateFieldInIde = hidePrivate,
+                                          Language = language,
+                                          EnableSummaryComment = enableSummaryComment,
+                                          CustomUsings = customUsings,
+                                          CollectionBase = collectionBase,
+                                          IncludeSerializeMethod = includeSerializeMethod,
+                                          GenerateCloneMethod = generateCloneMethod,
+                                          CodeBase = codeBase,
+                                          SerializeMethodName = serializeMethodName,
+                                          DeserializeMethodName = deserializeMethodName,
+                                          SaveToFileMethodName = saveToFileMethodName,
+                                          LoadFromFileMethodName = loadFromFileMethodName,
+                                      };
+
+            return Process(generatorParams);
+        }
+
+        /// <summary>
+        /// Initiate code generation process
+        /// </summary>
+        /// <param name="generatorParams">Generator parameters</param>
+        /// <returns></returns>
+        internal static Result<CodeNamespace> Process(GeneratorParams generatorParams)
+        {
+            var ns = new CodeNamespace();
             try
             {
-                #region Set generation context
-                XmlSchema xsd;
-                GeneratorContext.GeneratorParams.CollectionObjectType = collectionType;
-                GeneratorContext.GeneratorParams.EnableDataBinding = enableDataBinding;
-                GeneratorContext.GeneratorParams.HidePrivateFieldInIde = hidePrivate;
-                GeneratorContext.GeneratorParams.Language = language;
-                GeneratorContext.GeneratorParams.EnableSummaryComment = enableSummaryComment;
-                GeneratorContext.GeneratorParams.CustomUsings = customUsings;
-                GeneratorContext.GeneratorParams.CollectionBase = collectionBase;
-                GeneratorContext.GeneratorParams.IncludeSerializeMethod = includeSerializeMethod;
-                GeneratorContext.GeneratorParams.SerializeMethodName = serializeMethodName;
-                GeneratorContext.GeneratorParams.DeserializeMethodName = deserializeMethodName;
-                GeneratorContext.GeneratorParams.SaveToFileMethodName = saveToFileMethodName;
-                GeneratorContext.GeneratorParams.LoadFromFileMethodName = loadFromFileMethodName;
-
-                XmlSchemas schemas = new XmlSchemas();
-                using (FileStream fs = new FileStream(xsdFile, FileMode.Open, FileAccess.Read))
-                {
-                    xsd = XmlSchema.Read(fs, null);
-                    XmlSchemaSet schemaSet = new XmlSchemaSet();
-                    schemaSet.Add(xsd);
-                    schemaSet.Compile();
-
-                    foreach (XmlSchema schema in schemaSet.Schemas())
-                    {
-                        schemas.Add(schema);
-                    }
-                }
-
-                
-                #endregion
+                GeneratorContext.GeneratorParams = generatorParams;
 
                 #region namespace
-                CodeNamespace ns = new CodeNamespace();
+
                 ns.Imports.Add(new CodeNamespaceImport("System"));
                 ns.Imports.Add(new CodeNamespaceImport("System.Diagnostics"));
                 ns.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
@@ -93,17 +98,13 @@ namespace Xsd2Code
                 ns.Imports.Add(new CodeNamespaceImport("System.Xml.Schema"));
                 ns.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
 
-                if (customUsings != null)
+                if (generatorParams.CustomUsings != null)
                 {
-                    foreach (var item in customUsings)
-                    {
+                    foreach (var item in generatorParams.CustomUsings)
                         ns.Imports.Add(new CodeNamespaceImport(item.NameSpace));
-                    }
                 }
                 if (GeneratorContext.GeneratorParams.IncludeSerializeMethod)
-                {
                     ns.Imports.Add(new CodeNamespaceImport("System.IO"));
-                }
 
                 switch (GeneratorContext.GeneratorParams.CollectionObjectType)
                 {
@@ -116,33 +117,59 @@ namespace Xsd2Code
                     default:
                         break;
                 }
+                if (generatorParams.GenerateDataContracts)
+                {
+                    ns.Imports.Add(new CodeNamespaceImport("System.Runtime.Serialization"));
+                }
+                ns.Name = generatorParams.NameSpace;
 
-                ns.Name = targetNamespace;
+                #endregion
+
+                #region Set generation context
+
                 #endregion
 
                 #region Get XmlTypeMapping
-                XmlCodeExporter exporter = new XmlCodeExporter(ns);
-                
-                XmlSchemaImporter importer = new XmlSchemaImporter(schemas);
+
+                XmlSchema xsd;
+                var schemas = new XmlSchemas();
+
+                using (var fs = new FileStream(generatorParams.InputFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    xsd = XmlSchema.Read(fs, null);
+
+                    var schemaSet = new XmlSchemaSet();
+
+                    schemaSet.Add(xsd);
+                    schemaSet.Compile();
+
+                    foreach (XmlSchema schema in schemaSet.Schemas())
+                        schemas.Add(schema);
+                }
+
+                var exporter = new XmlCodeExporter(ns);
+                var importer = new XmlSchemaImporter(schemas);
+
                 foreach (XmlSchemaElement element in xsd.Elements.Values)
                 {
-                    XmlTypeMapping mapping = importer.ImportTypeMapping(element.QualifiedName);
+                    var mapping = importer.ImportTypeMapping(element.QualifiedName);
                     exporter.ExportTypeMapping(mapping);
                 }
 
                 #endregion
 
                 #region Execute extensions
-                GeneratorExtension ext = new GeneratorExtension();
+
+                var ext = new GeneratorExtension();
                 ext.Process(ns, xsd);
+
                 #endregion Execute extensions
 
-                return ns;
+                return new Result<CodeNamespace>(ns, true);
             }
             catch (Exception e)
             {
-                errorMessage = e.Message;
-                return null;
+                return new Result<CodeNamespace>(ns, false, e.Message, MessageType.Error);
             }
         }
     }

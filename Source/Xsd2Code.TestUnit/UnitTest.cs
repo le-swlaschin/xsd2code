@@ -1,35 +1,42 @@
 using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.CodeDom;
-using System.CodeDom.Compiler;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using Xsd2Code.TestUnit.Properties;
+using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xsd2Code.Library;
+using Xsd2Code.TestUnit.Properties;
 
 namespace Xsd2Code.TestUnit
 {
     /// <summary>
-    /// Summary description for UnitTest1 (איû)
+    /// Xsd2Code unit tests
     /// </summary>
+    /// <remarks>
+    /// Revision history:
+    /// 
+    ///     Modified 2009-02-25 by Ruslan Urban 
+    ///     Performed code review
+    ///     Changed output folder to the TestResults folder to preserve files in the testing history
+    ///     TODO: Add tests that compile generated code
+    /// 
+    /// </remarks>
     [TestClass]
     public class UnitTest
     {
-        private string NameSpace = "Xsd2Code.TestUnit";
-        private string DirOutput = @"c:\temp\";
-
-        public UnitTest()
+        /// <summary>
+        /// Output folder: TestResults folder relative to the solution root folder
+        /// </summary>
+        private static string OutputFolder
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"; }
         }
 
+        /// <summary>
+        /// Code generation namespace  
+        /// </summary>
+        private const string CodeGenerationNamespace = "Xsd2Code.TestUnit";
+
         #region Additional test attributes
+
         //
         // You can use the following additional attributes as you write your tests:
         //
@@ -49,6 +56,7 @@ namespace Xsd2Code.TestUnit
         // [TestCleanup()]
         // public void MyTestCleanup() { }
         //
+
         #endregion
 
         /// <summary>
@@ -57,21 +65,13 @@ namespace Xsd2Code.TestUnit
         [TestMethod]
         public void Circular()
         {
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Circular.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Circular);
-            }
+            // Copy resource file to the run-time directory
+            string inputFilePath = GetInputFilePath("Circular.xsd", Resources.Circular);
 
-            string FileName = DirOutput + "Circular.xsd";
-            string ErrorMessage = "";
-            string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, new List<NamespaceParam>(), string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
+            var xsdGen = new GeneratorFacade(GetGeneratorParams(inputFilePath));
+            var result = xsdGen.Generate();
 
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            Assert.IsTrue(result.Success, result.Messages.ToString());
         }
 
         /// <summary>
@@ -80,22 +80,15 @@ namespace Xsd2Code.TestUnit
         [TestMethod]
         public void StackOverFlow()
         {
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "StackOverFlow.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.StackOverFlow);
-            }
+            // Copy resource file to the run-time directory
+            string inputFilePath = GetInputFilePath("StackOverFlow.xsd", Resources.StackOverFlow);
 
-            string FileName = DirOutput + "StackOverFlow.xsd";
-            string ErrorMessage = "";
-            string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, new List<NamespaceParam>(), string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
+            var xsdGen = new GeneratorFacade(GetGeneratorParams(inputFilePath));
+            var result = xsdGen.Generate();
 
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            Assert.IsTrue(result.Success, result.Messages.ToString());
         }
+
 
         /// <summary>
         /// DVDs this instance.
@@ -103,26 +96,16 @@ namespace Xsd2Code.TestUnit
         [TestMethod]
         public void Dvd()
         {
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Dvd.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.dvd);
-            }
+            // Copy resource file to the run-time directory
+            GetInputFilePath("Actor.xsd", Resources.Actor);
 
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Actor.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Actor);
-            }
+            // Copy resource file to the run-time directory
+            string inputFilePath = GetInputFilePath("Dvd.xsd", Resources.dvd);
 
-            string FileName = DirOutput + "Dvd.xsd";
-            string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, new List<NamespaceParam>(), string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
-            string OutputFileName;
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            var xsdGen = new GeneratorFacade(GetGeneratorParams(inputFilePath));
+            var result = xsdGen.Generate();
+
+            Assert.IsTrue(result.Success, result.Messages.ToString());
         }
 
 
@@ -133,28 +116,23 @@ namespace Xsd2Code.TestUnit
         public void Gender()
         {
             // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Gender.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Gender);
-            }
+            string inputFilePath = GetInputFilePath("Gender.xsd", Resources.Gender);
 
-            string FileName = DirOutput + "Gender.xsd";
-            string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, false, false, true, new List<NamespaceParam>(), string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", false);
-            string OutputFileName;
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            var xsdGen = new GeneratorFacade(GetGeneratorParams(inputFilePath));
 
-            Root genderRoot = new Root();
-            genderRoot.GenderAttribute = ksgender.female;
-            genderRoot.GenderAttributeSpecified = true;
-            genderRoot.GenderElement = ksgender.female;
-            genderRoot.GenderIntAttribute = "toto";
+            var result = xsdGen.Generate();
+            if (!result.Success)
+                Assert.Fail(result.Messages.ToString());
+
+            var genderRoot = new Root
+                                 {
+                                     GenderAttribute = ksgender.female,
+                                     GenderAttributeSpecified = true,
+                                     GenderElement = ksgender.female,
+                                     GenderIntAttribute = "toto"
+                                 };
             Exception exp;
-            genderRoot.SaveToFile(@"c:\temp\gender.xml", out exp);
-            
+            genderRoot.SaveToFile(OutputFolder + @"gender.xml", out exp);
         }
 
         /// <summary>
@@ -163,48 +141,33 @@ namespace Xsd2Code.TestUnit
         [TestMethod]
         public void AlowDebug()
         {
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Dvd.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.dvd);
-            }
+            // Copy resource file to the run-time directory
+            GetInputFilePath("Actor.xsd", Resources.Actor);
+            string inputFilePath = GetInputFilePath("Dvd.xsd", Resources.dvd);
 
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Actor.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Actor);
-            }
+            var generatorParams = GetGeneratorParams(inputFilePath);
+            generatorParams.DisableDebug = false;
+            generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".DebugEnabled.cs");
 
-            string FileName = DirOutput + "Dvd.xsd";
-            string ErrorMessage = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, new List<NamespaceParam>(), string.Empty, true, "Serialize", "Deserialize", "SaveToFile", "LoadFromFile", true);
-            string OutputFileName;
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            var xsdGen = new GeneratorFacade(generatorParams);
+            var result = xsdGen.Generate();
+
+            Assert.IsTrue(result.Success, result.Messages.ToString());
         }
+
         [TestMethod]
         public void Hierarchical()
         {
-            // Get the code namespace for the schema.
-            using (StreamWriter sw = new StreamWriter(DirOutput + "Hierarchical.xsd", false))
-            {
-                sw.Write(Xsd2Code.TestUnit.Properties.Resources.Hierarchical);
-            }
+            // Copy resource file to the run-time directory
+            string inputFilePath = GetInputFilePath("Hierarchical.xsd", Resources.Hierarchical);
 
-            string FileName = DirOutput + "Hierarchical.xsd";
-            string ErrorMessage = "";
-            string OutputFileName = "";
-            GeneratorFacade xsdGen = new GeneratorFacade(FileName, NameSpace, GenerationLanguage.CSharp, CollectionType.List, true, true, true, new List<NamespaceParam>(), string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, false);
-            if (!xsdGen.Generate(out OutputFileName, out ErrorMessage))
-            {
-                Assert.Fail(ErrorMessage);
-            }
+            var xsdGen = new GeneratorFacade(GetGeneratorParams(inputFilePath));
+            var result = xsdGen.Generate();
+
+            Assert.IsTrue(result.Success, result.Messages.ToString());
         }
-        
+
         [TestMethod]
-        
         public void Serialize()
         {
             DvdCollection dvdCol = GetDvd();
@@ -217,14 +180,10 @@ namespace Xsd2Code.TestUnit
             {
                 string dvdColStr2 = dvdColFromXml.Serialize();
                 if (!dvdColStr1.Equals(dvdColStr2))
-                {
                     Assert.Fail("dvdColFromXml is not equal after Deserialize");
-                }
             }
             else
-            {
                 Assert.Fail(exception.Message);
-            }
         }
 
         [TestMethod]
@@ -232,44 +191,61 @@ namespace Xsd2Code.TestUnit
         {
             DvdCollection dvdCol = GetDvd();
             Exception exception;
-            if (!dvdCol.SaveToFile(@"c:\temp\savedvd.xml", out exception))
-            {
+            if (!dvdCol.SaveToFile(OutputFolder + @"savedvd.xml", out exception))
                 Assert.Fail(string.Format("Failed to save file. {0}", exception.Message));
-            }
 
             DvdCollection loadedDvdCollection;
             Exception e;
-            if (!DvdCollection.LoadFromFile(@"c:\temp\savedvd.xml", out loadedDvdCollection, out e))
-            {
+            if (!DvdCollection.LoadFromFile(OutputFolder + @"savedvd.xml", out loadedDvdCollection, out e))
                 Assert.Fail(string.Format("Failed to load file. {0}", e.Message));
-            }
 
             string xmlBegin = dvdCol.Serialize();
             string xmlEnd = loadedDvdCollection.Serialize();
 
             if (!xmlBegin.Equals(xmlEnd))
-            {
                 Assert.Fail(string.Format("xmlBegin and xmlEnd are not equal after LoadFromFile"));
-            }
         }
-        
+
         [TestMethod]
         public void InvalidLoadFromFile()
         {
             DvdCollection loadedDvdCollection;
             Exception e;
-            DvdCollection.LoadFromFile(@"c:\tempo\savedvd.xml", out loadedDvdCollection, out e);
+            DvdCollection.LoadFromFile(OutputFolder + @"savedvd.error.xml", out loadedDvdCollection, out e);
         }
-        
+
         private static DvdCollection GetDvd()
         {
-            DvdCollection dvdCol = new DvdCollection();
-            dvd newdvd = new dvd();
-            newdvd.Title = "Matrix";
-            newdvd.Style = Styles.Action;
-            newdvd.Actor.Add(new Actor { firstname = "Thomas", lastname = "Anderson" });
+            var dvdCol = new DvdCollection();
+            var newdvd = new dvd {Title = "Matrix", Style = Styles.Action};
+            newdvd.Actor.Add(new Actor {firstname = "Thomas", lastname = "Anderson"});
             dvdCol.Dvds.Add(newdvd);
             return dvdCol;
+        }
+
+        private static string GetInputFilePath(string resourceFileName, string fileContent)
+        {
+            using (var sw = new StreamWriter(OutputFolder + resourceFileName, false))
+                sw.Write(fileContent);
+
+            return OutputFolder + resourceFileName;
+        }
+
+        private static GeneratorParams GetGeneratorParams(string inputFilePath)
+        {
+            return new GeneratorParams
+                       {
+                           InputFilePath = inputFilePath,
+                           NameSpace = CodeGenerationNamespace,
+                           CodeBase = CodeBase.NetFX20,
+                           CollectionObjectType = CollectionType.ObservableCollection,
+                           DisableDebug = true,
+                           EnableDataBinding = true,
+                           GenerateDataContracts = true,
+                           GenerateCloneMethod = true,
+                           IncludeSerializeMethod = true,
+                           HidePrivateFieldInIde = true
+                       };
         }
     }
 }
