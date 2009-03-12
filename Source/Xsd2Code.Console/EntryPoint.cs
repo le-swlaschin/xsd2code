@@ -16,13 +16,15 @@ namespace Xsd2Code
     ///     Modified 2009-02-20 by Ruslan Urban
     ///     Changed parsing of command-line arguments
     /// 
+    ///     Modified 2009-03-12 By Ruslan Urban
+    ///     Enabled GenerateDataContracts option
+    /// 
     /// </remarks>
     internal class EntryPoint
     {
-         [STAThread]
+        [STAThread]
         static private void Main(string[] args)
         {
-
             // Display hekp when no parameters have been specified
             if (args.Length < 1)
             {
@@ -71,6 +73,7 @@ namespace Xsd2Code
                 {
                     case "/n":
                     case "/ns":
+                    case "/namespace":
                         if (i < args.Length - 1)
                         {
                             generatorParams.NameSpace = args[i + 1];
@@ -113,7 +116,7 @@ namespace Xsd2Code
                     case "/codebase":
                         if (i < args.Length - 1)
                         {
-                            generatorParams.CodeBase = Utility.ToEnum<CodeBase>(args[i + 1]);
+                            generatorParams.Platform = Utility.ToEnum<CodeBase>(args[i + 1]);
                             i++;
                         }
                         break;
@@ -153,6 +156,16 @@ namespace Xsd2Code
                         }
                         break;
 
+                    case "/p":
+                    case "/pl":
+                    case "/platform":
+                        if (i < args.Length - 1)
+                        {
+                            generatorParams.Platform = Utility.GetCodeBase(args[i + 1]);
+                            i++;
+                        }
+                        break;
+
                     case "/u":
                     case "/us":
                     case "/using":
@@ -184,16 +197,14 @@ namespace Xsd2Code
                         generatorParams.EnableDataBinding = false;
                         break;
 
-                    /* RU20090225: TODO: Implement WCF attribute generation
-                                        case "/dc":
-                                        case "/dc+":
-                                            generatorParams.GenerateDataContracts = true;
-                                            break;
-                                        case "/dc-":
-                                            generatorParams.GenerateDataContracts = false;
-                                            break;
+                    case "/dc":
+                    case "/dc+":
+                        generatorParams.GenerateDataContracts = true;
+                        break;
+                    case "/dc-":
+                        generatorParams.GenerateDataContracts = false;
+                        break;
 
-                    */
 
                     case "/sc":
                     case "/sc+":
@@ -242,7 +253,6 @@ namespace Xsd2Code
                     case "/help":
                         DisplayHelp();
                         return;
-
                 }
             }
 
@@ -251,9 +261,9 @@ namespace Xsd2Code
             {
                 generatorParams.OutputFilePath =
                     Utility.GetOutputFilePath(generatorParams.InputFilePath,
-                                                      generatorParams.Language);
+                                              generatorParams.Language);
             }
-            
+
             // Auto-generate missing generated code namespace
             if (string.IsNullOrEmpty(generatorParams.NameSpace))
                 generatorParams.NameSpace = Path.GetFileNameWithoutExtension(generatorParams.InputFilePath);
@@ -263,8 +273,8 @@ namespace Xsd2Code
             var generator = new GeneratorFacade(generatorParams);
 
             // Generate code
-             var result = generator.Generate();
-             if (!result.Success)
+            var result = generator.Generate();
+            if (!result.Success)
             {
                 // Display the error and wait for user confirmation
                 Console.WriteLine();
@@ -281,8 +291,7 @@ namespace Xsd2Code
             Console.WriteLine();
             Console.WriteLine("Finished");
             Console.WriteLine();
-
-         }
+        }
 
         static private void DisplayApplicationInfo()
         {
@@ -304,6 +313,7 @@ namespace Xsd2Code
             Console.WriteLine(Resources.Help);
             Console.WriteLine();
         }
+
         /// <summary>
         /// Display contents of the help file ~/Resources/Help.txt
         /// </summary>

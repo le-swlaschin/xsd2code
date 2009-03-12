@@ -62,7 +62,6 @@ namespace Xsd2Code.SetupLibrary
 
             // Setup .addin path and assembly path
             string addinTargetPath = Path.Combine(
-                
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 @"Visual Studio 2008\Addins");
 

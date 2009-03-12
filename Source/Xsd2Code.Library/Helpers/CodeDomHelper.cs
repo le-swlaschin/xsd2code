@@ -178,7 +178,7 @@ namespace Xsd2Code.Library.Helpers
             tryStatmanentsCol.Add(CreateObject(typeof (StringReader), "stringReader", new[] {"xml"}));
 
             var serializerParameter = "xmlTextReader";
-            switch (GeneratorContext.GeneratorParams.CodeBase)
+            switch (GeneratorContext.GeneratorParams.Platform)
             {
                 case CodeBase.Silverlight20:
                     serializerParameter = "stringReader";

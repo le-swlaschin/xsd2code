@@ -67,7 +67,7 @@ namespace Xsd2Code.Library
                                           CollectionBase = collectionBase,
                                           IncludeSerializeMethod = includeSerializeMethod,
                                           GenerateCloneMethod = generateCloneMethod,
-                                          CodeBase = codeBase,
+                                          Platform = codeBase,
                                           SerializeMethodName = serializeMethodName,
                                           DeserializeMethodName = deserializeMethodName,
                                           SaveToFileMethodName = saveToFileMethodName,

@@ -15,7 +15,7 @@ namespace Xsd2Code.Library
     /// Revision history:
     /// 
     ///     Modified 2009-02-20 by Ruslan Urban
-    ///     Added CodeBase and GenerateCloneMethod properties
+    ///     Added Platform and GenerateCloneMethod properties
     /// 
     /// </remarks>
     public class GeneratorParams
@@ -64,7 +64,7 @@ namespace Xsd2Code.Library
 
         #endregion
 
-        private CodeBase codeBase = default(CodeBase);
+        private CodeBase platform = default(CodeBase);
         private bool enableDataBinding = true;
 
         /// <summary>
@@ -166,10 +166,10 @@ namespace Xsd2Code.Library
         [Category("Behavior")]
         [DefaultValue(CodeBase.NetFX20)]
         [Description("Generated code base")]
-        public CodeBase CodeBase
+        public CodeBase Platform
         {
-            get { return this.codeBase; }
-            set { this.codeBase = value; }
+            get { return this.platform; }
+            set { this.platform = value; }
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace Xsd2Code.Library
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateCloneMethodTag));
                     parameters.GenerateDataContracts =
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateDataContractsTag));
-                    parameters.CodeBase =
+                    parameters.Platform =
                             Utility.ToEnum<CodeBase>(optionLine.ExtractStrFromXML(GeneratorContext.CodeBaseTag));
                     parameters.DisableDebug =
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.DisableDebugTag));
@@ -420,7 +420,7 @@ namespace Xsd2Code.Library
 
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CodeBaseTag,
-                                                          this.CodeBase.ToString()));
+                                                          this.Platform.ToString()));
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SerializeMethodNameTag,
                                                           this.SerializeMethodName));

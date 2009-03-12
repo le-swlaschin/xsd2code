@@ -180,7 +180,7 @@ namespace Xsd2Code.Library
             GeneratorContext.GeneratorParams.CollectionBase = collectionBase;
             GeneratorContext.GeneratorParams.IncludeSerializeMethod = includeSerializeMethod;
             GeneratorContext.GeneratorParams.GenerateCloneMethod = implementCloneMethod;
-            GeneratorContext.GeneratorParams.CodeBase = codeBase;
+            GeneratorContext.GeneratorParams.Platform = codeBase;
             GeneratorContext.GeneratorParams.SerializeMethodName = serializeMethodName;
             GeneratorContext.GeneratorParams.DeserializeMethodName = deserializeMethodName;
             GeneratorContext.GeneratorParams.SaveToFileMethodName = saveToFileMethodName;

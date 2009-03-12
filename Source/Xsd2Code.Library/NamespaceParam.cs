@@ -9,7 +9,6 @@ namespace Xsd2Code.Library
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using Xsd2Code.Helpers;
     using System.IO;
     using System.ComponentModel;
 
