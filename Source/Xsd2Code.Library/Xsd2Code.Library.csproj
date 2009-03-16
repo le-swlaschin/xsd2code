@@ -102,11 +102,19 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CodeBase.cs" />
-    <Compile Include="CodeDomProviderFactory.cs" />
+    <Compile Include="Extensions\CodeExtension.cs" />
+    <Compile Include="Extensions\Silverlight20Extension.cs" />
+    <Compile Include="Extensions\Net35Extension.cs" />
+    <Compile Include="Extensions\Net30Extension.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\CodeDomProviderFactory.cs" />
     <Compile Include="CollectionType.cs" />
     <Compile Include="GenerationLanguage.cs" />
-    <Compile Include="GeneratorExtension.cs">
+    <Compile Include="Extensions\Net20Extension.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GeneratorContext.cs" />
@@ -127,9 +135,18 @@
     <Compile Include="Helpers\XmlHelper.cs" />
     <Compile Include="GeneratorFacade.cs" />
     <Compile Include="NamespaceParam.cs" />
+    <Compile Include="TargetFramework.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

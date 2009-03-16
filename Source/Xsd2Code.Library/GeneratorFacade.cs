@@ -48,7 +48,7 @@ namespace Xsd2Code.Library
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
         /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
         /// <param name="implementCloneMethod"></param>
-        /// <param name="codeBase"></param>
+        /// <param name="targetFramework"></param>
         [Obsolete("Do not use", true)]
         public GeneratorFacade(string inputFile,
                                string nameSpace,
@@ -58,14 +58,14 @@ namespace Xsd2Code.Library
                                List<NamespaceParam> customUsings, string collectionBase, bool includeSerializeMethod,
                                string serializeMethodName, string deserializeMethodName, string saveToFileMethodName,
                                string loadFromFileMethodName, bool disableDebug, bool implementCloneMethod,
-                               CodeBase codeBase)
+                               TargetFramework targetFramework)
         {
             var provider = CodeDomProviderFactory.GetProvider(language);
 
             this.Init(inputFile, nameSpace, provider, collectionType, enableDataBinding, hidePrivate,
                       enableSummaryComment, customUsings, collectionBase, includeSerializeMethod, serializeMethodName,
                       deserializeMethodName, saveToFileMethodName, loadFromFileMethodName, disableDebug,
-                      implementCloneMethod, codeBase);
+                      implementCloneMethod, targetFramework);
         }
 
         /// <summary>
@@ -87,18 +87,18 @@ namespace Xsd2Code.Library
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
         /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
         /// <param name="implementCloneMethod"></param>
-        /// <param name="codeBase"></param>
+        /// <param name="targetFramework"></param>
         public GeneratorFacade(string inputFile, string nameSpace, CodeDomProvider provider,
                                CollectionType collectionType, bool enableDataBinding, bool hidePrivate,
                                bool enableSummaryComment, List<NamespaceParam> customUsings, string collectionBase,
                                bool includeSerializeMethod, string serializeMethodName, string deserializeMethodName,
                                string saveToFileMethodName, string loadFromFileMethodName, bool disableDebug,
-                               bool implementCloneMethod, CodeBase codeBase)
+                               bool implementCloneMethod, TargetFramework targetFramework)
         {
             this.Init(inputFile, nameSpace, provider, collectionType, enableDataBinding, hidePrivate,
                       enableSummaryComment, customUsings, collectionBase, includeSerializeMethod, serializeMethodName,
                       deserializeMethodName, saveToFileMethodName, loadFromFileMethodName, disableDebug,
-                      implementCloneMethod, codeBase);
+                      implementCloneMethod, targetFramework);
         }
 
 
@@ -163,12 +163,12 @@ namespace Xsd2Code.Library
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
         /// <param name="disableDebug">if set to <c>true</c> [disable debug].</param>
         /// <param name="implementCloneMethod"></param>
-        /// <param name="codeBase"></param>
+        /// <param name="targetFramework"></param>
         public void Init(string inputFile, string nameSpace, CodeDomProvider provider, CollectionType collectionType,
                          bool enableDataBinding, bool hidePrivate, bool enableSummaryComment,
                          List<NamespaceParam> customUsings, string collectionBase, bool includeSerializeMethod,
                          string serializeMethodName, string deserializeMethodName, string saveToFileMethodName,
-                         string loadFromFileMethodName, bool disableDebug, bool implementCloneMethod, CodeBase codeBase)
+                         string loadFromFileMethodName, bool disableDebug, bool implementCloneMethod, TargetFramework targetFramework)
         {
             GeneratorContext.GeneratorParams.InputFilePath = inputFile;
             GeneratorContext.GeneratorParams.NameSpace = nameSpace;
@@ -180,7 +180,7 @@ namespace Xsd2Code.Library
             GeneratorContext.GeneratorParams.CollectionBase = collectionBase;
             GeneratorContext.GeneratorParams.IncludeSerializeMethod = includeSerializeMethod;
             GeneratorContext.GeneratorParams.GenerateCloneMethod = implementCloneMethod;
-            GeneratorContext.GeneratorParams.Platform = codeBase;
+            GeneratorContext.GeneratorParams.TargetFramework = targetFramework;
             GeneratorContext.GeneratorParams.SerializeMethodName = serializeMethodName;
             GeneratorContext.GeneratorParams.DeserializeMethodName = deserializeMethodName;
             GeneratorContext.GeneratorParams.SaveToFileMethodName = saveToFileMethodName;

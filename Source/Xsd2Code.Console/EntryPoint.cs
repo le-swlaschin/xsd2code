@@ -116,7 +116,7 @@ namespace Xsd2Code
                     case "/codebase":
                         if (i < args.Length - 1)
                         {
-                            generatorParams.Platform = Utility.ToEnum<CodeBase>(args[i + 1]);
+                            generatorParams.TargetFramework = Utility.ToEnum<TargetFramework>(args[i + 1]);
                             i++;
                         }
                         break;
@@ -158,10 +158,12 @@ namespace Xsd2Code
 
                     case "/p":
                     case "/pl":
+                    case "/tp":
+                    case "/tpl":
                     case "/platform":
                         if (i < args.Length - 1)
                         {
-                            generatorParams.Platform = Utility.GetCodeBase(args[i + 1]);
+                            generatorParams.TargetFramework = Utility.GetTargetPlatform(args[i + 1]);
                             i++;
                         }
                         break;

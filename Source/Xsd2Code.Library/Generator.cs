@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Xsd2Code.Library.Extensions;
 using Xsd2Code.Library.Helpers;
 
 namespace Xsd2Code.Library
@@ -43,7 +44,7 @@ namespace Xsd2Code.Library
         /// <param name="saveToFileMethodName">Name of the save to file method.</param>
         /// <param name="loadFromFileMethodName">Name of the load from file method.</param>
         /// <param name="generateCloneMethod"></param>
-        /// <param name="codeBase"></param>
+        /// <param name="targetFramework"></param>
         /// <returns>result CodeNamespace</returns>
         [Obsolete("Do not use", true)]
         internal static Result<CodeNamespace> Process(string xsdFile, string targetNamespace,
@@ -54,7 +55,7 @@ namespace Xsd2Code.Library
                                                       string collectionBase, bool includeSerializeMethod,
                                                       string serializeMethodName, string deserializeMethodName,
                                                       string saveToFileMethodName, string loadFromFileMethodName,
-                                                      bool generateCloneMethod, CodeBase codeBase)
+                                                      bool generateCloneMethod, TargetFramework targetFramework)
         {
             var generatorParams = new GeneratorParams
                                       {
@@ -67,7 +68,7 @@ namespace Xsd2Code.Library
                                           CollectionBase = collectionBase,
                                           IncludeSerializeMethod = includeSerializeMethod,
                                           GenerateCloneMethod = generateCloneMethod,
-                                          Platform = codeBase,
+                                          TargetFramework = targetFramework,
                                           SerializeMethodName = serializeMethodName,
                                           DeserializeMethodName = deserializeMethodName,
                                           SaveToFileMethodName = saveToFileMethodName,
@@ -87,45 +88,10 @@ namespace Xsd2Code.Library
             var ns = new CodeNamespace();
             try
             {
-                GeneratorContext.GeneratorParams = generatorParams;
-
-                #region namespace
-
-                ns.Imports.Add(new CodeNamespaceImport("System"));
-                ns.Imports.Add(new CodeNamespaceImport("System.Diagnostics"));
-                ns.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
-                ns.Imports.Add(new CodeNamespaceImport("System.Collections"));
-                ns.Imports.Add(new CodeNamespaceImport("System.Xml.Schema"));
-                ns.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
-
-                if (generatorParams.CustomUsings != null)
-                {
-                    foreach (var item in generatorParams.CustomUsings)
-                        ns.Imports.Add(new CodeNamespaceImport(item.NameSpace));
-                }
-                if (GeneratorContext.GeneratorParams.IncludeSerializeMethod)
-                    ns.Imports.Add(new CodeNamespaceImport("System.IO"));
-
-                switch (GeneratorContext.GeneratorParams.CollectionObjectType)
-                {
-                    case CollectionType.List:
-                        ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
-                        break;
-                    case CollectionType.ObservableCollection:
-                        ns.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
-                        break;
-                    default:
-                        break;
-                }
-                if (generatorParams.GenerateDataContracts)
-                {
-                    ns.Imports.Add(new CodeNamespaceImport("System.Runtime.Serialization"));
-                }
-                ns.Name = generatorParams.NameSpace;
-
-                #endregion
 
                 #region Set generation context
+
+                GeneratorContext.GeneratorParams = generatorParams;
 
                 #endregion
 
@@ -160,7 +126,10 @@ namespace Xsd2Code.Library
 
                 #region Execute extensions
 
-                var ext = new GeneratorExtension();
+                var getExtensionResult = CodeExtension.GetCodeExtension(generatorParams);
+                if(!getExtensionResult.Success) return new Result<CodeNamespace>(ns, false, getExtensionResult.Messages);
+
+                var ext = getExtensionResult.Entity;
                 ext.Process(ns, xsd);
 
                 #endregion Execute extensions

@@ -15,7 +15,7 @@ namespace Xsd2Code.Library
     /// Revision history:
     /// 
     ///     Modified 2009-02-20 by Ruslan Urban
-    ///     Added Platform and GenerateCloneMethod properties
+    ///     Added TargetFramework and GenerateCloneMethod properties
     /// 
     /// </remarks>
     public class GeneratorParams
@@ -64,7 +64,7 @@ namespace Xsd2Code.Library
 
         #endregion
 
-        private CodeBase platform = default(CodeBase);
+        private TargetFramework targetFramework = default(TargetFramework);
         private bool enableDataBinding = true;
 
         /// <summary>
@@ -164,12 +164,12 @@ namespace Xsd2Code.Library
         /// Gets or sets a value indicating whether serialize/deserialize method support
         /// </summary>
         [Category("Behavior")]
-        [DefaultValue(CodeBase.NetFX20)]
+        [DefaultValue(Library.TargetFramework.Net20)]
         [Description("Generated code base")]
-        public CodeBase Platform
+        public TargetFramework TargetFramework
         {
-            get { return this.platform; }
-            set { this.platform = value; }
+            get { return this.targetFramework; }
+            set { this.targetFramework = value; }
         }
 
         /// <summary>
@@ -334,8 +334,8 @@ namespace Xsd2Code.Library
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateCloneMethodTag));
                     parameters.GenerateDataContracts =
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateDataContractsTag));
-                    parameters.Platform =
-                            Utility.ToEnum<CodeBase>(optionLine.ExtractStrFromXML(GeneratorContext.CodeBaseTag));
+                    parameters.TargetFramework =
+                            Utility.ToEnum<TargetFramework>(optionLine.ExtractStrFromXML(GeneratorContext.CodeBaseTag));
                     parameters.DisableDebug =
                             Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.DisableDebugTag));
 
@@ -420,7 +420,7 @@ namespace Xsd2Code.Library
 
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CodeBaseTag,
-                                                          this.Platform.ToString()));
+                                                          this.TargetFramework.ToString()));
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SerializeMethodNameTag,
                                                           this.SerializeMethodName));

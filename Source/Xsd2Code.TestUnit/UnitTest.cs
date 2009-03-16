@@ -237,7 +237,7 @@ namespace Xsd2Code.TestUnit
                        {
                            InputFilePath = inputFilePath,
                            NameSpace = CodeGenerationNamespace,
-                           Platform = CodeBase.NetFX20,
+                           TargetFramework = TargetFramework.Net20,
                            CollectionObjectType = CollectionType.ObservableCollection,
                            DisableDebug = true,
                            EnableDataBinding = true,

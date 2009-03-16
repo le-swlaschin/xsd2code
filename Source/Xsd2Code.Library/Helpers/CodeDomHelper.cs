@@ -178,9 +178,9 @@ namespace Xsd2Code.Library.Helpers
             tryStatmanentsCol.Add(CreateObject(typeof (StringReader), "stringReader", new[] {"xml"}));
 
             var serializerParameter = "xmlTextReader";
-            switch (GeneratorContext.GeneratorParams.Platform)
+            switch (GeneratorContext.GeneratorParams.TargetFramework)
             {
-                case CodeBase.Silverlight20:
+                case TargetFramework.Silverlight20:
                     serializerParameter = "stringReader";
                     break;
                 default:
@@ -246,7 +246,7 @@ namespace Xsd2Code.Library.Helpers
         /// Return catch statments
         /// </summary>
         /// <returns>CodeCatchClause statments</returns>
-        private static CodeCatchClause[] GetCatchClause()
+        internal static CodeCatchClause[] GetCatchClause()
         {
             var catchStatmanents = new CodeStatement[2];
 
@@ -283,7 +283,7 @@ namespace Xsd2Code.Library.Helpers
         /// </summary>
         /// <param name="text">Return text comment</param>
         /// <returns>return return comment statment</returns>
-        private static CodeCommentStatement GetReturnComment(string text)
+        internal static CodeCommentStatement GetReturnComment(string text)
         {
             var comments = new CodeCommentStatement(string.Format("<returns>{0}</returns>", text));
             return comments;
@@ -622,70 +622,6 @@ namespace Xsd2Code.Library.Helpers
             saveToFileMethod.Comments.Add(GetReturnComment("true if can serialize and save into file; otherwise, false"));
 
             return saveToFileMethod;
-        }
-
-        #endregion
-
-        #region GetCloneMethod
-
-        /// <summary>
-        /// Generate defenition of the Clone() method
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        internal static CodeTypeMember GetCloneMethod(CodeTypeDeclaration type)
-        {
-            // ----------------------------------------------------------------------
-            // /// <summary>
-            // /// Create clone of this TClass object
-            // /// </summary>
-            // public TClass Clone()
-            // {
-            //    return ((TClass)this.MemberwiseClone());
-            // }
-            // ----------------------------------------------------------------------
-
-            var cloneMethod = new CodeMemberMethod
-                                  {
-                                      Attributes = MemberAttributes.Public,
-                                      Name = "Clone",
-                                      ReturnType = new CodeTypeReference(type.Name)
-                                  };
-
-            CreateSummaryComment(cloneMethod.Comments, string.Format("Create a clone of this {0} object", type.Name));
-            var memberwiseCloneMethod = new CodeMethodInvokeExpression(new CodeThisReferenceExpression(),
-                                                                       "MemberwiseClone");
-            var statement = new CodeMethodReturnStatement(new CodeCastExpression(type.Name, memberwiseCloneMethod));
-            cloneMethod.Statements.Add(statement);
-
-            /*
-                        TODO: Remove commented out fragment
-                        RU20090220: Commented out code fragment
-             
-                        cloneMethod.Statements.Add(new CodeVariableDeclarationStatement(
-                                                       new CodeTypeReference(type.Name), "cloneObject",
-                                                       new CodeObjectCreateExpression(new CodeTypeReference(type.Name))));
-
-                        foreach (CodeTypeMember member in type.Members)
-                        {
-                            #region Process Fields
-
-                            if (member is CodeMemberProperty)
-                            {
-                                CodeMemberProperty cmp = member as CodeMemberProperty;
-                                CodeAssignStatement cdtAssignStmt =
-                                    new CodeAssignStatement(
-                                        new CodeSnippetExpression(string.Format("cloneObject.{0}", member.Name)),
-                                        new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), member.Name));
-                                cloneMethod.Statements.Add(cdtAssignStmt);
-                            }
-
-                            #endregion
-                        }
-                        cloneMethod.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("cloneObject")));
-             */
-
-            return cloneMethod;
         }
 
         #endregion
