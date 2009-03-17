@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Schema;
@@ -32,6 +33,7 @@ namespace Xsd2Code.Library.Extensions
         /// <returns><see cref="ICodeExtension"/></returns>
         internal static Result<ICodeExtension> GetCodeExtension(GeneratorParams generatorParams)
         {
+
             switch (generatorParams.TargetFramework)
             {
                 case TargetFramework.Net20:
@@ -42,6 +44,35 @@ namespace Xsd2Code.Library.Extensions
                     return new Result<ICodeExtension>(new Net35Extension(), true);
                 case TargetFramework.Silverlight20:
                     return new Result<ICodeExtension>(new Silverlight20Extension(), true);
+            }
+
+
+            var types = Assembly.GetExecutingAssembly().GetTypes()
+                .Select(type => new
+                                    {
+                                        Type = type,
+                                        TargetFrameworkAttributes =
+                                    type.GetCustomAttributes(typeof (CodeExtensionAttribute), true)
+                                    })
+
+                .Where(o =>
+                       o.TargetFrameworkAttributes.Length > 0 &&
+                       o.TargetFrameworkAttributes
+                           .Where(attr => 
+                               ((CodeExtensionAttribute) attr).TargetFramework == generatorParams.TargetFramework)
+                           .Count() > 0)
+                           .ToList();
+
+            if(types.Count==1)
+            {
+                try
+                {
+                    return new Result<ICodeExtension>(Activator.CreateInstance(types[0].Type) as ICodeExtension, true);
+                }
+                catch (Exception ex)
+                {
+                    return new Result<ICodeExtension>(null, false, ex.Message, MessageType.Error);
+                }
             }
 
             return new Result<ICodeExtension>(null, false,
@@ -323,10 +354,10 @@ namespace Xsd2Code.Library.Extensions
 
         protected virtual void CreateSerializeMethods(CodeTypeDeclaration type)
         {
-            type.Members.Add(this.GetSerializeCodeDomMethod(type));
-            type.Members.Add(this.GetDeserialize(type));
-            type.Members.Add(this.GetSaveToFileCodeDomMethod(type));
-            type.Members.Add(this.GetLoadFromFileCodeDomMethod(type));
+            type.Members.Add(this.CreateSerializeMethod(type));
+            type.Members.Add(this.CreateDeserializeMethod(type));
+            type.Members.Add(this.CreateSaveToFileMethod(type));
+            type.Members.Add(this.CreateLoadFromFileMethod(type));
         }
 
         /// <summary>
@@ -334,7 +365,7 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">The type object to serilize.</param>
         /// <returns>return the CodeDOM serialize method</returns>
-        protected virtual CodeMemberMethod GetSerializeCodeDomMethod(CodeTypeDeclaration type)
+        protected virtual CodeMemberMethod CreateSerializeMethod(CodeTypeDeclaration type)
         {
             var serializeMethod = new CodeMemberMethod
                                       {
@@ -412,7 +443,7 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">represent a type declaration of class</param>
         /// <returns>Deserialize CodeMemberMethod</returns>
-        protected virtual CodeMemberMethod GetDeserialize(CodeTypeDeclaration type)
+        protected virtual CodeMemberMethod CreateDeserializeMethod(CodeTypeDeclaration type)
         {
             var deserializeMethod = new CodeMemberMethod
                                         {
@@ -537,7 +568,7 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">CodeTypeDeclaration type.</param>
         /// <returns>return the save to file code DOM method statment </returns>
-        protected virtual CodeMemberMethod GetSaveToFileCodeDomMethod(CodeTypeDeclaration type)
+        protected virtual CodeMemberMethod CreateSaveToFileMethod(CodeTypeDeclaration type)
         {
             var saveToFileMethod = new CodeMemberMethod
                                        {
@@ -638,7 +669,7 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">The type CodeTypeDeclaration.</param>
         /// <returns>return the codeDom LoadFromFile method</returns>
-        protected virtual CodeMemberMethod GetLoadFromFileCodeDomMethod(CodeTypeDeclaration type)
+        protected virtual CodeMemberMethod CreateLoadFromFileMethod(CodeTypeDeclaration type)
         {
             #region Method declaration
 

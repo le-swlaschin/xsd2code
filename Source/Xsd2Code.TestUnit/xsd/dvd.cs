@@ -26,7 +26,7 @@ namespace Xsd2Code.TestUnit
     [System.Runtime.Serialization.DataContractAttribute(Name = "Actor")]
     public partial class Actor
     {
-
+        
         [EditorBrowsable(EditorBrowsableState.Never)]
         private string firstnameField;
 
@@ -173,6 +173,7 @@ namespace Xsd2Code.TestUnit
 
         private void OnPropertyChanged(string info)
         {
+             
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
             {

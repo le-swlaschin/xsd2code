@@ -55,12 +55,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UnitTest.cs" />
-    <Compile Include="xsd\ChoiceSequence.Designer.cs" />
-    <Compile Include="xsd\ChoiceSequence1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ChoiceSequence.xsd</DependentUpon>
-    </Compile>
     <Compile Include="xsd\dvd.cs">
       <DependentUpon>dvd.xsd</DependentUpon>
     </Compile>
@@ -78,8 +72,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="xsd\ChoiceSequence.xsd">
-      <Generator>Xsd2CodeCustomTool</Generator>
       <LastGenOutput>ChoiceSequence1.Designer.cs</LastGenOutput>
+      <Generator>Xsd2CodeCustomTool</Generator>
     </None>
     <None Include="xsd\dvd.xsd">
       <SubType>

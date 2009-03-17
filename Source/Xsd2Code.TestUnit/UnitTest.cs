@@ -187,6 +187,24 @@ namespace Xsd2Code.TestUnit
         }
 
         [TestMethod]
+        public void Silverlight20_1()
+        {
+            // Get the code namespace for the schema.
+            GetInputFilePath("Actor.xsd", Resources.Actor);
+            string inputFilePath = GetInputFilePath("dvd.xsd", Resources.dvd);
+
+            var generatorParams = GetGeneratorParams(inputFilePath);
+            generatorParams.TargetFramework = TargetFramework.Silverlight20;
+            generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".Silverlight20_01.cs");
+
+            var xsdGen = new GeneratorFacade(generatorParams);
+
+            var result = xsdGen.Generate();
+            if (!result.Success) Assert.Fail(result.Messages.ToString());
+
+        }
+
+        [TestMethod]
         public void Persistent()
         {
             DvdCollection dvdCol = GetDvd();
