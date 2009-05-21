@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<!--Created with Liquid XML Studio (http://www.liquid-technologies.com)-->
+<!--Created with Liquid XML Studio - FREE Community Edition (http://www.liquid-technologies.com)-->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" id="Dvd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:include schemaLocation="Actor.xsd" />
   <xs:element name="DvdCollection">
@@ -25,7 +25,7 @@
             </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="Style" type="Styles" />
+      <xs:element name="Style" type="Styles" default="Action"/>
       <xs:element maxOccurs="unbounded" ref="Actor">
         <xs:annotation>
           <xs:documentation>

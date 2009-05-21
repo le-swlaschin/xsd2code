@@ -207,6 +207,13 @@ namespace Xsd2Code
                         generatorParams.GenerateDataContracts = false;
                         break;
 
+                    case "/ap":
+                    case "/ap+":
+                        generatorParams.AutomaticProperties = true;
+                        break;
+                    case "/ap-":
+                        generatorParams.AutomaticProperties = false;
+                        break;
 
                     case "/sc":
                     case "/sc+":
@@ -215,6 +222,14 @@ namespace Xsd2Code
                     case "/sc-":
                     case "/sum-":
                         generatorParams.EnableSummaryComment = false;
+                        break;
+
+                    case "/xa":
+                    case "/xa+":
+                        generatorParams.GenerateXMLAttributes = true;
+                        break;
+                    case "/xa-":
+                        generatorParams.GenerateXMLAttributes = false;
                         break;
 
                     case "/cl":

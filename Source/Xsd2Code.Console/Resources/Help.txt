@@ -22,16 +22,21 @@ Options:
     /sf <SaveToFile>                    - SaveToFile methodname. Default: SaveToFile
     /dbg[+]                             - Enable debug step through
     /dbg-                               - Disable debug step through (default)
-    /db[+]                              - Enable data bindings (default)
-    /db-                                - Disable data bindings
+    /db[+]                              - Enable data bindings 
+    /db-                                - Disable data bindings (default)
     /dc[+]                              - Generate WCF data contract attributes 
     /dc-                                - Do not generate WCF data contract attributes (default)
     /cl[+]                              - Generate Clone method (shallow copy) 
     /cl-                                - Do not generate Clone method (default)
+    /ap[+]                              - Enable automatic properties
+    /ap[-]                              - Disable automatic properties (default)  
     /sc[+]                              - Enable summary comment
     /sc-                                - Disable summary comment (default)
-    /hp[+]                              - Hide private fields in IDE (default)
-    /hp-                                - Show private fields in IDE
+    /xa[+]                              - Geneare xml attributes
+    /xa[-]                              - Do not generate xml attributes (default)
+    
+    /hp[+]                              - Hide private fields in IDE
+    /hp-                                - Show private fields in IDE (default)
     
     /?, /h[elp]                         - Show this help
     

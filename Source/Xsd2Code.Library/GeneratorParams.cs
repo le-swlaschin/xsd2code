@@ -16,7 +16,8 @@ namespace Xsd2Code.Library
     /// 
     ///     Modified 2009-02-20 by Ruslan Urban
     ///     Added TargetFramework and GenerateCloneMethod properties
-    /// 
+    ///     Modified 2009-05-18 by Pascal Cabanel.
+    ///     Added NET 2.0 serialization attributes as an option
     /// </remarks>
     public class GeneratorParams
     {
@@ -33,6 +34,11 @@ namespace Xsd2Code.Library
         private List<NamespaceParam> customUsingsField = new List<NamespaceParam>();
 
         /// <summary>
+        /// Indicate if use automatic properties
+        /// </summary>
+        private bool automaticPropertiesField = false;
+
+        /// <summary>
         /// Name of deserialize method
         /// </summary>
         private string deserializeMethodNameField = "Deserialize";
@@ -40,12 +46,12 @@ namespace Xsd2Code.Library
         /// <summary>
         /// Indicate if allow debug into generated code.
         /// </summary>
-        private bool disableDebugField = true;
+        private bool disableDebugField = false;
 
         /// <summary>
         /// Indicate if hide private field in ide.
         /// </summary>
-        private bool hidePrivateFieldInIdeField = true;
+        private bool hidePrivateFieldInIdeField = false;
 
         /// <summary>
         /// Name of load from file method.
@@ -62,10 +68,14 @@ namespace Xsd2Code.Library
         /// </summary>
         private string serializeMethodNameField = "Serialize";
 
+        /// <summary>
+        /// indicate if generate NET 2.0 serialization attributes.
+        /// </summary>
+        private bool generateXMLAttributesField = false;
         #endregion
 
         private TargetFramework targetFramework = default(TargetFramework);
-        private bool enableDataBinding = true;
+        private bool enableDataBinding = false;
 
         /// <summary>
         /// Gets or sets the name space.
@@ -136,12 +146,19 @@ namespace Xsd2Code.Library
         /// Gets or sets a value indicating whether if implement INotifyPropertyChanged
         /// </summary>
         [Category("Behavior")]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         [Description("Indicating whether if implement INotifyPropertyChanged.")]
         public bool EnableDataBinding
         {
             get { return this.enableDataBinding; }
-            set { this.enableDataBinding = value; }
+            set
+            {
+                this.enableDataBinding = value;
+                if (this.enableDataBinding)
+                {
+                    AutomaticProperties = false;
+                }
+            }
         }
 
         /// <summary>
@@ -151,6 +168,32 @@ namespace Xsd2Code.Library
         [DefaultValue(false)]
         [Description("Indicating whether serialize/deserialize method nust be generate.")]
         public bool IncludeSerializeMethod { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether serialize/deserialize method support
+        /// </summary>
+        [Category("Behavior")]
+        [DefaultValue(false)]
+        [Description("Generate automatic properties when possible. (Work only for csharp with target framework 3.0 or 3.5 and EnableDataBinding disable)")]
+        public bool AutomaticProperties
+        {
+            get { return this.automaticPropertiesField; }
+            set
+            {
+                if (value)
+                {
+                    if (this.targetFramework != TargetFramework.Net20)
+                    {
+                        this.automaticPropertiesField = value;
+                        this.EnableDataBinding = false;
+                    }
+                }
+                else
+                {
+                    this.automaticPropertiesField = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether serialize/deserialize method support
@@ -169,14 +212,21 @@ namespace Xsd2Code.Library
         public TargetFramework TargetFramework
         {
             get { return this.targetFramework; }
-            set { this.targetFramework = value; }
+            set
+            {
+                this.targetFramework = value;
+                if (this.targetFramework == TargetFramework.Net20)
+                {
+                    AutomaticProperties = false;
+                }
+            }
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
         /// </summary>
         [Category("Behavior")]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         [Description("Indicating whether if generate EditorBrowsableState.Never attribute.")]
         public bool HidePrivateFieldInIde
         {
@@ -185,11 +235,23 @@ namespace Xsd2Code.Library
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
+        /// </summary>
+        [Category("Behavior")]
+        [DefaultValue(false)]
+        [Description("Indicating whether if generate .NET 2.0 serialization attributes.")]
+        public bool GenerateXMLAttributes
+        {
+            get { return this.generateXMLAttributesField; }
+            set { this.generateXMLAttributesField = value; }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether [disable debug].
         /// </summary>
         /// <value><c>true</c> if [disable debug]; otherwise, <c>false</c>.</value>
         [Category("Behavior")]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         [Description("Indicating whether if generate attribute for debug into generated code.")]
         public bool DisableDebug
         {
@@ -315,51 +377,55 @@ namespace Xsd2Code.Library
                 string optionLine = streamReader.ReadLine();
                 if (optionLine != null)
                 {
-                    parameters.NameSpace = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.NameSpaceTag);
+                    parameters.NameSpace = XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.NAMESPACETAG);
                     parameters.CollectionObjectType =
                             Utility.ToEnum<CollectionType>(
-                                    XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.CollectionTag));
+                                    XmlHelper.ExtractStrFromXML(optionLine, GeneratorContext.COLLECTIONTAG));
                     parameters.Language =
                             Utility.ToEnum<GenerationLanguage>(XmlHelper.ExtractStrFromXML(optionLine,
-                                                                                           GeneratorContext.CodeTypeTag));
+                                                                                           GeneratorContext.CODETYPETAG));
                     parameters.EnableDataBinding =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.EnableDataBindingTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLEDATABINDINGTAG));
                     parameters.HidePrivateFieldInIde =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.HidePrivateFieldTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.HIDEPRIVATEFIELDTAG));
                     parameters.EnableSummaryComment =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.EnableSummaryCommentTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLESUMMARYCOMMENTTAG));
                     parameters.IncludeSerializeMethod =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.IncludeSerializeMethodTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.INCLUDESERIALIZEMETHODTAG));
                     parameters.GenerateCloneMethod =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateCloneMethodTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATECLONEMETHODTAG));
                     parameters.GenerateDataContracts =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GenerateDataContractsTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEDATACONTRACTSTAG));
                     parameters.TargetFramework =
-                            Utility.ToEnum<TargetFramework>(optionLine.ExtractStrFromXML(GeneratorContext.CodeBaseTag));
+                            Utility.ToEnum<TargetFramework>(optionLine.ExtractStrFromXML(GeneratorContext.CODEBASETAG));
                     parameters.DisableDebug =
-                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.DisableDebugTag));
+                            Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.DISABLEDEBUGTAG));
 
-                    string str = optionLine.ExtractStrFromXML(GeneratorContext.SerializeMethodNameTag);
+                    parameters.GenerateXMLAttributes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEXMLATTRIBUTESTAG));
+
+                    parameters.AutomaticProperties = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.AUTOMATICPROPERTIESTAG));
+
+                    string str = optionLine.ExtractStrFromXML(GeneratorContext.SERIALIZEMETHODNAMETAG);
                     parameters.SerializeMethodName = str.Length > 0 ? str : "Serialize";
 
-                    str = optionLine.ExtractStrFromXML(GeneratorContext.DeserializeMethodNameTag);
+                    str = optionLine.ExtractStrFromXML(GeneratorContext.DESERIALIZEMETHODNAMETAG);
                     parameters.DeserializeMethodName = str.Length > 0 ? str : "Deserialize";
 
-                    str = optionLine.ExtractStrFromXML(GeneratorContext.SaveToFileMethodNameTag);
+                    str = optionLine.ExtractStrFromXML(GeneratorContext.SAVETOFILEMETHODNAMETAG);
                     parameters.SaveToFileMethodName = str.Length > 0 ? str : "SaveToFile";
 
-                    str = optionLine.ExtractStrFromXML(GeneratorContext.LoadFromFileMethodNameTag);
+                    str = optionLine.ExtractStrFromXML(GeneratorContext.LOADFROMFILEMETHODNAMETAG);
                     parameters.LoadFromFileMethodName = str.Length > 0 ? str : "LoadFromFile";
 
                     // TODO:get custom using
-                    string customUsingString = optionLine.ExtractStrFromXML(GeneratorContext.CustomUsingsTag);
+                    string customUsingString = optionLine.ExtractStrFromXML(GeneratorContext.CUSTOMUSINGSTAG);
                     if (!string.IsNullOrEmpty(customUsingString))
                     {
                         string[] usings = customUsingString.Split(';');
                         foreach (string item in usings)
                             parameters.CustomUsings.Add(new NamespaceParam { NameSpace = item });
                     }
-                    parameters.CollectionBase = optionLine.ExtractStrFromXML(GeneratorContext.CollectionBaseTag);
+                    parameters.CollectionBase = optionLine.ExtractStrFromXML(GeneratorContext.COLLECTIONBASETAG);
                 }
             }
 
@@ -388,53 +454,56 @@ namespace Xsd2Code.Library
         {
             var optionsLine = new StringBuilder();
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.NameSpaceTag, this.NameSpace));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.NAMESPACETAG, this.NameSpace));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CollectionTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.COLLECTIONTAG,
                                                           this.CollectionObjectType.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CodeTypeTag, this.Language.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CODETYPETAG, this.Language.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.EnableDataBindingTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEDATABINDINGTAG,
                                                           this.EnableDataBinding.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.HidePrivateFieldTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.HIDEPRIVATEFIELDTAG,
                                                           this.HidePrivateFieldInIde.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.EnableSummaryCommentTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLESUMMARYCOMMENTTAG,
                                                           this.EnableSummaryComment.ToString()));
 
             if (!string.IsNullOrEmpty(this.CollectionBase))
-                optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CollectionBaseTag, this.CollectionBase));
+                optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.COLLECTIONBASETAG, this.CollectionBase));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.IncludeSerializeMethodTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.INCLUDESERIALIZEMETHODTAG,
                                                           this.IncludeSerializeMethod.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GenerateCloneMethodTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATECLONEMETHODTAG,
                                                           this.GenerateCloneMethod.ToString()));
 
-            /* RU20090225: TODO: Implement WCF attribute generation
-              optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GenerateDataContractsTag,
-                                                          this.GenerateDataContracts.ToString()));
-             */
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATEDATACONTRACTSTAG,
+                                                        this.GenerateDataContracts.ToString()));
 
-
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CodeBaseTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CODEBASETAG,
                                                           this.TargetFramework.ToString()));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SerializeMethodNameTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SERIALIZEMETHODNAMETAG,
                                                           this.SerializeMethodName));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.DeserializeMethodNameTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.DESERIALIZEMETHODNAMETAG,
                                                           this.DeserializeMethodName));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SaveToFileMethodNameTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SAVETOFILEMETHODNAMETAG,
                                                           this.SaveToFileMethodName));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.LoadFromFileMethodNameTag,
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.LOADFROMFILEMETHODNAMETAG,
                                                           this.LoadFromFileMethodName));
 
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.DisableDebugTag, this.DisableDebug.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATEXMLATTRIBUTESTAG,
+                                                          this.GenerateXMLAttributes.ToString()));
+
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.AUTOMATICPROPERTIESTAG,
+                                              this.AutomaticProperties.ToString()));
+
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.DISABLEDEBUGTAG, this.DisableDebug.ToString()));
 
             var customUsingsStr = new StringBuilder();
             if (this.CustomUsings != null)
@@ -452,7 +521,7 @@ namespace Xsd2Code.Library
                         customUsingsStr = customUsingsStr.Remove(customUsingsStr.Length - 1, 1);
                 }
 
-                optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CustomUsingsTag,
+                optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CUSTOMUSINGSTAG,
                                                               customUsingsStr.ToString()));
             }
 

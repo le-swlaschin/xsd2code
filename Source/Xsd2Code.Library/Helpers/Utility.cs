@@ -45,6 +45,7 @@ namespace Xsd2Code.Library.Helpers
                 case "visualcplusplus":
                     return GenerationLanguage.VisualCpp;
                 case "vb":
+                    return GenerationLanguage.VisualBasic;
                 case "bas":
                 case "visualbasic":
                     return GenerationLanguage.VisualCpp;

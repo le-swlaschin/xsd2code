@@ -6,7 +6,7 @@ namespace Xsd2Code.Library.Extensions
     [CodeExtension(TargetFramework.Net20)]
     public class Net20Extension : CodeExtension
     {
-        public override void CreateDataContractAttribute(System.CodeDom.CodeTypeDeclaration type, System.Xml.Schema.XmlSchema schema)
+        protected override void CreateDataContractAttribute(System.CodeDom.CodeTypeDeclaration type, System.Xml.Schema.XmlSchema schema)
         {
             // No data contracts in the Net.20
         }

@@ -297,13 +297,13 @@ namespace Xsd2Code.Library
                     if (!result.Success) return result;
 
                     var ns = result.Entity;
-
+ 
                     using (var outputStream = new StreamWriter(outputFilePath + ".tmp", false))
                         this.providerField.GenerateCodeFromNamespace(ns, outputStream, new CodeGeneratorOptions());
                 }
                 catch (Exception e)
                 {
-                    var errorMessage = "Faild to generate code\n";
+                    var errorMessage = "Failed to generate code\n";
                     errorMessage += "Exception :\n";
                     errorMessage += e.Message;
 
@@ -320,7 +320,7 @@ namespace Xsd2Code.Library
                 {
                     if ((outputFile.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                     {
-                        var errorMessage = "Faild to generate code\n";
+                        var errorMessage = "Failed to generate code\n";
                         errorMessage += outputFilePath + " is write protect";
                         return new Result(false, MessageType.Error, errorMessage);
                     }
@@ -376,8 +376,7 @@ namespace Xsd2Code.Library
                             }
                         }
                     }
-
-                    outputStream.Close();
+                    outputStream.Close();                    
                 }
                 try
                 {

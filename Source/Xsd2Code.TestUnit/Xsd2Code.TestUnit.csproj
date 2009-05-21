@@ -58,6 +58,9 @@
     <Compile Include="xsd\dvd.cs">
       <DependentUpon>dvd.xsd</DependentUpon>
     </Compile>
+    <Compile Include="xsd\dvd.Designer.cs">
+      <DependentUpon>dvd.cs</DependentUpon>
+    </Compile>
     <Compile Include="xsd\Gender.cs">
       <DependentUpon>Gender.xsd</DependentUpon>
     </Compile>

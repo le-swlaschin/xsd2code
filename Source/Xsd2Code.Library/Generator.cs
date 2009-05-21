@@ -17,7 +17,8 @@ namespace Xsd2Code.Library
     /// 
     ///     Modified 2009-02-20 by Ruslan Urban
     ///     Changed signature of the GeneratorFacade class constructor
-    /// 
+    ///     Modified 2009-05-18 by Pascal Cabanel
+    ///     Use CodeExtentionFactory
     /// </remarks>
     public sealed class Generator
     {
@@ -126,7 +127,7 @@ namespace Xsd2Code.Library
 
                 #region Execute extensions
 
-                var getExtensionResult = CodeExtension.GetCodeExtension(generatorParams);
+                var getExtensionResult = GeneratorFactory.GetCodeExtension(generatorParams);
                 if(!getExtensionResult.Success) return new Result<CodeNamespace>(ns, false, getExtensionResult.Messages);
 
                 var ext = getExtensionResult.Entity;

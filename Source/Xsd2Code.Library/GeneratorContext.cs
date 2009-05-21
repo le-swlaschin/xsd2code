@@ -15,99 +15,111 @@
         /// <summary>
         /// Enable serialize/deserialize generation method
         /// </summary>
-        public const string CodeBaseTag = "CodeBaseTag";
+        public const string CODEBASETAG = "CodeBaseTag";
 
         /// <summary>
         /// Language tag
         /// </summary>
-        public const string CodeTypeTag = "codeType";
+        public const string CODETYPETAG = "codeType";
 
         /// <summary>
         /// Base generic type for collections when CollectionType is DefinedType
         /// </summary>
-        public const string CollectionBaseTag = "CollectionBase";
+        public const string COLLECTIONBASETAG = "CollectionBase";
 
         /// <summary>
         /// Collection tag
         /// </summary>
-        public const string CollectionTag = "Collection";
+        public const string COLLECTIONTAG = "Collection";
 
         /// <summary>
         /// List of custom using/import types (, separated)
         /// </summary>
-        public const string CustomUsingsTag = "CustomUsings";
+        public const string CUSTOMUSINGSTAG = "CustomUsings";
 
         /// <summary>
         /// Name of Deserialize method
         /// </summary>
-        public const string DeserializeMethodNameTag = "DeserializeMethodName";
+        public const string DESERIALIZEMETHODNAMETAG = "DeserializeMethodName";
 
         /// <summary>
         /// Disable debug in genetated code.
         /// </summary>
-        public const string DisableDebugTag = "DisableDebug";
+        public const string DISABLEDEBUGTAG = "DisableDebug";
+
+        /// <summary>
+        /// Indicate if generate automatic properties.
+        /// </summary>
+        public const string AUTOMATICPROPERTIESTAG = "AutomaticProperties";
 
         /// <summary>
         /// Enable data binding tag
         /// </summary>
-        public const string EnableDataBindingTag = "EnableDataBinding";
+        public const string ENABLEDATABINDINGTAG = "EnableDataBinding";
 
         /// <summary>
         /// Generate summary documentation
         /// </summary>
-        public const string EnableSummaryCommentTag = "EnableSummaryComment";
+        public const string ENABLESUMMARYCOMMENTTAG = "EnableSummaryComment";
 
         /// <summary>
         /// Hide private fields in IDE
         /// </summary>
-        public const string HidePrivateFieldTag = "HidePrivateFieldInIDE";
+        public const string HIDEPRIVATEFIELDTAG = "HidePrivateFieldInIDE";
 
         /// <summary>
         /// Enable generation of the Clone method
         /// </summary>
-        public const string GenerateCloneMethodTag = "GenerateCloneMethod";
+        public const string GENERATECLONEMETHODTAG = "GenerateCloneMethod";
 
         /// <summary>
         /// Enable serialize/deserialize generation method
         /// </summary>
-        public const string IncludeSerializeMethodTag = "IncludeSerializeMethod";
+        public const string INCLUDESERIALIZEMETHODTAG = "IncludeSerializeMethod";
 
         /// <summary>
         /// Name of Deserialize method
         /// </summary>
-        public const string LoadFromFileMethodNameTag = "LoadFromFileMethodName";
+        public const string LOADFROMFILEMETHODNAMETAG = "LoadFromFileMethodName";
 
         /// <summary>
         /// namespace tag
         /// </summary>
-        public const string NameSpaceTag = "NameSpace";
+        public const string NAMESPACETAG = "NameSpace";
 
         /// <summary>
         /// Name of Serialize method
         /// </summary>
-        public const string SaveToFileMethodNameTag = "SaveToFileMethodName";
+        public const string SAVETOFILEMETHODNAMETAG = "SaveToFileMethodName";
 
         /// <summary>
         /// Name of Serialize method
         /// </summary>
-        public const string SerializeMethodNameTag = "SerializeMethodName";
-
+        public const string SERIALIZEMETHODNAMETAG = "SerializeMethodName";
 
         /// <summary>
         /// Generate data contracts tag
         /// </summary>
-        public const string GenerateDataContractsTag = "GenerateDataContracts";
+        public const string GENERATEDATACONTRACTSTAG = "GenerateDataContracts";
+
+        /// <summary>
+        /// Indicate if generate NET 2.0 serialization attributes.
+        /// </summary>
+        public const string GENERATEXMLATTRIBUTESTAG = "GenerateXMLAttributes";
 
         #region Fields
 
-        static private GeneratorParams generatorParams = new GeneratorParams();
+        /// <summary>
+        /// static instance of GeneratorParams
+        /// </summary>
+        private static GeneratorParams generatorParams = new GeneratorParams();
 
         #endregion
 
         #region property
 
         /// <summary>
-        /// Static instance of generator parameters, accessible from within any class in the application domain
+        /// Gets or sets static instance of generator parameters, accessible from within any class in the application domain
         /// </summary>
         public static GeneratorParams GeneratorParams
         {

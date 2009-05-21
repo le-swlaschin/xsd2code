@@ -4,7 +4,7 @@ namespace Xsd2Code.Library.Extensions
     /// Implements code extension for .Net Framework 3.5
     /// </summary>
     [CodeExtension(TargetFramework.Net35)]
-    public class Net35Extension : CodeExtension
+    public class Net35Extension : Net30Extension
     {
         
     }

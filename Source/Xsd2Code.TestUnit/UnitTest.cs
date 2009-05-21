@@ -27,7 +27,7 @@ namespace Xsd2Code.TestUnit
         /// </summary>
         private static string OutputFolder
         {
-            get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"; }
+            get { return @"c:\temp\"; } // Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"; }
         }
 
         /// <summary>
@@ -202,6 +202,65 @@ namespace Xsd2Code.TestUnit
             var result = xsdGen.Generate();
             if (!result.Success) Assert.Fail(result.Messages.ToString());
 
+        }
+
+        [TestMethod]
+        public void XMLAttributes()
+        {
+            // Get the code namespace for the schema.
+            GetInputFilePath("Actor.xsd", Resources.Actor);
+            string inputFilePath = GetInputFilePath("dvd.xsd", Resources.dvd);
+
+            var generatorParams = GetGeneratorParams(inputFilePath);
+            generatorParams.GenerateXMLAttributes = true;
+
+            generatorParams.TargetFramework = TargetFramework.Net20;
+            generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".xml.cs");
+
+            var xsdGen = new GeneratorFacade(generatorParams);
+            var result = xsdGen.Generate();
+
+            if (!result.Success) Assert.Fail(result.Messages.ToString());
+        }
+
+        [TestMethod]
+        public void AutomaticProperties()
+        {
+            // Get the code namespace for the schema.
+            GetInputFilePath("Actor.xsd", Resources.Actor);
+            string inputFilePath = GetInputFilePath("dvd.xsd", Resources.dvd);
+
+            var generatorParams = new GeneratorParams();
+            generatorParams.InputFilePath = inputFilePath;
+            GetGeneratorParams(inputFilePath);
+            generatorParams.EnableSummaryComment = true;
+            generatorParams.GenerateDataContracts = false;
+            generatorParams.AutomaticProperties = true;
+
+            generatorParams.TargetFramework = TargetFramework.Net30;
+            generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".autoProp.cs");
+
+            var xsdGen = new GeneratorFacade(generatorParams);
+            var result = xsdGen.Generate();
+
+            if (!result.Success) Assert.Fail(result.Messages.ToString());
+        }
+        [TestMethod]
+        public void WcfAttributes()
+        {
+            // Get the code namespace for the schema.
+            GetInputFilePath("Actor.xsd", Resources.Actor);
+            string inputFilePath = GetInputFilePath("dvd.xsd", Resources.dvd);
+
+            var generatorParams = GetGeneratorParams(inputFilePath);
+            generatorParams.GenerateDataContracts = true;
+            generatorParams.TargetFramework = TargetFramework.Net30;
+            generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".wcf.cs");
+
+            var xsdGen = new GeneratorFacade(generatorParams);
+            var result = xsdGen.Generate();
+
+            if (!result.Success) Assert.Fail(result.Messages.ToString());
         }
 
         [TestMethod]
