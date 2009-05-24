@@ -76,7 +76,6 @@
     </EmbeddedResource>
     <None Include="xsd\ChoiceSequence.xsd">
       <LastGenOutput>ChoiceSequence1.Designer.cs</LastGenOutput>
-      <Generator>Xsd2CodeCustomTool</Generator>
     </None>
     <None Include="xsd\dvd.xsd">
       <SubType>
