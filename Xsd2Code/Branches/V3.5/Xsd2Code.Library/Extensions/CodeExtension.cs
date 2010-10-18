@@ -300,7 +300,8 @@ namespace Xsd2Code.Library.Extensions
             PropertiesListFields.Clear();
 
             // Inherits from EntityBase
-            if (GeneratorContext.GeneratorParams.GenericBaseClass.Enabled && type.BaseTypes.Count == 0)
+            var inheritsFromClass = type.BaseTypes.Count > 0;
+            if (GeneratorContext.GeneratorParams.GenericBaseClass.Enabled && !inheritsFromClass)
             {
                 var ctr = new CodeTypeReference(GeneratorContext.GeneratorParams.GenericBaseClass.BaseClassName);
                 ctr.TypeArguments.Add(new CodeTypeReference(type.Name));
@@ -308,8 +309,11 @@ namespace Xsd2Code.Library.Extensions
             }
             else
             {
-                if (GeneratorContext.GeneratorParams.EnableDataBinding)
-                    type.BaseTypes.Add(typeof(INotifyPropertyChanged));
+                if (!inheritsFromClass)
+                {
+                    if (GeneratorContext.GeneratorParams.EnableDataBinding)
+                        type.BaseTypes.Add(typeof (INotifyPropertyChanged));
+                }
             }
 
             // Generate WCF DataContract
@@ -368,9 +372,11 @@ namespace Xsd2Code.Library.Extensions
             // If don't use base class, generate all methods inside class
             if (!GeneratorContext.GeneratorParams.GenericBaseClass.Enabled)
             {
-                if (GeneratorContext.GeneratorParams.EnableDataBinding)
-                    this.CreateDataBinding(type);
-
+                if (!inheritsFromClass)
+                {
+                    if (GeneratorContext.GeneratorParams.EnableDataBinding)
+                        this.CreateDataBinding(type);
+                }
                 if (GeneratorContext.GeneratorParams.Serialization.Enabled)
                 {
                     CreateStaticSerializer(type);
@@ -1520,8 +1526,7 @@ namespace Xsd2Code.Library.Extensions
                 code.Imports.Add(new CodeNamespaceImport("System.Text"));
             }
 
-            if (GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight &&
-                GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
+            if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
             {
                 code.Imports.Add(new CodeNamespaceImport("System.Xml"));
                

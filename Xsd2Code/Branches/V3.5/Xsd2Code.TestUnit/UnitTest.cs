@@ -277,13 +277,13 @@ namespace Xsd2Code.TestUnit
                 DvdCollection deserialiseDvd;
                 dvd.SaveToFile(@"c:\temp\dvdASCII.xml", Encoding.ASCII);
                 if (!DvdCollection.LoadFromFile(@"c:\temp\dvdASCII.xml", Encoding.ASCII, out deserialiseDvd, out exp))
-                 {
+                {
                     Assert.Fail("LoadFromFile failed on ASCII encoding ");
-                 }
+                }
                 else
                 {
                     if (!deserialiseDvd.Dvds[0].Title.Equals("Matrix ???"))
-                   {
+                    {
                         Assert.Fail("LoadFromFile failed on ASCII encoding ");
                     }
                 }
@@ -291,7 +291,7 @@ namespace Xsd2Code.TestUnit
                 dvd.SaveToFile(@"c:\temp\dvdUTF8.xml", Encoding.UTF8);
                 if (!DvdCollection.LoadFromFile(@"c:\temp\dvdUTF8.xml", Encoding.UTF8, out deserialiseDvd, out exp))
                 {
-                    Assert.Fail("LoadFromFile failed on UTF8 encoding "); 
+                    Assert.Fail("LoadFromFile failed on UTF8 encoding ");
                 }
                 else
                 {
@@ -358,6 +358,21 @@ namespace Xsd2Code.TestUnit
             }
         }
 
+
+        /// <summary>
+        /// Test LazyLoadind pattern
+        /// </summary>
+        [TestMethod]
+        public void Hierarchy()
+        {
+            lock (testLock)
+            {
+                var hierarchy = new Hierarchy();
+                hierarchy.inheritedElmt = new MyOverrideType() { somethingelse = "test" };
+                hierarchy.SaveToFile(@"c:\temp\test.xml");
+                TestUnit.Hierarchy.LoadFromFile(@"c:\temp\test.xml");
+            }
+        }
         /// <summary>
         /// Test PropertyNameSpecified
         /// </summary>
@@ -507,6 +522,26 @@ namespace Xsd2Code.TestUnit
 
                 // Copy resource file to the run-time directory
                 string inputFilePath = GetInputFilePath("Hierarchical.xsd", Resources.Hierarchical);
+
+                var generatorParams = GetGeneratorParams(inputFilePath);
+                var xsdGen = new GeneratorFacade(generatorParams);
+                var result = xsdGen.Generate();
+
+                Assert.IsTrue(result.Success, result.Messages.ToString());
+
+                var compileResult = CompileCSFile(generatorParams.OutputFilePath);
+                Assert.IsTrue(compileResult.Success, compileResult.Messages.ToString());
+            }
+        }
+
+        [TestMethod]
+        public void Inheritance()
+        {
+            lock (testLock)
+            {
+
+                // Copy resource file to the run-time directory
+                string inputFilePath = GetInputFilePath("Inheritance.xsd", Resources.Inheritance);
 
                 var generatorParams = GetGeneratorParams(inputFilePath);
                 var xsdGen = new GeneratorFacade(generatorParams);

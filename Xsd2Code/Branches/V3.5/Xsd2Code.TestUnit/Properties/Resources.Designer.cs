@@ -185,6 +185,30 @@ namespace Xsd2Code.TestUnit.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;xs:schema id=&quot;Inheritance&quot;
+        ///    targetNamespace=&quot;http://tempuri.org/Inheritance.xsd&quot;
+        ///    elementFormDefault=&quot;qualified&quot;
+        ///    xmlns=&quot;http://tempuri.org/Inheritance.xsd&quot;
+        ///    xmlns:mstns=&quot;http://tempuri.org/Inheritance.xsd&quot;
+        ///    xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
+        ///&gt;
+        ///  &lt;xs:element name=&quot;RootElement&quot;&gt;
+        ///    &lt;xs:complexType&gt;
+        ///          &lt;xs:sequence&gt;
+        ///      &lt;xs:element name=&quot;Garage&quot; type=&quot;Garage&quot;/&gt;
+        ///    &lt;/xs:sequence&gt;
+        ///    
+        ///    &lt;/xs:complexType&gt;
+        ///  &lt;/xs:element&gt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Inheritance {
+            get {
+                return ResourceManager.GetString("Inheritance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;xs:schema elementFormDefault=&quot;qualified&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
         ///  &lt;xs:element name=&quot;Address&quot;&gt;
         ///    &lt;xs:complexType&gt;

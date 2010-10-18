@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio (http://www.liquid-technologies.com)-->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" id="Actor" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Hierarchy">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="inheritedElmt" type="MyOverrideType"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="OverrideType" abstract="true">
+    <xs:attribute name="editable" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:complexType name="MyOverrideType">
+    <xs:complexContent>
+      <xs:extension base="OverrideType">
+        <xs:attribute name="somethingelse" type="xs:string"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+    
+
+</xs:schema>

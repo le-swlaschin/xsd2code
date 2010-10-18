@@ -85,6 +85,8 @@
     <Compile Include="xsd\Hierarchical.cs">
       <DependentUpon>Hierarchical.xsd</DependentUpon>
     </Compile>
+    <Compile Include="xsd\hierarchy.designer.cs" />
+    <Compile Include="xsd\Inheritance.designer.cs" />
     <Compile Include="xsd\LazyLoading.designer.cs" />
     <Compile Include="xsd\mailxml_base.designer.cs" />
     <Compile Include="xsd\PersonTypeAnnotation.designer.cs" />
@@ -112,6 +114,9 @@
     </Content>
     <Content Include="xsd\Actor.xsd" />
     <Content Include="xsd\Circular.xsd" />
+    <Content Include="xsd\hierarchy.xsd">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="xsd\dvd.xsx">
       <DependentUpon>dvd.xsd</DependentUpon>
     </None>
@@ -121,6 +126,9 @@
     <Content Include="xsd\StackOverFlow.xsd" />
     <Content Include="xsd\TestAnnotations.xsd" />
     <None Include="xsd\hexBinary.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="xsd\Inheritance.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="xsd\LazyLoading.xsd">

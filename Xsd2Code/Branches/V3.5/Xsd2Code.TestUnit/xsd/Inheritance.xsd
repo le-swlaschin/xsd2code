@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Inheritance"
+    targetNamespace="http://tempuri.org/Inheritance.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/Inheritance.xsd"
+    xmlns:mstns="http://tempuri.org/Inheritance.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="RootElement">
+    <xs:complexType>
+          <xs:sequence>
+      <xs:element name="Garage" type="Garage"/>
+    </xs:sequence>
+    
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Garage">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="voitures" type="Voiture" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Vehicule">
+    <xs:sequence>
+      <xs:element name="Marque" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Voiture">
+    <xs:complexContent>
+      <xs:extension base="Garage">
+        <xs:sequence>
+          <xs:element name="Marque" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+</xs:schema>
+
+
+
+
+
