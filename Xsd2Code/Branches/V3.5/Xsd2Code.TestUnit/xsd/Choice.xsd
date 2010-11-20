@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Choice"
+    targetNamespace="http://tempuri.org/Choice.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/Choice.xsd"
+    xmlns:mstns="http://tempuri.org/Choice.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="Choice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:sequence>
+            <xs:element name="car" type="Car" minOccurs="0"/>
+            <xs:element name="plane" type="Plane" minOccurs="0"/>
+          </xs:sequence>
+            <xs:element name="train" type="Train" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="Car">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int"/>     
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Plane">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Train">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int"  />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

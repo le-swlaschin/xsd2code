@@ -691,6 +691,23 @@ namespace Xsd2Code.TestUnit
         }
 
         [TestMethod]
+        public void TestChoice()
+        {
+            lock (testLock)
+            {
+                Choice choice = new Choice();
+                choice.Items.Add(new Car() {Speed = 150});
+                choice.Items.Add(new Train() {Speed = 250});
+                choice.Items.Add(new Plane() {Speed = 350});
+                choice.SaveToFile(@"c:\temp\choiceS.xml");
+
+                Choice deserilizeChoice;
+                Choice.LoadFromFile(@"c:\temp\choice.xml", out deserilizeChoice);
+                deserilizeChoice.SaveToFile(@"c:\temp\choiceD.xml");
+            }
+        }
+
+        [TestMethod]
         public void TestAnnotations()
         {
             lock (testLock)

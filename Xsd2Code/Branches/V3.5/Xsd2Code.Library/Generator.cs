@@ -118,8 +118,12 @@ namespace Xsd2Code.Library
                     schemas.Add(schema);
                 }
 
-                const CodeGenerationOptions generationOptions = CodeGenerationOptions.GenerateOrder;
                 var exporter = new XmlCodeExporter(ns);
+                CodeGenerationOptions generationOptions = CodeGenerationOptions.None;
+                if (generatorParams.Serialization.GenerateOrderXmlAttributes)
+                {
+                    generationOptions = CodeGenerationOptions.GenerateOrder;
+                }
                 var importer = new XmlSchemaImporter(schemas, generationOptions, new ImportContext(new CodeIdentifiers(), false));
 
                 foreach (XmlSchemaElement element in xsd.Elements.Values)

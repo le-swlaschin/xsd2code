@@ -45,6 +45,11 @@
         public const string ENABLEENCODINGTAG = "EnableEncoding";
 
         /// <summary>
+        /// Indicate tag for order xml attribute
+        /// </summary>
+        public const string ORDERXMLATTRIBUTETAG = "OrderXMLAttrib";
+
+        /// <summary>
         /// Indicate whether if text encoding is enable
         /// </summary>
         public const string DEFAULTENCODERTAG = "Encoder";

@@ -187,6 +187,12 @@ namespace Xsd2Code.Library
         public DefaultEncoder DefaultEncoder { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating the name of SaveToFile method.
+        /// </summary>
+        [Category("Serialize"), DefaultValue(false), Description("Generate order xml Attribute (Work only if GenerateXmlAttributes is true).")]
+        public bool GenerateOrderXmlAttributes { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
         /// </summary>
         [Category("Serialize")]
@@ -738,6 +744,7 @@ namespace Xsd2Code.Library
                 parameters.TrackingChanges.GenerateTrackingClasses = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATETRACKINGCLASSESTAG));
                 parameters.Serialization.Enabled = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.INCLUDESERIALIZEMETHODTAG));
                 parameters.Serialization.EnableEncoding = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLEENCODINGTAG));
+                parameters.Serialization.GenerateOrderXmlAttributes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ORDERXMLATTRIBUTETAG));
                 parameters.Serialization.DefaultEncoder = Utility.ToEnum<DefaultEncoder>(optionLine.ExtractStrFromXML(GeneratorContext.DEFAULTENCODERTAG));
                 parameters.GenerateCloneMethod = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATECLONEMETHODTAG));
                 parameters.GenerateDataContracts = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEDATACONTRACTSTAG));
@@ -829,6 +836,7 @@ namespace Xsd2Code.Library
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.SAVETOFILEMETHODNAMETAG, this.Serialization.SaveToFileMethodName));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.LOADFROMFILEMETHODNAMETAG, this.Serialization.LoadFromFileMethodName));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATEXMLATTRIBUTESTAG, this.Serialization.GenerateXmlAttributes.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ORDERXMLATTRIBUTETAG, this.Serialization.GenerateOrderXmlAttributes.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEENCODINGTAG, this.Serialization.EnableEncoding.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.AUTOMATICPROPERTIESTAG, this.PropertyParams.AutomaticProperties.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATESHOULDSERIALIZETAG, this.PropertyParams.GenerateShouldSerializeProperty.ToString()));

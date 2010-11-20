@@ -25,6 +25,8 @@ namespace Xsd2Code.Extras
     /// <summary>
     /// 
     /// </summary>
+    ///
+
     public class ObjectChangeTracker : System.ComponentModel.INotifyPropertyChanged
     {
         #region  Fields
@@ -35,7 +37,7 @@ namespace Xsd2Code.Extras
         private Delegate collectionChangedDelegateField = null;
 
         private bool objectTrackingEnabledField;
-        private readonly object trackedObjectField;
+        private object trackedObjectField;
 
         private PropertyValueStatesDictionary propertyValueStatesFields;
         //private ValueStatesDictionary valueStatesField;
@@ -45,7 +47,17 @@ namespace Xsd2Code.Extras
         private ObjectsOriginalFromCollectionProperties objectsOriginalFromCollectionsField = new ObjectsOriginalFromCollectionProperties();
         #endregion
 
+        public ObjectChangeTracker()
+        {
+                
+        }
+
         public ObjectChangeTracker(object trackedObject)
+        {
+            Attach(trackedObject);
+        }
+
+        public void Attach(object trackedObject)
         {
             trackedObjectField = trackedObject;
         }
@@ -63,6 +75,8 @@ namespace Xsd2Code.Extras
                 ObjectStateChanging(this, new ObjectStateChangingEventArgs() { NewState = newState });
             }
         }
+
+        public int MyProperty { get; set; }
 
         /// <summary>
         /// indicate current state
@@ -373,28 +387,31 @@ namespace Xsd2Code.Extras
 
         #region public properties
         // Returns the removed objects to collection valued properties that were changed.
-        [DataMember]
         public ObjectsRemovedFromCollectionProperties ObjectsRemovedFromCollectionProperties
         {
             get { return objectsRemovedFromCollectionsField ?? (objectsRemovedFromCollectionsField = new ObjectsRemovedFromCollectionProperties()); }
         }
 
         // Returns the original values for properties that were changed.
-        [DataMember]
         public PropertyValueStatesDictionary PropertyValueStates
         {
-            get { return propertyValueStatesFields ?? (propertyValueStatesFields = new PropertyValueStatesDictionary()); }
+            get
+            {
+                return propertyValueStatesFields ?? (propertyValueStatesFields = new PropertyValueStatesDictionary());
+            }
+            set
+            {
+                propertyValueStatesFields = value;
+            }
         }
 
         // Returns the added objects to collection valued properties that were changed.
-        [DataMember]
         public ObjectsAddedToCollectionProperties ObjectsAddedToCollectionProperties
         {
             get { return objectsAddedToCollectionsField ?? (objectsAddedToCollectionsField = new ObjectsAddedToCollectionProperties()); }
         }
 
         // Returns the added objects to collection valued properties that were changed.
-        [DataMember]
         public ObjectsOriginalFromCollectionProperties ObjectsOriginalFromCollectionProperties
         {
             get { return objectsOriginalFromCollectionsField ?? (objectsOriginalFromCollectionsField = new ObjectsOriginalFromCollectionProperties()); }
@@ -419,33 +436,44 @@ namespace Xsd2Code.Extras
         /// Captures the original value for a property that is changing.
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
-        /// <param name="value">The value.</param>
-        public void RecordCurrentValue(string propertyName, object value)
+        /// <param name="trackedObject">The value.</param>
+        public void RecordCurrentValue(string propertyName, object trackedObject)
         {
+            if (trackedObject != null)
+            {
+                var senderType = trackedObject.GetType();
+                var interfce = senderType.GetInterface("ICollection");
+                if (interfce != null)
+                    return;
+
+                if (!senderType.FullName.Contains("System."))
+                    return;
+            }
+             
             if (objectTrackingEnabledField)
             {
                 if (!PropertyValueStates.ContainsKey(propertyName))
                 {
-                    PropertyValueStates[propertyName] = new PropertyValueState() { PropertyName = propertyName, OriginalValue = value, CurrentValue = value, State = ObjectState.Unchanged };
+                    PropertyValueStates[propertyName] = new PropertyValueState() { PropertyName = propertyName, OriginalValue = trackedObject, CurrentValue = trackedObject, State = ObjectState.Unchanged };
                 }
                 // Compare original value new 
                 else
                 {
-                    PropertyValueStates[propertyName].CurrentValue = value;
+                    PropertyValueStates[propertyName].CurrentValue = trackedObject;
                     var originalValue = PropertyValueStates[propertyName].OriginalValue;
                     if (originalValue != null)
                     {
-                        PropertyValueStates[propertyName].State = originalValue.Equals(value) ? ObjectState.Unchanged : ObjectState.Modified;
+                        PropertyValueStates[propertyName].State = originalValue.Equals(trackedObject) ? ObjectState.Unchanged : ObjectState.Modified;
                     }
                     else
                     {
-                        if (value == null)
+                        if (trackedObject == null)
                         {
                             PropertyValueStates[propertyName].State = ObjectState.Unchanged;
                         }
                         else
                         {
-                            PropertyValueStates[propertyName].State = string.IsNullOrEmpty(value.ToString()) ? ObjectState.Unchanged : ObjectState.Modified;
+                            PropertyValueStates[propertyName].State = string.IsNullOrEmpty(trackedObject.ToString()) ? ObjectState.Unchanged : ObjectState.Modified;
                         }
                     }
                 }
@@ -573,21 +601,19 @@ namespace Xsd2Code.Extras
     #endregion
 
 
-    public class ObjectsOriginalFromCollectionProperties : Dictionary<string, ObjectList> { }
+    public class ObjectsOriginalFromCollectionProperties : SerializableDictionary<string, ObjectList> { }
 
-    public class ObjectsAddedToCollectionProperties : Dictionary<string, ObjectList> { }
+    public class ObjectsAddedToCollectionProperties : SerializableDictionary<string, ObjectList> { }
 
-    public class ObjectsRemovedFromCollectionProperties : Dictionary<string, ObjectList> { }
+    public class ObjectsRemovedFromCollectionProperties : SerializableDictionary<string, ObjectList> { }
 
-    public class PropertyValueStatesDictionary : Dictionary<string, PropertyValueState> { }
+    [Serializable]
+    public class PropertyValueStatesDictionary : SerializableDictionary<string, PropertyValueState> { }
 
     public class ObjectList : List<object> { }
-    // The interface is implemented by the self tracking entities that EF will generate.
-    // We will have an Adapter that converts this interface to the interface that the EF expects.
-    // The Adapter will live on the server side.
+
     public interface IObjectWithChangeTracker
     {
-        // Has all the change tracking information for the subgraph of a given object.
         ObjectChangeTracker ChangeTracker { get; }
     }
 }
