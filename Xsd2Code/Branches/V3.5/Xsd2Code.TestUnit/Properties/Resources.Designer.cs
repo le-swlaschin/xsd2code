@@ -165,6 +165,31 @@ namespace Xsd2Code.TestUnit.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; elementFormDefault=&quot;qualified&quot;&gt;
+        ///
+        ///  &lt;xs:element name=&quot;root&quot; type=&quot;rootType&quot;/&gt;
+        ///
+        ///  &lt;xs:element name=&quot;Image&quot;&gt;
+        ///    &lt;xs:complexType&gt;
+        ///      &lt;xs:simpleContent&gt;
+        ///        &lt;xs:extension base=&quot;xs:base64Binary&quot;&gt;
+        ///          &lt;xs:attribute name=&quot;fileName&quot; type=&quot;xs:string&quot; use=&quot;optional&quot;/&gt;
+        ///        &lt;/xs:extension&gt;
+        ///      &lt;/xs:simpleContent&gt;
+        ///    &lt;/xs:complexType&gt;
+        ///  &lt;/xs:element&gt;
+        ///
+        ///  &lt;xs:complexType name=&quot;rootType&quot;&gt;
+        ///    &lt;x [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string hexBinary {
+            get {
+                return ResourceManager.GetString("hexBinary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; elementFormDefault=&quot;qualified&quot; attributeFormDefault=&quot;unqualified&quot;&gt;
         ///  &lt;xs:element name=&quot;Root&quot;&gt;

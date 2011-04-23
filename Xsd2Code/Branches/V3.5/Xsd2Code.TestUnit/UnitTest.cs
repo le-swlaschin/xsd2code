@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -247,7 +248,7 @@ namespace Xsd2Code.TestUnit
                 generatorParams.TrackingChanges.GenerateTrackingClasses = false;
                 generatorParams.Serialization.EnableEncoding = false;
                 generatorParams.Serialization.DefaultEncoder = DefaultEncoder.UTF8;
-                generatorParams.Language = GenerationLanguage.VisualBasic;
+                generatorParams.Language = GenerationLanguage.CSharp;
 
                 var xsdGen = new GeneratorFacade(generatorParams);
                 var result = xsdGen.Generate();
@@ -358,6 +359,46 @@ namespace Xsd2Code.TestUnit
             }
         }
 
+        /// <summary>
+        /// Test LazyLoadind pattern
+        /// </summary>
+        [TestMethod]
+        public void HexBinary()
+        {
+            lock (testLock)
+            {
+                // Copy resource file to the run-time directory
+                string inputFilePath = GetInputFilePath("hexBinary.xsd", Resources.hexBinary);
+                var generatorParams = GetGeneratorParams(inputFilePath);
+                generatorParams.CollectionObjectType = CollectionType.List;
+                generatorParams.TargetFramework = TargetFramework.Net20;
+                generatorParams.EnableInitializeFields = true;
+
+                var xsdGen = new GeneratorFacade(generatorParams);
+                xsdGen.Generate();
+
+                var compileResult = CompileCSFile(generatorParams.OutputFilePath);
+                Assert.IsTrue(compileResult.Success, compileResult.Messages.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Test LazyLoadind pattern
+        /// </summary>
+        [TestMethod]
+        public void SerilizeBitmap()
+        {
+            lock (testLock)
+            {
+                var igm = new ImageElement();
+                var myBmp = Image.FromFile(@"D:\MyDeveloppement\Xsd2Code\Branches\V3.5\Xsd2Code.TestUnit\img15.jpg");
+                var ms = new MemoryStream();
+                myBmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                igm.Value = ms.ToArray();
+
+                igm.SaveToFile(@"c:\temp\bitmap.xml");
+            }
+        }
 
         /// <summary>
         /// Test LazyLoadind pattern
@@ -696,9 +737,9 @@ namespace Xsd2Code.TestUnit
             lock (testLock)
             {
                 Choice choice = new Choice();
-                choice.Items.Add(new Car() {Speed = 150});
-                choice.Items.Add(new Train() {Speed = 250});
-                choice.Items.Add(new Plane() {Speed = 350});
+                choice.Items.Add(new Car() { Speed = 150 });
+                choice.Items.Add(new Train() { Speed = 250 });
+                choice.Items.Add(new Plane() { Speed = 350 });
                 choice.SaveToFile(@"c:\temp\choiceS.xml");
 
                 Choice deserilizeChoice;

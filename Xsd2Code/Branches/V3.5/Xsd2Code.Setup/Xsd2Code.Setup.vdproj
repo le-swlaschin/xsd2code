@@ -129,6 +129,30 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+        "OwnerKey" = "8:_2DECD1E3637A43FA94AF210B2D7AA487"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+        "OwnerKey" = "8:_43143199410A44EBBF1E69F608989EB1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+        "OwnerKey" = "8:_61D0BF83862A4181AEEADA21FB1C17A9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+        "OwnerKey" = "8:_647C0AD6D184438F9314D2B6DD0FD9C1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4A1C2F71B52E4530E1FC4A6BE4C46AFE"
         "OwnerKey" = "8:_E79428D34B58A2B7744637C662EB602E"
         "MsmSig" = "8:_UNDEFINED"
@@ -429,30 +453,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_FB176250F79F42EE265B5C7692948A90"
-        "OwnerKey" = "8:_2DECD1E3637A43FA94AF210B2D7AA487"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB176250F79F42EE265B5C7692948A90"
-        "OwnerKey" = "8:_647C0AD6D184438F9314D2B6DD0FD9C1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB176250F79F42EE265B5C7692948A90"
-        "OwnerKey" = "8:_61D0BF83862A4181AEEADA21FB1C17A9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB176250F79F42EE265B5C7692948A90"
-        "OwnerKey" = "8:_43143199410A44EBBF1E69F608989EB1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9B04B0A1BA372F57AC19697A9635EBE0"
         "MsmSig" = "8:_UNDEFINED"
@@ -586,7 +586,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_FB176250F79F42EE265B5C7692948A90"
+        "OwnerKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -770,7 +770,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:3.5.21022           "
+                "FrameworkVersion" = "8:3.5.21022             "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=76617"
                 }
@@ -926,6 +926,37 @@
             {
             "SourcePath" = "8:dte90.olb"
             "TargetName" = "8:dte90.olb"
+            "Tag" = "8:"
+            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=3.5.0.25093, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_4A01E4C6EDFC8EAE3AF731A8B58657D5"
+                    {
+                    "Name" = "8:Xsd2Code.Library.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Xsd2Code.Library.dll"
+            "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
             "Condition" = "8:"
@@ -1485,37 +1516,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FB176250F79F42EE265B5C7692948A90"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=3.5.0.15289, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_FB176250F79F42EE265B5C7692948A90"
-                    {
-                    "Name" = "8:Xsd2Code.Library.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Xsd2Code.Library.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -1582,9 +1582,9 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Xsd2Code 3.5 (x64)"
+        "ProductName" = "8:Xsd2Code 3.5"
         "ProductCode" = "8:{6255C587-C9E6-411A-A43A-F6FD0932BAE0}"
-        "PackageCode" = "8:{7FD29714-FDF0-46BC-8350-8E6EA09CD5B1}"
+        "PackageCode" = "8:{15D8DBC7-EE52-4DA2-98B9-2FEBADBDB8A9}"
         "UpgradeCode" = "8:{B1212179-F6B2-47F4-9666-9BECDD409C41}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1605,7 +1605,7 @@
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
-        "TargetPlatform" = "3:1"
+        "TargetPlatform" = "3:0"
         "PreBuildEvent" = "8:"
         "PostBuildEvent" = "8:"
         "RunPostBuildEvent" = "3:0"
@@ -2786,7 +2786,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2DECD1E3637A43FA94AF210B2D7AA487"
             {
-            "SourcePath" = "8:..\\Xsd2Code.Console\\obj\\x64\\Release\\Xsd2Code.exe"
+            "SourcePath" = "8:..\\Xsd2Code.Console\\obj\\Debug\\Xsd2Code.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
@@ -2842,7 +2842,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_43143199410A44EBBF1E69F608989EB1"
             {
-            "SourcePath" = "8:..\\Xsd2Code.CustomTool\\obj\\x64\\Release\\Xsd2Code.CustomTool.dll"
+            "SourcePath" = "8:..\\Xsd2Code.CustomTool\\obj\\Debug\\Xsd2Code.CustomTool.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E8C374FC59DF4755876911DCF099C3C1"
@@ -2870,7 +2870,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_61D0BF83862A4181AEEADA21FB1C17A9"
             {
-            "SourcePath" = "8:..\\Xsd2Code.Addin\\obj\\x64\\Release\\Xsd2Code.Addin.dll"
+            "SourcePath" = "8:..\\Xsd2Code.Addin\\obj\\Debug\\Xsd2Code.Addin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
@@ -2898,7 +2898,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_647C0AD6D184438F9314D2B6DD0FD9C1"
             {
-            "SourcePath" = "8:..\\Xsd2Code.CustomTool\\obj\\x64\\Release\\Xsd2Code.CustomTool.dll"
+            "SourcePath" = "8:..\\Xsd2Code.CustomTool\\obj\\Debug\\Xsd2Code.CustomTool.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
@@ -2926,7 +2926,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D38EA559F6BE4D89980464F2DCA34A8E"
             {
-            "SourcePath" = "8:..\\Xsd2Code.Library\\obj\\x64\\Release\\Xsd2Code.Library.dll"
+            "SourcePath" = "8:..\\Xsd2Code.Library\\obj\\Debug\\Xsd2Code.Library.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E8C374FC59DF4755876911DCF099C3C1"

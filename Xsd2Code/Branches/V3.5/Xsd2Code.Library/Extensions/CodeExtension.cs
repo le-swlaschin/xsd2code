@@ -1704,12 +1704,18 @@ namespace Xsd2Code.Library.Extensions
                 {
                     if (GeneratorContext.GeneratorParams.PropertyParams.EnableLazyLoading)
                     {
-                        LazyLoadingFields.Add(field.Name);
+                        if (field.Type.BaseType != typeof(byte).FullName)
+                        {
+                            LazyLoadingFields.Add(field.Name);
+                        }
                     }
                     else
                     {
-                        ctor.Statements.Insert(0, this.CreateInstance(field.Name, field.Type));
-                        addedToConstructor = true;
+                        if (field.Type.BaseType != typeof(byte).FullName)
+                        {
+                            ctor.Statements.Insert(0, this.CreateInstance(field.Name, field.Type));
+                            addedToConstructor = true;
+                        }
                     }
                 }
             }
