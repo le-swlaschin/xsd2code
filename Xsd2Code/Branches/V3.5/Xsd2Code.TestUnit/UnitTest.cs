@@ -338,7 +338,7 @@ namespace Xsd2Code.TestUnit
         /// DVDs this instance.
         /// </summary>
         [TestMethod]
-        public void CamelCaseTest()
+        public void PascalCaseTest()
         {
             lock (testLock)
             {
@@ -351,7 +351,7 @@ namespace Xsd2Code.TestUnit
                 generatorParams.CollectionObjectType = CollectionType.List;
                 generatorParams.TargetFramework = TargetFramework.Net20;
                 generatorParams.Serialization.GenerateXmlAttributes = true;
-                generatorParams.PropertyParams.CamelCaseProperty = true;
+                generatorParams.PropertyParams.PascalCaseProperty = true;
 
                 var xsdGen = new GeneratorFacade(generatorParams);
                 xsdGen.Generate();

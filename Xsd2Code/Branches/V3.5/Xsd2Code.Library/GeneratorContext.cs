@@ -77,7 +77,7 @@
         /// <summary>
         /// Language tag
         /// </summary>
-        public const string CAMELCASEPROPERTYTAG = "CamelCase";
+        public const string PASCALCASEPROPERTYTAG = "PascalCase";
 
         /// <summary>
         /// Base generic type for collections when CollectionType is DefinedType

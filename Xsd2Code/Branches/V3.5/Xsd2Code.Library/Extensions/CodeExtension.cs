@@ -125,7 +125,7 @@ namespace Xsd2Code.Library.Extensions
                              select p.Name).ToList();
 
             // First we do an initial loop through the types to rename them to pascal case (and fix their attributes accordingly)
-            if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+            if (GeneratorContext.GeneratorParams.PropertyParams.PascalCaseProperty)
             {
                 TypeList = new List<string>();
                 foreach (var type in types)
@@ -156,7 +156,7 @@ namespace Xsd2Code.Library.Extensions
 
             foreach (var type in types)
             {
-                if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                if (GeneratorContext.GeneratorParams.PropertyParams.PascalCaseProperty)
                 {
                     //If one type extends another it needs the Include attribute to be fixed
                     IEnumerable<CodeAttributeDeclaration> attributes =
@@ -398,8 +398,8 @@ namespace Xsd2Code.Library.Extensions
                 var codeMember = member as CodeMemberField;
                 if (codeMember != null)
                 {
-                    // Change Base type Name to camelCase.
-                    if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                    // Change Base type Name to PascalCase.
+                    if (GeneratorContext.GeneratorParams.PropertyParams.PascalCaseProperty)
                     {
                         if (TypeList.Contains(codeMember.Type.BaseType))
                             codeMember.Type.BaseType = CodeDomHelper.GetPascalCaseName(codeMember.Type.BaseType);
@@ -427,7 +427,7 @@ namespace Xsd2Code.Library.Extensions
                 if (codeMemberProperty != null)
                 {
                     #region CamelCase, re-name all references to classes in properties that have been renamed to pascal case
-                    if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                    if (GeneratorContext.GeneratorParams.PropertyParams.PascalCaseProperty)
                     {
                         if (TypeList.Contains(codeMemberProperty.Type.BaseType))
                             codeMemberProperty.Type.BaseType =
