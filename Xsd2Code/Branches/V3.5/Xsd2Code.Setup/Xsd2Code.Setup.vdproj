@@ -51,12 +51,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_168D5F04CD9D25F5DAD76F7AA25061B3"
-        "OwnerKey" = "8:_61D0BF83862A4181AEEADA21FB1C17A9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2A29D83B76A4737E5B5A1C69D018BDF4"
         "OwnerKey" = "8:_02BF6658565AB89A9E0E5EDAD398D4D4"
         "MsmSig" = "8:_UNDEFINED"
@@ -136,7 +130,7 @@
         "Entry"
         {
         "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
-        "OwnerKey" = "8:_43143199410A44EBBF1E69F608989EB1"
+        "OwnerKey" = "8:_647C0AD6D184438F9314D2B6DD0FD9C1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -148,7 +142,7 @@
         "Entry"
         {
         "MsmKey" = "8:_4A01E4C6EDFC8EAE3AF731A8B58657D5"
-        "OwnerKey" = "8:_647C0AD6D184438F9314D2B6DD0FD9C1"
+        "OwnerKey" = "8:_43143199410A44EBBF1E69F608989EB1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -221,6 +215,12 @@
         {
         "MsmKey" = "8:_647C0AD6D184438F9314D2B6DD0FD9C1"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_674F4AA5D7277B0B154E0E1C17120924"
+        "OwnerKey" = "8:_61D0BF83862A4181AEEADA21FB1C17A9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -562,7 +562,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_168D5F04CD9D25F5DAD76F7AA25061B3"
+        "OwnerKey" = "8:_674F4AA5D7277B0B154E0E1C17120924"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -770,7 +770,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:3.5.21022             "
+                "FrameworkVersion" = "8:3.5.21022              "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=76617"
                 }
@@ -815,37 +815,6 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E8C374FC59DF4755876911DCF099C3C1"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_168D5F04CD9D25F5DAD76F7AA25061B3"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-                "ScatterAssemblies"
-                {
-                    "_168D5F04CD9D25F5DAD76F7AA25061B3"
-                    {
-                    "Name" = "8:Extensibility.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Extensibility.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -946,7 +915,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=3.5.0.25093, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Xsd2Code.Library, Version=3.5.0.39231, Culture=neutral, PublicKeyToken=04032056d5f54f80, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4A01E4C6EDFC8EAE3AF731A8B58657D5"
@@ -1155,6 +1124,37 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_674F4AA5D7277B0B154E0E1C17120924"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_674F4AA5D7277B0B154E0E1C17120924"
+                    {
+                    "Name" = "8:Extensibility.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Extensibility.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_006CBF0784B24831A183FEE0E7D94E51"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7AF8E2F3BE8F4E97998788BF368F6289"
@@ -1584,7 +1584,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Xsd2Code 3.5"
         "ProductCode" = "8:{6255C587-C9E6-411A-A43A-F6FD0932BAE0}"
-        "PackageCode" = "8:{15D8DBC7-EE52-4DA2-98B9-2FEBADBDB8A9}"
+        "PackageCode" = "8:{CFA34C3F-721C-4459-B0DF-1F69F6464BA8}"
         "UpgradeCode" = "8:{B1212179-F6B2-47F4-9666-9BECDD409C41}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

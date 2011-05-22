@@ -831,6 +831,7 @@ namespace Xsd2Code.Library
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLESUMMARYCOMMENTTAG, this.Miscellaneous.EnableSummaryComment.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEVIRTUALPROPERTIESTAG, this.PropertyParams.EnableVirtualProperties.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.PASCALCASEPROPERTYTAG, this.PropertyParams.PascalCaseProperty.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.BASECLASSNAMETAG, this.GenericBaseClass.BaseClassName.ToString()));
 
             if (!string.IsNullOrEmpty(this.CollectionBase))
                 optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.COLLECTIONBASETAG, this.CollectionBase));
