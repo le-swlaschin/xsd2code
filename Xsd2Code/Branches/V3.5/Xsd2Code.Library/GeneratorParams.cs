@@ -122,6 +122,14 @@ namespace Xsd2Code.Library
         public bool GenerateShouldSerializeProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether suppoort encoding.
+        /// </summary>
+        [Category("Property")]
+        [DefaultValue(false)]
+        [Description("Enable/Disable CamelCase property name.")]
+        public bool CamelCaseProperty { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether if generate EditorBrowsableState.Never attribute
         /// </summary>
         [Category("Property")]
@@ -751,6 +759,7 @@ namespace Xsd2Code.Library
                 parameters.TargetFramework = Utility.ToEnum<TargetFramework>(optionLine.ExtractStrFromXML(GeneratorContext.CODEBASETAG));
                 parameters.Miscellaneous.DisableDebug = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.DISABLEDEBUGTAG));
                 parameters.Serialization.GenerateXmlAttributes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEXMLATTRIBUTESTAG));
+                parameters.PropertyParams.CamelCaseProperty = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.CAMELCASEPROPERTYTAG));
                 parameters.PropertyParams.AutomaticProperties = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.AUTOMATICPROPERTIESTAG));
                 parameters.PropertyParams.EnableVirtualProperties = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLEVIRTUALPROPERTIESTAG));
                 parameters.GenericBaseClass.Enabled = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.USEGENERICBASECLASSTAG));
@@ -821,6 +830,7 @@ namespace Xsd2Code.Library
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.HIDEPRIVATEFIELDTAG, this.Miscellaneous.HidePrivateFieldInIde.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLESUMMARYCOMMENTTAG, this.Miscellaneous.EnableSummaryComment.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEVIRTUALPROPERTIESTAG, this.PropertyParams.EnableVirtualProperties.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.CAMELCASEPROPERTYTAG, this.PropertyParams.CamelCaseProperty.ToString()));
 
             if (!string.IsNullOrEmpty(this.CollectionBase))
                 optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.COLLECTIONBASETAG, this.CollectionBase));

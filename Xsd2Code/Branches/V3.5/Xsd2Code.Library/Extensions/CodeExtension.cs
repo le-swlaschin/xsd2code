@@ -54,6 +54,8 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         private static readonly SortedList<string, string> CollectionTypes = new SortedList<string, string>();
 
+        private static List<string> TypeList { get; set; }
+
         /// <summary>
         /// Contains all enum.
         /// </summary>
@@ -122,8 +124,61 @@ namespace Xsd2Code.Library.Extensions
                              where p.IsEnum
                              select p.Name).ToList();
 
+            // First we do an initial loop through the types to rename them to pascal case (and fix their attributes accordingly)
+            if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+            {
+                TypeList = new List<string>();
+                foreach (var type in types)
+                {
+                    TypeList.Add(type.Name);
+                    IEnumerable<CodeAttributeDeclaration> attributes =
+                        type.CustomAttributes.Cast<CodeAttributeDeclaration>();
+                    if (!attributes.Any(att => att.Name == "System.Xml.Serialization.XmlRootAttribute"))
+                    {
+                        var xmlAtt = new CodeAttributeDeclaration("System.Xml.Serialization.XmlRootAttribute");
+                        xmlAtt.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(type.Name)));
+                        type.CustomAttributes.Add(xmlAtt);
+                    }
+                    else
+                    {
+                        attributes.First(att => att.Name == "System.Xml.Serialization.XmlRootAttribute").Arguments.Add(
+                            new CodeAttributeArgument("ElementName", new CodePrimitiveExpression(type.Name)));
+                    }
+                    if (attributes.Any(att => att.Name == "System.Xml.Serialization.XmlTypeAttribute"))
+                    {
+                        attributes.First(att => att.Name == "System.Xml.Serialization.XmlTypeAttribute").Arguments.Add(
+                            new CodeAttributeArgument("TypeName", new CodePrimitiveExpression(type.Name)));
+                    }
+
+                    type.Name = CodeDomHelper.GetPascalCaseName(type.Name);
+                }
+            }
+
             foreach (var type in types)
             {
+                if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                {
+                    //If one type extends another it needs the Include attribute to be fixed
+                    IEnumerable<CodeAttributeDeclaration> attributes =
+                        type.CustomAttributes.Cast<CodeAttributeDeclaration>();
+                    if (attributes.Any(att => att.Name == "System.Xml.Serialization.XmlIncludeAttribute"))
+                    {
+                        foreach (
+                            var includeAtt in
+                                attributes.Where(att => att.Name == "System.Xml.Serialization.XmlIncludeAttribute"))
+                        {
+                            var typeOfArg = ((CodeTypeOfExpression) (includeAtt.Arguments[0].Value)).Type;
+                            if (TypeList.Contains(typeOfArg.BaseType))
+                                typeOfArg.BaseType = CodeDomHelper.GetPascalCaseName(typeOfArg.BaseType);
+                        }
+                    }
+                    //and the types it extends to be fixed
+                    foreach (CodeTypeReference baseType in type.BaseTypes)
+                    {
+                        if (TypeList.Contains(baseType.BaseType))
+                            baseType.BaseType = CodeDomHelper.GetPascalCaseName(baseType.BaseType);
+                    }
+                }
                 CollectionTypes.Clear();
                 LazyLoadingFields.Clear();
                 CollectionTypesFields.Clear();
@@ -336,9 +391,34 @@ namespace Xsd2Code.Library.Extensions
                     this.RemoveDefaultXmlAttributes(member.CustomAttributes);
                 }
 
+
+                //-----------------------------
+                //These changes are to re-name all references to classes in fields that have been renamed to pascal case.
+                //-----------------------------
                 var codeMember = member as CodeMemberField;
                 if (codeMember != null)
                 {
+                    // Change Base type Name to camelCase.
+                    if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                    {
+                        if (TypeList.Contains(codeMember.Type.BaseType))
+                            codeMember.Type.BaseType = CodeDomHelper.GetPascalCaseName(codeMember.Type.BaseType);
+
+                        if (codeMember.Type.ArrayElementType != null)
+                        {
+                            if (TypeList.Contains(codeMember.Type.ArrayElementType.BaseType))
+                                codeMember.Type.ArrayElementType.BaseType =
+                                    CodeDomHelper.GetPascalCaseName(codeMember.Type.ArrayElementType.BaseType);
+                        }
+                        if (codeMember.Type.TypeArguments.Count > 0)
+                        {
+                            foreach (CodeTypeReference genericType in codeMember.Type.TypeArguments)
+                            {
+                                if (TypeList.Contains(genericType.BaseType))
+                                    genericType.BaseType = CodeDomHelper.GetPascalCaseName(genericType.BaseType);
+                            }
+                        }
+                    }
                     MemberFieldsListFields.Add(codeMember.Name);
                     this.ProcessFields(codeMember, ctor, codeNamespace, ref addedToConstructor);
                 }
@@ -346,6 +426,63 @@ namespace Xsd2Code.Library.Extensions
                 var codeMemberProperty = member as CodeMemberProperty;
                 if (codeMemberProperty != null)
                 {
+                    #region CamelCase, re-name all references to classes in properties that have been renamed to pascal case
+                    if (GeneratorContext.GeneratorParams.PropertyParams.CamelCaseProperty)
+                    {
+                        if (TypeList.Contains(codeMemberProperty.Type.BaseType))
+                            codeMemberProperty.Type.BaseType =
+                                CodeDomHelper.GetPascalCaseName(codeMemberProperty.Type.BaseType);
+                        if (codeMemberProperty.Type.ArrayElementType != null)
+                        {
+                            if (TypeList.Contains(codeMemberProperty.Type.ArrayElementType.BaseType))
+                                codeMemberProperty.Type.ArrayElementType.BaseType =
+                                    CodeDomHelper.GetPascalCaseName(codeMemberProperty.Type.ArrayElementType.BaseType);
+                        }
+                        if (codeMemberProperty.Type.TypeArguments.Count > 0)
+                        {
+                            foreach (CodeTypeReference genericType in codeMemberProperty.Type.TypeArguments)
+                            {
+                                if (TypeList.Contains(genericType.BaseType))
+                                    genericType.BaseType = CodeDomHelper.GetPascalCaseName(genericType.BaseType);
+                            }
+                        }
+
+                        var attrs = codeMemberProperty.CustomAttributes.Cast<CodeAttributeDeclaration>();
+
+                        //These changes are to ensure that the attributes have the correct camel case name reference in them.
+                        CodeAttributeDeclaration xmlElAtt = null;
+                        if (attrs.Any(att => att.Name == "System.Xml.Serialization.XmlElementAttribute"))
+                        {
+                            xmlElAtt = attrs.First(att => att.Name == "System.Xml.Serialization.XmlElementAttribute");
+                            xmlElAtt.Arguments.Add(new CodeAttributeArgument("ElementName",
+                                                                             new CodePrimitiveExpression(
+                                                                                 codeMemberProperty.Name)));
+                            //This is almost certainly the wrong place to address this issue
+                            FixBadTypeMapping(type, codeMemberProperty, xmlElAtt);
+                        }
+                        else if (!attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute") &&
+                                 !attrs.Any(att => att.Name == "System.Xml.Serialization.XmlArrayAttribute"))
+                        {
+                            xmlElAtt = new CodeAttributeDeclaration("System.Xml.Serialization.XmlElementAttribute");
+                            xmlElAtt.Arguments.Add(
+                                new CodeAttributeArgument(new CodePrimitiveExpression(codeMemberProperty.Name)));
+                            codeMemberProperty.CustomAttributes.Add(xmlElAtt);
+                        }
+                        if (attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute"))
+                        {
+                            var xmlAttAtt =
+                                attrs.First(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
+                            xmlAttAtt.Arguments.Add(new CodeAttributeArgument("AttributeName",
+                                                                              new CodePrimitiveExpression(
+                                                                                  codeMemberProperty.Name)));
+                            //This is almost certainly the wrong place to address this issue
+                            FixBadTypeMapping(type, codeMemberProperty, xmlAttAtt);
+                        }
+
+                        codeMemberProperty.Name = CodeDomHelper.GetPascalCaseName(codeMemberProperty.Name);
+                    }
+                    #endregion
+
                     PropertiesListFields.Add(codeMemberProperty.Name);
                     this.ProcessProperty(type, codeNamespace, codeMemberProperty, currentElement, schema);
                 }
@@ -394,6 +531,34 @@ namespace Xsd2Code.Library.Extensions
             if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified != PropertyNameSpecifiedType.Default)
             {
                 GeneratePropertyNameSpecified(type);
+            }else
+            {
+                GeneratePropertyNameSpecifiedNullable(type);
+            }
+        }
+
+        /// <summary>
+        /// Fixes bad type mappings caused to missing value types in older versions of .net.
+        /// </summary>
+        private static void FixBadTypeMapping(CodeTypeDeclaration type, CodeMemberProperty property, CodeAttributeDeclaration attribute)
+        {
+            foreach(CodeAttributeArgument arg in attribute.Arguments)
+            {
+                if(arg.Name == "DataType")
+                {
+                    var value = arg.Value as CodePrimitiveExpression;
+                    if(value != null && value.Value != null && value.Value is string)
+                    {
+                        //Add extra if typeName == statements for dealing with other types
+                        var typeName = (string) value.Value;
+                        if(typeName == "integer")
+                        {
+                            var field = CodeDomHelper.FindField(type, CodeDomHelper.GetFieldName(property.Name));
+                            field.Type.BaseType = "System.Numerics.BigInteger";
+                            property.Type.BaseType = "System.Numerics.BigInteger";
+                        }
+                    }
+                }
             }
         }
 
@@ -407,14 +572,23 @@ namespace Xsd2Code.Library.Extensions
             {
                 if (!propertyName.EndsWith("Specified"))
                 {
+                    var property = CodeDomHelper.FindProperty(type, propertyName);
                     CodeMemberProperty specifiedProperty = null;
                     // Search in all properties if PropertyNameSpecified exist
                     string searchPropertyName = string.Format("{0}Specified", propertyName);
                     specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
 
+                    var attrs = property.CustomAttributes.Cast<CodeAttributeDeclaration>();
+
+                    //We check for this, because I decided not to generate "specified" methods for attributes as attributes behave
+                    //slightly differently to elements (they can't be complex types such as nullables).
+                    //I plan to address this differently by generating them (without nullable) and adding an extra clause 
+                    //to automatically set the specified property to true in the property setter
+                    var isAttribute = attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
+                                   
                     if (specifiedProperty != null)
                     {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.None)
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.None || isAttribute)
                         {
                             type.Members.Remove(specifiedProperty);
                             var field = CodeDomHelper.FindField(type, CodeDomHelper.GetSpecifiedFieldName(propertyName));
@@ -426,7 +600,79 @@ namespace Xsd2Code.Library.Extensions
                     }
                     else
                     {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All)
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All && !isAttribute)
+                        {
+
+                            CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates the property name specified.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        private static void GeneratePropertyNameSpecifiedNullable(CodeTypeDeclaration type)
+        {
+            foreach (var propertyName in PropertiesListFields)
+            {
+                if (!propertyName.EndsWith("Specified"))
+                {
+                    var property = CodeDomHelper.FindProperty(type, propertyName);
+                    CodeMemberProperty specifiedProperty = null;
+                    // Search in all properties if PropertyNameSpecified exist
+                    string searchPropertyName = string.Format("{0}Specified", propertyName);
+                    specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
+
+                    var attrs = property.CustomAttributes.Cast<CodeAttributeDeclaration>();
+                    //We check for this, because I decided not to generate "specified" methods for attributes as attributes behave
+                    //slightly differently to elements (they can't be complex types such as nullables).
+                    //I plan to address this differently by generating them (without nullable) and adding an extra clause 
+                    //to automatically set the specified property to true in the property setter
+                    var isAttribute = attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
+
+                    if (specifiedProperty != null)
+                    {
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.Default)
+                        {
+                            if (isAttribute)
+                            {
+                                type.Members.Remove(specifiedProperty);
+                                var field = CodeDomHelper.FindField(type, CodeDomHelper.GetSpecifiedFieldName(propertyName));
+                                if (field != null)
+                                {
+                                    type.Members.Remove(field);
+                                }
+                            }
+                            else
+                            {
+                                specifiedProperty.SetStatements.Clear();
+                                specifiedProperty.GetStatements.Clear();
+                                specifiedProperty.GetStatements.Add(
+                                    new CodeMethodReturnStatement(new CodeSnippetExpression(property.Name + ".HasValue")));
+                                var field = CodeDomHelper.FindField(type,
+                                                                    CodeDomHelper.GetSpecifiedFieldName(propertyName));
+                                if (field != null)
+                                {
+                                    type.Members.Remove(field);
+                                }
+
+                                var propertyField = CodeDomHelper.FindField(type,
+                                                                            CodeDomHelper.GetFieldName(propertyName));
+                                var typeCopy = propertyField.Type;
+                                propertyField.Type = new CodeTypeReference(typeof (System.Nullable<>));
+                                propertyField.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
+                                property.Type = new CodeTypeReference(typeof (System.Nullable<>));
+                                property.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All && !isAttribute)
                         {
 
                             CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
@@ -1989,6 +2235,8 @@ namespace Xsd2Code.Library.Extensions
                                     property.Type.BaseType != new CodeTypeReference(typeof(double)).BaseType &&
                                     property.Type.BaseType != new CodeTypeReference(typeof(int)).BaseType &&
                                     property.Type.BaseType != new CodeTypeReference(typeof(bool)).BaseType &&
+                                    property.Type.BaseType != new CodeTypeReference(typeof(decimal)).BaseType &&
+                                    property.Type.BaseType != new CodeTypeReference("System.Numerics.BigInteger").BaseType &&
                                     enumListField.IndexOf(property.Type.BaseType) == -1)
                                 {
                                     // ---------------------------------------------

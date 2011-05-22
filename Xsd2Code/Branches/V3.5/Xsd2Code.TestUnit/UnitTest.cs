@@ -226,7 +226,7 @@ namespace Xsd2Code.TestUnit
         /// DVDs this instance.
         /// </summary>
         [TestMethod]
-        public void Dvd()
+        public void EncodingTest()
         {
             lock (testLock)
             {
@@ -283,7 +283,7 @@ namespace Xsd2Code.TestUnit
                 }
                 else
                 {
-                    if (!deserialiseDvd.Dvds[0].Title.Equals("Matrix ???"))
+                    if (!deserialiseDvd.Dvds[0].Title.Equals("Matrix יא?"))
                     {
                         Assert.Fail("LoadFromFile failed on ASCII encoding ");
                     }
@@ -334,6 +334,32 @@ namespace Xsd2Code.TestUnit
             }
         }
 
+        /// <summary>
+        /// DVDs this instance.
+        /// </summary>
+        [TestMethod]
+        public void CamelCaseTest()
+        {
+            lock (testLock)
+            {
+                // Copy resource file to the run-time directory
+                GetInputFilePath("Actor.xsd", Resources.Actor);
+
+                // Copy resource file to the run-time directory
+                string inputFilePath = GetInputFilePath("Dvd.xsd", Resources.dvd);
+                var generatorParams = GetGeneratorParams(inputFilePath);
+                generatorParams.CollectionObjectType = CollectionType.List;
+                generatorParams.TargetFramework = TargetFramework.Net20;
+                generatorParams.Serialization.GenerateXmlAttributes = true;
+                generatorParams.PropertyParams.CamelCaseProperty = true;
+
+                var xsdGen = new GeneratorFacade(generatorParams);
+                xsdGen.Generate();
+
+                var compileResult = CompileCSFile(generatorParams.OutputFilePath);
+                Assert.IsTrue(compileResult.Success, compileResult.Messages.ToString());
+            }
+        }
 
         /// <summary>
         /// Test LazyLoadind pattern

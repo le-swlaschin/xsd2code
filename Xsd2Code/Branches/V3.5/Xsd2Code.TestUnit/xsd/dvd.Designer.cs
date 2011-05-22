@@ -1277,7 +1277,7 @@ namespace Xsd2Code.TestUnit
             try
             {
                 string xmlString = Serialize(encoding);
-                streamWriter = new System.IO.StreamWriter(fileName, false, Encoding.UTF8);
+                streamWriter = new System.IO.StreamWriter(fileName, false, encoding);
                 streamWriter.WriteLine(xmlString);
                 streamWriter.Close();
             }

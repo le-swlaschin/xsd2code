@@ -483,9 +483,20 @@ namespace Xsd2Code.Library.Helpers
             type.Members.Add(property);
         }
 
+        internal static string GetPascalCaseName(string camelCaseName)
+        {
+            return camelCaseName.Substring(0, 1).ToUpper() + camelCaseName.Substring(1, camelCaseName.Length - 1);
+        }
+
          internal static string GetSpecifiedFieldName(string propertyName)
          {
              return string.Format("{0}{1}FieldSpecified", propertyName.Substring(0, 1).ToLower(),
+                                  propertyName.Substring(1, propertyName.Length - 1));
+         }
+
+         internal static string GetFieldName(string propertyName)
+         {
+             return string.Format("{0}{1}Field", propertyName.Substring(0, 1).ToLower(),
                                   propertyName.Substring(1, propertyName.Length - 1));
          }
 

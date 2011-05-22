@@ -75,6 +75,11 @@
         public const string BASECLASSNAMETAG = "BaseClassName";
 
         /// <summary>
+        /// Language tag
+        /// </summary>
+        public const string CAMELCASEPROPERTYTAG = "CamelCase";
+
+        /// <summary>
         /// Base generic type for collections when CollectionType is DefinedType
         /// </summary>
         public const string COLLECTIONBASETAG = "CollectionBase";
