@@ -167,7 +167,7 @@ namespace Xsd2Code.Library.Extensions
                             var includeAtt in
                                 attributes.Where(att => att.Name == "System.Xml.Serialization.XmlIncludeAttribute"))
                         {
-                            var typeOfArg = ((CodeTypeOfExpression) (includeAtt.Arguments[0].Value)).Type;
+                            var typeOfArg = ((CodeTypeOfExpression)(includeAtt.Arguments[0].Value)).Type;
                             if (TypeList.Contains(typeOfArg.BaseType))
                                 typeOfArg.BaseType = CodeDomHelper.GetPascalCaseName(typeOfArg.BaseType);
                         }
@@ -367,7 +367,7 @@ namespace Xsd2Code.Library.Extensions
                 if (!inheritsFromClass)
                 {
                     if (GeneratorContext.GeneratorParams.EnableDataBinding)
-                        type.BaseTypes.Add(typeof (INotifyPropertyChanged));
+                        type.BaseTypes.Add(typeof(INotifyPropertyChanged));
                 }
             }
 
@@ -531,7 +531,8 @@ namespace Xsd2Code.Library.Extensions
             if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified != PropertyNameSpecifiedType.Default)
             {
                 GeneratePropertyNameSpecified(type);
-            }else
+            }
+            else
             {
                 GeneratePropertyNameSpecifiedNullable(type);
             }
@@ -542,16 +543,16 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         private static void FixBadTypeMapping(CodeTypeDeclaration type, CodeMemberProperty property, CodeAttributeDeclaration attribute)
         {
-            foreach(CodeAttributeArgument arg in attribute.Arguments)
+            foreach (CodeAttributeArgument arg in attribute.Arguments)
             {
-                if(arg.Name == "DataType")
+                if (arg.Name == "DataType")
                 {
                     var value = arg.Value as CodePrimitiveExpression;
-                    if(value != null && value.Value != null && value.Value is string)
+                    if (value != null && value.Value != null && value.Value is string)
                     {
                         //Add extra if typeName == statements for dealing with other types
-                        var typeName = (string) value.Value;
-                        if(typeName == "integer")
+                        var typeName = (string)value.Value;
+                        if (typeName == "integer")
                         {
                             var field = CodeDomHelper.FindField(type, CodeDomHelper.GetFieldName(property.Name));
                             field.Type.BaseType = "System.Numerics.BigInteger";
@@ -585,7 +586,7 @@ namespace Xsd2Code.Library.Extensions
                     //I plan to address this differently by generating them (without nullable) and adding an extra clause 
                     //to automatically set the specified property to true in the property setter
                     var isAttribute = attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
-                                   
+
                     if (specifiedProperty != null)
                     {
                         if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.None || isAttribute)
@@ -662,13 +663,13 @@ namespace Xsd2Code.Library.Extensions
                                 var propertyField = CodeDomHelper.FindField(type,
                                                                             CodeDomHelper.GetFieldName(propertyName));
                                 var typeCopy = propertyField.Type;
-                                propertyField.Type = new CodeTypeReference(typeof (System.Nullable<>));
+                                propertyField.Type = new CodeTypeReference(typeof(System.Nullable<>));
                                 propertyField.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
-                                property.Type = new CodeTypeReference(typeof (System.Nullable<>));
+                                property.Type = new CodeTypeReference(typeof(System.Nullable<>));
                                 property.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
                             }
                         }
-                        
+
                     }
                     else
                     {
@@ -890,7 +891,7 @@ namespace Xsd2Code.Library.Extensions
                     new CodeVariableReferenceExpression("xmlWriterSettings.Encoding"),
                     new CodeArgumentReferenceExpression("encoding")));
 
-                var createXmlWriter = CodeDomHelper.GetInvokeMethod("XmlWriter","Create",new CodeExpression[]
+                var createXmlWriter = CodeDomHelper.GetInvokeMethod("XmlWriter", "Create", new CodeExpression[]
                         {
                             new CodeArgumentReferenceExpression("memoryStream"),
                             new CodeArgumentReferenceExpression("xmlWriterSettings")
@@ -932,9 +933,10 @@ namespace Xsd2Code.Library.Extensions
                                                       new CodeTypeReferenceExpression("System.IO.SeekOrigin.Begin")
                                                   }));
 
+            var streamReaderParams = GeneratorContext.GeneratorParams.Serialization.EnableEncoding ? new[] { "memoryStream", "encoding" } : new[] { "memoryStream" };
             tryStatmanentsCol.Add(new CodeAssignStatement(
                 new CodeVariableReferenceExpression("streamReader"),
-                CodeDomHelper.CreateInstance(typeof(StreamReader), new[] { "memoryStream" })));
+                CodeDomHelper.CreateInstance(typeof(StreamReader), streamReaderParams)));
 
             var readToEnd = CodeDomHelper.GetInvokeMethod("streamReader", "ReadToEnd");
             tryStatmanentsCol.Add(new CodeMethodReturnStatement(readToEnd));
@@ -1775,7 +1777,7 @@ namespace Xsd2Code.Library.Extensions
             if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
             {
                 code.Imports.Add(new CodeNamespaceImport("System.Xml"));
-               
+
             }
             switch (GeneratorContext.GeneratorParams.CollectionObjectType)
             {

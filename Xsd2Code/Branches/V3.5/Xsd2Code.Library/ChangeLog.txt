@@ -64,3 +64,4 @@
 2011-04-07, PC:  Apply path 7518 (Modifies the code generation for setter properties when data binding is enabled. It produces slightly better and smaller code.)
 2011-05-22, PC:  Issue #13549 : Convert class names to PascalCase. Thanks to David Collis.
 				 Issue #13557 : The GenericBaseClass/BaseClassName field is lost every time you close the dialog.
+2011-01-01, PC:  Issue #14395 : Serialize method don't use encoding parameter in StreamReader call.

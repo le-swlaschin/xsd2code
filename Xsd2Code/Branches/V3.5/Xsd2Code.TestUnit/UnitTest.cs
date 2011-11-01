@@ -246,7 +246,7 @@ namespace Xsd2Code.TestUnit
                 generatorParams.Serialization.GenerateXmlAttributes = true;
                 generatorParams.TrackingChanges.Enabled = false;
                 generatorParams.TrackingChanges.GenerateTrackingClasses = false;
-                generatorParams.Serialization.EnableEncoding = false;
+                generatorParams.Serialization.EnableEncoding = true;
                 generatorParams.Serialization.DefaultEncoder = DefaultEncoder.UTF8;
                 generatorParams.Language = GenerationLanguage.CSharp;
 
