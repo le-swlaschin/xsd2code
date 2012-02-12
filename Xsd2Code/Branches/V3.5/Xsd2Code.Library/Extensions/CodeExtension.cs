@@ -2052,30 +2052,32 @@ namespace Xsd2Code.Library.Extensions
 
                     var propChange = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "OnPropertyChanged"), propertyChangeParams);
 
-                    var propAssignStatment = prop.SetStatements[0] as CodeAssignStatement;
-                    if (propAssignStatment != null)
+                    if (prop.HasSet)
                     {
-                        var cfreL = propAssignStatment.Left as CodeFieldReferenceExpression;
-                        var cfreR = propAssignStatment.Right as CodePropertySetValueReferenceExpression;
-
-                        if (cfreL != null)
+                        var propAssignStatment = prop.SetStatements[0] as CodeAssignStatement;
+                        if (propAssignStatment != null)
                         {
-                            var setValueCondition = new CodeStatementCollection { propAssignStatment, propChange };
+                            var cfreL = propAssignStatment.Left as CodeFieldReferenceExpression;
+                            var cfreR = propAssignStatment.Right as CodePropertySetValueReferenceExpression;
 
-                            // ---------------------------------------------
-                            // (this.descriptionField == null)
-                            // ---------------------------------------------
-                            CodeBinaryOperatorExpression exprFieldEqualsNull = new CodeBinaryOperatorExpression(
-                                new CodeFieldReferenceExpression(
-                                    new CodeThisReferenceExpression(),
-                                    cfreL.FieldName),
-                                CodeBinaryOperatorType.IdentityEquality,
-                                new CodePrimitiveExpression(null));
+                            if (cfreL != null)
+                            {
+                                var setValueCondition = new CodeStatementCollection {propAssignStatment, propChange};
 
-                            // ---------------------------------------------
-                            // (xxxField.Equals(value) != true)
-                            // ---------------------------------------------
-                            CodeBinaryOperatorExpression exprFieldNotEqualsValue = new CodeBinaryOperatorExpression(
+                                // ---------------------------------------------
+                                // (this.descriptionField == null)
+                                // ---------------------------------------------
+                                CodeBinaryOperatorExpression exprFieldEqualsNull = new CodeBinaryOperatorExpression(
+                                    new CodeFieldReferenceExpression(
+                                        new CodeThisReferenceExpression(),
+                                        cfreL.FieldName),
+                                    CodeBinaryOperatorType.IdentityEquality,
+                                    new CodePrimitiveExpression(null));
+
+                                // ---------------------------------------------
+                                // (xxxField.Equals(value) != true)
+                                // ---------------------------------------------
+                                CodeBinaryOperatorExpression exprFieldNotEqualsValue = new CodeBinaryOperatorExpression(
                                     new CodeMethodInvokeExpression(
                                         new CodeFieldReferenceExpression(
                                             null,
@@ -2085,48 +2087,49 @@ namespace Xsd2Code.Library.Extensions
                                     CodeBinaryOperatorType.IdentityInequality,
                                     new CodePrimitiveExpression(true));
 
-                            CodeStatement[] setValueStatements = CodeDomHelper.CodeStmtColToArray(setValueCondition);
+                                CodeStatement[] setValueStatements = CodeDomHelper.CodeStmtColToArray(setValueCondition);
 
-                            var property = member as CodeMemberProperty;
-                            if (property != null)
-                            {
-                                if (property.Type.BaseType != new CodeTypeReference(typeof(long)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(DateTime)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(float)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(double)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(int)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(bool)).BaseType &&
-                                    property.Type.BaseType != new CodeTypeReference(typeof(decimal)).BaseType &&
+                                var property = member as CodeMemberProperty;
+                                if (property != null)
+                                {
+                                    if (property.Type.BaseType != new CodeTypeReference(typeof (long)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (DateTime)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (float)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (double)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (int)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (bool)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof (decimal)).BaseType &&
                                     property.Type.BaseType != new CodeTypeReference("System.Numerics.BigInteger").BaseType &&
-                                    enumListField.IndexOf(property.Type.BaseType) == -1)
-                                {
-                                    // ---------------------------------------------
-                                    // if ((this.descriptionField == null) || (xxxField.Equals(value) != true)) { ... }
-                                    // ---------------------------------------------
-                                    var condStatmentCondNullOrNotEquals = new CodeConditionStatement(
-                                        new CodeBinaryOperatorExpression(
-                                            exprFieldEqualsNull,
-                                            CodeBinaryOperatorType.BooleanOr, exprFieldNotEqualsValue
-                                            ),
-                                        setValueStatements);
+                                        enumListField.IndexOf(property.Type.BaseType) == -1)
+                                    {
+                                        // ---------------------------------------------
+                                        // if ((this.descriptionField == null) || (xxxField.Equals(value) != true)) { ... }
+                                        // ---------------------------------------------
+                                        var condStatmentCondNullOrNotEquals = new CodeConditionStatement(
+                                            new CodeBinaryOperatorExpression(
+                                                exprFieldEqualsNull,
+                                                CodeBinaryOperatorType.BooleanOr, exprFieldNotEqualsValue
+                                                ),
+                                            setValueStatements);
 
-                                    prop.SetStatements[0] = condStatmentCondNullOrNotEquals;
-                                }
-                                else
-                                {
-                                    // ---------------------------------------------
-                                    // if ((xxxField.Equals(value) != true)) { ... }
-                                    // ---------------------------------------------
-                                    var condStatmentFieldEquals = new CodeConditionStatement(
-                                        exprFieldNotEqualsValue,
-                                        setValueStatements);
+                                        prop.SetStatements[0] = condStatmentCondNullOrNotEquals;
+                                    }
+                                    else
+                                    {
+                                        // ---------------------------------------------
+                                        // if ((xxxField.Equals(value) != true)) { ... }
+                                        // ---------------------------------------------
+                                        var condStatmentFieldEquals = new CodeConditionStatement(
+                                            exprFieldNotEqualsValue,
+                                            setValueStatements);
 
-                                    prop.SetStatements[0] = condStatmentFieldEquals;
+                                        prop.SetStatements[0] = condStatmentFieldEquals;
+                                    }
                                 }
                             }
+                            else
+                                prop.SetStatements.Add(propChange);
                         }
-                        else
-                            prop.SetStatements.Add(propChange);
                     }
                 }
             }
