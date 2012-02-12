@@ -154,6 +154,8 @@ namespace Xsd2Code.Library.Extensions
                 }
             }
 
+            // Fixes http://xsd2code.codeplex.com/WorkItem/View.aspx?WorkItemId=14391
+            CollectionTypes.Clear();
             foreach (var type in types)
             {
                 if (GeneratorContext.GeneratorParams.PropertyParams.PascalCaseProperty)
@@ -179,7 +181,6 @@ namespace Xsd2Code.Library.Extensions
                             baseType.BaseType = CodeDomHelper.GetPascalCaseName(baseType.BaseType);
                     }
                 }
-                CollectionTypes.Clear();
                 LazyLoadingFields.Clear();
                 CollectionTypesFields.Clear();
 

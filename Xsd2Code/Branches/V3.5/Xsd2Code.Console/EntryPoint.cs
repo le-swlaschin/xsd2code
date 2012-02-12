@@ -108,8 +108,28 @@ namespace Xsd2Code
                     case "/collectionbase":
                         if (i < args.Length - 1)
                         {
-                            generatorParams.CollectionObjectType = Utility.ToEnum<CollectionType>(args[i + 1]);
+                            string[] argParts = args[i + 1].Split(',');
                             i++;
+                            if (argParts.Length >= 1)
+                            {
+                                var collectionObjectType = Utility.ToEnum<CollectionType>(argParts[0]);
+                                if (collectionObjectType == CollectionType.DefinedType)
+                                {
+                                    if (argParts.Length == 2)
+                                    {
+                                        generatorParams.CollectionObjectType = collectionObjectType;
+                                        generatorParams.CollectionBase = argParts[1];
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Warning: Malformed /c /collection command line switch - Custom collection type not specified.");
+                                    }
+                                }
+                                else
+                                {
+                                    generatorParams.CollectionObjectType = collectionObjectType;
+                                }
+                            }
                         }
                         break;
 
