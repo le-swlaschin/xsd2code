@@ -114,7 +114,7 @@ namespace Xsd2Code.Library.Helpers
             var language = GetGenerationLanguage(provider);
             return GetOutputFilePath(xsdFilePath, language);
              */ 
-            return Path.ChangeExtension(xsdFilePath, ".designer." + provider.FileExtension);
+            return Path.ChangeExtension(xsdFilePath, ".Designer." + provider.FileExtension);
         }
 
         /// <summary>

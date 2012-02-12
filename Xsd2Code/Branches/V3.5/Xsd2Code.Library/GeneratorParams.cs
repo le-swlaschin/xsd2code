@@ -247,7 +247,7 @@ namespace Xsd2Code.Library
             }
         }
 
-        [DefaultValue(true), Description("If true, generate tracking changes classes inside [SchemaName].designed.cs file.")]
+        [DefaultValue(true), Description("If true, generate tracking changes classes inside [SchemaName].Designer.cs file.")]
         public bool GenerateTrackingClasses { get; set; }
 
         public override string ToString()
@@ -283,7 +283,7 @@ namespace Xsd2Code.Library
         /// <summary>
         /// Gets or sets a value indicating the name of Serialize method.
         /// </summary>
-        [DefaultValue("true"), Description("Generate base class code inside [ShemaName].designer.cs file")]
+        [DefaultValue("true"), Description("Generate base class code inside [ShemaName].Designer.cs file")]
         public bool GenerateBaseClass { get; set; }
 
         public override string ToString()

@@ -71,14 +71,12 @@ namespace Xsd2Code.SetupLibrary
         {
             base.Install(savedState);
 
+            // Fixes http://xsd2code.codeplex.com/WorkItem/View.aspx?WorkItemId=6988
+            // Environment.GetFolderPath not works because CA runs with SYSTEM account. Personal folder path is passed through CA data.
             // Setup .addin path and assembly path
-            string vs2008AddinTarget = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                @"Visual Studio 2008\Addins");
+            string vs2008AddinTarget = Path.Combine(this.Context.Parameters["personal"].TrimEnd(null), @"Visual Studio 2008\Addins");
 
-            string vs2010AddinTarget = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                @"Visual Studio 2010\Addins");
+            string vs2010AddinTarget = Path.Combine(this.Context.Parameters["personal"].TrimEnd(null), @"Visual Studio 2010\Addins");
 
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             try

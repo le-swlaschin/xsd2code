@@ -65,3 +65,11 @@
 2011-05-22, PC:  Issue #13549 : Convert class names to PascalCase. Thanks to David Collis.
 				 Issue #13557 : The GenericBaseClass/BaseClassName field is lost every time you close the dialog.
 2011-01-01, PC:  Issue #14395 : Serialize method don't use encoding parameter in StreamReader call.
+2012-02-12, PC:  Issue #14391 : Apply DavidC (Nov 28 2011 at10:19 AM) Path It contains also following command line correction.
+                 If collection base is set to DefinedType via /c command line switch, this type cannot be specified.
+				 Command line switch /c is modified to: /c DefinedType,<Custom Collection Type>
+2012-02-12, PC:	 Issue #14391 : The Xsd2Code Generation generates a '.designer.cs' file and the 'Run Custom Tool' creates a '.Designer.cs' file.
+				 Issue #6988  : Setup does not place addin file correctly if My Documents folder is moved
+				 
+				 
+				 

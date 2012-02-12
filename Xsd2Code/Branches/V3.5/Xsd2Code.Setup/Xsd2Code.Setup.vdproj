@@ -683,7 +683,7 @@
             "Sequence" = "3:2"
             "Identifier" = "8:_C5EAF019_147D_425B_B9C1_46B74CA85213"
             "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
+            "CustomActionData" = "8:/personal=\"[PersonalFolder] \""
             }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_8FD1C23829F946E486528BD2B9E3BE19"
             {
@@ -1595,7 +1595,7 @@
         "Manufacturer" = "8:Xsd2Code"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.codeplex.com/Xsd2Code/Thread/List.aspx"
-        "Title" = "8:Xsd2Code 3.0 - DotNet Business Entity class generator from XML schema definition files"
+        "Title" = "8:Xsd2Code 3.5 - DotNet Business Entity class generator from XML schema definition files"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Xsd2Code team"
         "Keywords" = "8:Code generator, code generation, XSD, Xml Schema definition, C#, Visual Basic, Visual C++, , tool, utility, Business Entity, Business Object"
