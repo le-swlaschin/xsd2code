@@ -132,11 +132,20 @@ namespace Xsd2Code.Library
                     exporter.ExportTypeMapping(mapping);
                 }
 
-                //Fixes/handles http://xsd2code.codeplex.com/WorkItem/View.aspx?WorkItemId=6941
-                foreach (XmlSchemaComplexType complex in xsd.Items.OfType<XmlSchemaComplexType>())
+                if (generatorParams.Miscellaneous.GenerateAllTypes)
                 {
-                    var mapping = importer.ImportSchemaType(complex.QualifiedName);
-                    exporter.ExportTypeMapping(mapping);
+                    // Fixes/handles http://xsd2code.codeplex.com/WorkItem/View.aspx?WorkItemId=6941
+                    foreach (XmlSchemaComplexType complex in xsd.Items.OfType<XmlSchemaComplexType>())
+                    {
+                        var mapping = importer.ImportSchemaType(complex.QualifiedName);
+
+                        // Fixes/handles http://xsd2code.codeplex.com/WorkItem/View.aspx?WorkItemId=13228
+                        // Export only types not exported from preceding foreach cycle
+                        if (ns.Types.Cast<CodeTypeDeclaration>().Count(p => p.Name == mapping.TypeFullName) == 0)
+                        {
+                            exporter.ExportTypeMapping(mapping);
+                        }
+                    }
                 }
 
                 #endregion

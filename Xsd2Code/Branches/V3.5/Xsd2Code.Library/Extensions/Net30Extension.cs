@@ -16,6 +16,8 @@ namespace Xsd2Code.Library.Extensions
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Text;
     using System.Xml.Schema;
     using Helpers;
 
@@ -25,25 +27,6 @@ namespace Xsd2Code.Library.Extensions
     [CodeExtension(TargetFramework.Net30)]
     public class Net30Extension : CodeExtension
     {
-        #region Private Fields
-
-        /// <summary>
-        /// List the properties that will change to auto properties
-        /// </summary>
-        private readonly List<CodeMemberProperty> autoPropertyListField = new List<CodeMemberProperty>();
-
-        /// <summary>
-        /// List the fields to be deleted
-        /// </summary>
-        private readonly List<CodeMemberField> fieldListToRemoveField = new List<CodeMemberField>();
-
-        /// <summary>
-        /// List fields that require an initialization in the constructor
-        /// </summary>
-        private readonly List<string> fieldWithAssignementInCtorListField = new List<string>();
-
-        #endregion
-
         #region Protected methods
 
         /// <summary>
@@ -54,36 +37,10 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration</param>
         protected override void ProcessClass(CodeNamespace codeNamespace, XmlSchema schema, CodeTypeDeclaration type)
         {
-            this.autoPropertyListField.Clear();
-            this.fieldListToRemoveField.Clear();
-            this.fieldWithAssignementInCtorListField.Clear();
-
-            // looks for properties that can not become automatic property
-            CodeConstructor ctor = null;
-            foreach (CodeTypeMember member in type.Members)
-            {
-                if (member is CodeConstructor)
-                    ctor = member as CodeConstructor;
-            }
-
-            if (ctor != null)
-            {
-                foreach (var statement in ctor.Statements)
-                {
-                    var codeAssignStatement = statement as CodeAssignStatement;
-                    if (codeAssignStatement == null) continue;
-                    var code = codeAssignStatement.Left as CodeFieldReferenceExpression;
-                    if (code != null)
-                    {
-                        this.fieldWithAssignementInCtorListField.Add(code.FieldName);
-                    }
-                }
-            }
-
             base.ProcessClass(codeNamespace, schema, type);
 
             // generate automatic properties
-            this.GenerateAutomaticProperties(type);
+            GenerateAutomaticProperties(type);
         }
 
         /// <summary>
@@ -98,16 +55,13 @@ namespace Xsd2Code.Library.Extensions
             if (GeneratorContext.GeneratorParams.GenerateDataContracts)
             {
                 var attributeType = new CodeTypeReference("System.Runtime.Serialization.DataContractAttribute");
-                var codeAttributeArgument = new List<CodeAttributeArgument>();
-
-                //var typeName = string.Concat('"', type.Name, '"');
-                //codeAttributeArgument.Add(new CodeAttributeArgument("Name", new CodeSnippetExpression(typeName)));
-                codeAttributeArgument.Add(new CodeAttributeArgument("Name", new CodePrimitiveExpression(type.Name)));
+                var codeAttributeArgument = new List<CodeAttributeArgument>
+                    {
+                        new CodeAttributeArgument("Name", new CodePrimitiveExpression(type.Name))
+                    };
 
                 if (!string.IsNullOrEmpty(schema.TargetNamespace))
                 {
-                    //var targetNamespace = string.Concat('\"', schema.TargetNamespace, '\"');
-                    //codeAttributeArgument.Add(new CodeAttributeArgument("Namespace", new CodeSnippetExpression(targetNamespace)));
                     codeAttributeArgument.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(schema.TargetNamespace)));
                 }
 
@@ -139,94 +93,8 @@ namespace Xsd2Code.Library.Extensions
             base.ImportNamespaces(code);
 
             if (GeneratorContext.GeneratorParams.GenerateDataContracts)
+            {
                 code.Imports.Add(new CodeNamespaceImport("System.Runtime.Serialization"));
-        }
-
-        /// <summary>
-        /// Property process
-        /// </summary>
-        /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration</param>
-        /// <param name="ns">The ns.</param>
-        /// <param name="member">Type members include fields, methods, properties, constructors and nested types</param>
-        /// <param name="xmlElement">Represent the root element in schema</param>
-        /// <param name="schema">XML Schema</param>
-        protected override void ProcessProperty(CodeTypeDeclaration type, CodeNamespace ns, CodeTypeMember member, XmlSchemaElement xmlElement, XmlSchema schema)
-        {
-            // Get now if property is array before base.ProcessProperty call.
-            var prop = (CodeMemberProperty)member;
-
-            base.ProcessProperty(type, ns, member, xmlElement, schema);
-
-            int i = 0;
-            // Generate automatic properties.
-            if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
-            {
-                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties)
-                {
-                    bool excludeType = false;
-                    // Change automatic property only for type of system Namespace, 
-                    if (prop.Type.BaseType.Contains("System."))
-                    {
-                        // Exclude collection type
-                        if (CollectionTypesFields.IndexOf(prop.Name) == -1)
-                        {
-                            // Get private fieldName
-                            var propReturnStatment = prop.GetStatements[0] as CodeMethodReturnStatement;
-                            if (propReturnStatment != null)
-                            {
-                                var field = propReturnStatment.Expression as CodeFieldReferenceExpression;
-                                if (field != null)
-                                {
-                                    // Check if private field don't need initialisation in ctor (defaut value).
-                                    if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.FieldName) == -1)
-                                    {
-                                        this.autoPropertyListField.Add(member as CodeMemberProperty);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// process Fields.
-        /// </summary>
-        /// <param name="member">CodeTypeMember member</param>
-        /// <param name="ctor">CodeMemberMethod constructor</param>
-        /// <param name="ns">CodeNamespace XSD</param>
-        /// <param name="addedToConstructor">Indicates if create a new constructor</param>
-        protected override void ProcessFields(CodeTypeMember member, CodeMemberMethod ctor, CodeNamespace ns, ref bool addedToConstructor)
-        {
-            // Get now if filed is array before base.ProcessProperty call.
-            var field = (CodeMemberField)member;
-            bool isArray = field.Type.ArrayElementType != null;
-
-            base.ProcessFields(member, ctor, ns, ref addedToConstructor);
-
-            // Generate automatic properties.
-            if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
-            {
-                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties)
-                {
-                    if (!isArray)
-                    {
-                        bool finded;
-                        if (!this.IsComplexType(field.Type, ns, out finded))
-                        {
-                            if (finded)
-                            {
-                                // If this field is not assigned in ctor, add it in remove list.
-                                // with automatic property, don't need to keep private field.
-                                if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.Name) == -1)
-                                {
-                                    this.fieldListToRemoveField.Add(field);
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -250,10 +118,8 @@ namespace Xsd2Code.Library.Extensions
             }
 
             provider.GenerateCodeFromExpression(arg.Value, strWriter, new CodeGeneratorOptions());
-            var strrdr = new StringReader(strWriter.ToString());
-            return strrdr.ReadToEnd();
+            return strWriter.ToString();
         }
-        #endregion
 
         /// <summary>
         /// Outputs the attribute argument.
@@ -265,84 +131,88 @@ namespace Xsd2Code.Library.Extensions
             var strWriter = new StringWriter();
             var provider = CodeDomProviderFactory.GetProvider(GeneratorContext.GeneratorParams.Language);
             provider.GenerateCodeFromExpression(arg, strWriter, new CodeGeneratorOptions());
-            var strrdr = new StringReader(strWriter.ToString());
-            return strrdr.ReadToEnd();
+            return strWriter.ToString();
         }
 
-
-        #region Private methods
         /// <summary>
         /// Generates the automatic properties.
         /// </summary>
         /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration.</param>
-        private void GenerateAutomaticProperties(CodeTypeDeclaration type)
+        private static void GenerateAutomaticProperties(CodeTypeDeclaration type)
         {
-            if (Equals(GeneratorContext.GeneratorParams.Language, GenerationLanguage.CSharp))
+            // Generate automatic properties.
+            if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
             {
-                // If databinding is disable, use automatic property
-                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties)
+                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties
+                    && !GeneratorContext.GeneratorParams.EnableDataBinding)
                 {
-                    foreach (var item in this.autoPropertyListField)
+                    var ctor = type.Members.OfType<CodeConstructor>().FirstOrDefault();
+                    foreach (var member in type.Members.OfType<CodeMemberProperty>().ToList())
                     {
-                        var cm = new CodeSnippetTypeMember();
-                        bool transformToAutomaticproperty = true;
-
-                        var attributesString = new List<string>();
-                        foreach (var attribute in item.CustomAttributes)
+                        var propReturnStatement = member.GetStatements[0] as CodeMethodReturnStatement;
+                        if ((member.GetStatements.Count == 1) && (propReturnStatement != null))
                         {
-                            var attrib = attribute as CodeAttributeDeclaration;
-                            if (attrib != null)
+                            var field = propReturnStatement.Expression as CodeFieldReferenceExpression;
+                            if (field != null)
                             {
-                                // Don't transform property with default value.
-                                if (attrib.Name == "System.ComponentModel.DefaultValueAttribute")
+                                // property isn't lazy loaded, is convertible to automatic
+                                StringBuilder propertyText = new StringBuilder();
+                                foreach (var attribute in member.CustomAttributes.OfType<CodeAttributeDeclaration>())
                                 {
-                                    transformToAutomaticproperty = false;
-                                }
-                                else
-                                {
-                                    string attributesArguments = string.Empty;
-                                    foreach (var arg in attrib.Arguments)
+                                    propertyText.AppendFormat("        [{0}(", attribute.Name);
+                                    bool first = true;
+                                    foreach (var argument in attribute.Arguments.OfType<CodeAttributeArgument>())
                                     {
-                                        var argument = arg as CodeAttributeArgument;
-                                        if (argument != null)
+                                        if (!first)
                                         {
-                                            attributesArguments += AttributeArgumentToString(argument) + ",";
+                                            propertyText.Append(", ");
                                         }
-                                    }
-                                    // Remove last ","
-                                    if (attributesArguments.Length > 0)
-                                        attributesArguments = attributesArguments.Remove(attributesArguments.Length - 1);
 
-                                    attributesString.Add(string.Format("[{0}({1})]", attrib.Name, attributesArguments));
+                                        first = false;
+                                        propertyText.Append(AttributeArgumentToString(argument));
+                                    }
+
+                                    propertyText.AppendLine(")]");
+                                }
+
+                                propertyText.AppendFormat(
+                                    "        public {0}{1} {2} {{ get; {3}set; }}",
+                                    GeneratorContext.GeneratorParams.PropertyParams.EnableVirtualProperties ? "virtual " : string.Empty,
+                                    ExpressionToString(new CodeTypeReferenceExpression(member.Type)),
+                                    member.Name,
+                                    member.HasSet ? string.Empty : "private ");
+                                propertyText.AppendLine();
+
+                                var codeSnippet = new CodeSnippetTypeMember { Text = propertyText.ToString() };
+                                codeSnippet.Comments.AddRange(member.Comments);
+                                type.Members.Add(codeSnippet);
+                                type.Members.Remove(member);
+
+                                // Check if private field need initialisation in ctor (defaut value).
+                                if (ctor != null)
+                                {
+                                    var ctorInitAssignment =
+                                        ctor.Statements.OfType<CodeAssignStatement>().FirstOrDefault(
+                                            stat =>
+                                            stat.Left is CodeFieldReferenceExpression
+                                            &&
+                                            ((CodeFieldReferenceExpression)stat.Left).FieldName.Equals(field.FieldName));
+
+                                    if (ctorInitAssignment != null)
+                                    {
+                                        ((CodeFieldReferenceExpression)ctorInitAssignment.Left).FieldName = member.Name;
+                                    }
+                                }
+
+                                var fieldToRemove =
+                                    type.Members.OfType<CodeMemberField>().FirstOrDefault(
+                                        currentField => currentField.Name.Equals(field.FieldName));
+                                if (fieldToRemove != null)
+                                {
+                                    type.Members.Remove(fieldToRemove);
                                 }
                             }
                         }
-
-                        if (transformToAutomaticproperty)
-                        {
-                            foreach (var attribute in attributesString)
-                            {
-                                cm.Text += "    " + attribute + "\n";
-                            }
-                            var ct = new CodeTypeReferenceExpression(item.Type);
-                            var prop = ExpressionToString(ct);
-                            var text = string.Format("    public {0} {1} ", prop, item.Name);
-                            cm.Text += string.Concat(text, "{get; set;}\n");
-                            cm.Comments.AddRange(item.Comments);
-
-                            type.Members.Add(cm);
-                            type.Members.Remove(item);
-                        }
-                    }
-
-                    // Now remove all private fileds
-                    foreach (var item in this.fieldListToRemoveField)
-                    {
-                        if (item.Name == "mailClassField" && type.Name == "uspsSummaryType")
-                        {
-                            ;
-                        }
-                        type.Members.Remove(item);
                     }
                 }
             }

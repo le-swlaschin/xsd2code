@@ -53,6 +53,11 @@ namespace Xsd2Code.Library
         [DefaultValue(false)]
         [Description("Indicating whether if generate summary documentation from xsd annotation.")]
         public bool EnableSummaryComment { get; set; }
+
+        [Category("Behavior")]
+        [DefaultValue(true)]
+        [Description("Indicating whether type declarations are generated without any elements declarations.")]
+        public bool GenerateAllTypes { get; set; }
     }
 
     [Serializable]
@@ -377,6 +382,7 @@ namespace Xsd2Code.Library
             this.GenericBaseClass.Enabled = false;
             this.EnableInitializeFields = true;
             this.Miscellaneous.ExcludeIncludedTypes = false;
+            this.Miscellaneous.GenerateAllTypes = true;
             this.TrackingChanges.PropertyChanged += TrackingChangesPropertyChanged;
             this.Serialization.DefaultEncoder = DefaultEncoder.UTF8;
         }
@@ -768,6 +774,7 @@ namespace Xsd2Code.Library
                 parameters.EnableInitializeFields = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLEINITIALIZEFIELDSTAG), true);
                 parameters.Miscellaneous.ExcludeIncludedTypes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.EXCLUDEINCLUDEDTYPESTAG));
                 parameters.PropertyParams.GeneratePropertyNameSpecified = Utility.ToEnum<PropertyNameSpecifiedType>(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEPROPERTYNAMESPECIFIEDTAG));
+                parameters.Miscellaneous.GenerateAllTypes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEALLTYPESTAG), true);
 
                 string str = optionLine.ExtractStrFromXML(GeneratorContext.SERIALIZEMETHODNAMETAG);
                 parameters.Serialization.SerializeMethodName = str.Length > 0 ? str : "Serialize";
@@ -877,6 +884,7 @@ namespace Xsd2Code.Library
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.EXCLUDEINCLUDEDTYPESTAG, this.Miscellaneous.ExcludeIncludedTypes.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEINITIALIZEFIELDSTAG, this.EnableInitializeFields.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATEALLTYPESTAG, this.Miscellaneous.GenerateAllTypes.ToString()));
 
             return optionsLine.ToString();
         }

@@ -22,10 +22,6 @@
 // </remarks>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Collections.ObjectModel;
-using System.Text;
-using Xsd2Code.Library.Properties;
-
 namespace Xsd2Code.Library.Extensions
 {
     using System;
@@ -36,12 +32,12 @@ namespace Xsd2Code.Library.Extensions
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
     using System.Xml;
     using System.Xml.Schema;
     using System.Xml.Serialization;
-    using Helpers;
 
-    public class ObjectList : List<object> { }
+    using Xsd2Code.Library.Helpers;
 
     /// <summary>
     /// Base class for code generation extension
@@ -208,7 +204,11 @@ namespace Xsd2Code.Library.Extensions
                     this.RemoveDefaultXmlAttributes(type.CustomAttributes);
                 }
 
-                if (!type.IsClass && !type.IsStruct) continue;
+                if (!type.IsClass && !type.IsStruct)
+                {
+                    SummaryCommentsHelper.ProcessEnum(type, schema);
+                    continue;
+                }
 
                 this.ProcessClass(code, schema, type);
             }
@@ -259,7 +259,7 @@ namespace Xsd2Code.Library.Extensions
                     {
                         if (argument.Name == "Namespace")
                         {
-                            if (((CodePrimitiveExpression)argument.Value).Value == schema.TargetNamespace)
+                            if (schema.TargetNamespace.Equals(((CodePrimitiveExpression)argument.Value).Value))
                             {
                                 return true;
                             }
@@ -374,15 +374,14 @@ namespace Xsd2Code.Library.Extensions
 
             // Generate WCF DataContract
             this.CreateDataContractAttribute(type, schema);
-
-            XmlSchemaElement currentElement = null;
-            if (GeneratorContext.GeneratorParams.Miscellaneous.EnableSummaryComment)
-                currentElement = this.CreateSummaryCommentFromSchema(type, schema, currentElement);
-
+            SummaryCommentsHelper.CreateSummaryCommentFromSchema(type, schema);
             foreach (CodeTypeMember member in type.Members)
             {
                 // Remove default remarks attribute
-                member.Comments.Clear();
+                if (!(member is CodeConstructor))
+                {
+                    member.Comments.Clear();
+                }
 
                 // Remove default .Net 2.0 XML attributes if disabled or silverlight project.
                 // Fixes http://xsd2code.codeplex.com/workitem/11761
@@ -485,7 +484,7 @@ namespace Xsd2Code.Library.Extensions
                     #endregion
 
                     PropertiesListFields.Add(codeMemberProperty.Name);
-                    this.ProcessProperty(type, codeNamespace, codeMemberProperty, currentElement, schema);
+                    this.ProcessProperty(type, codeNamespace, codeMemberProperty, schema);
                 }
             }
 
@@ -735,34 +734,6 @@ namespace Xsd2Code.Library.Extensions
             var propertyChangedMethod = CodeDomHelper.CreatePropertyChangedMethod();
 
             type.Members.Add(propertyChangedMethod);
-        }
-
-
-        /// <summary>
-        /// Creates the summary comment from schema.
-        /// </summary>
-        /// <param name="codeTypeDeclaration">The code type declaration.</param>
-        /// <param name="schema">The input XML schema.</param>
-        /// <param name="currentElement">The current element.</param>
-        /// <returns>returns the element found otherwise null</returns>
-        protected virtual XmlSchemaElement CreateSummaryCommentFromSchema(CodeTypeDeclaration codeTypeDeclaration, XmlSchema schema, XmlSchemaElement currentElement)
-        {
-            var xmlSchemaElement = this.SearchElementInSchema(codeTypeDeclaration, schema, new List<XmlSchema>());
-            if (xmlSchemaElement != null)
-            {
-                currentElement = xmlSchemaElement;
-                if (xmlSchemaElement.Annotation != null)
-                {
-                    foreach (var item in xmlSchemaElement.Annotation.Items)
-                    {
-                        var xmlDoc = item as XmlSchemaDocumentation;
-                        if (xmlDoc == null) continue;
-                        this.CreateCommentStatement(codeTypeDeclaration.Comments, xmlDoc);
-                    }
-                }
-            }
-
-            return currentElement;
         }
 
         /// <summary>
@@ -1816,85 +1787,6 @@ namespace Xsd2Code.Library.Extensions
         }
 
         /// <summary>
-        /// Recursive search of elemement.
-        /// </summary>
-        /// <param name="type">Element to search</param>
-        /// <param name="xmlElement">Current element</param>
-        /// <param name="currentElementName">Name of the current element.</param>
-        /// <param name="hierarchicalElmtName">The hierarchical Elmt Name.</param>
-        /// <returns>
-        /// return found XmlSchemaElement or null value
-        /// </returns>
-        protected virtual XmlSchemaElement SearchElement(CodeTypeDeclaration type, XmlSchemaElement xmlElement, string currentElementName, string hierarchicalElmtName)
-        {
-            var found = false;
-            if (type.IsClass)
-            {
-                if (xmlElement.Name == null)
-                    return null;
-
-                if (type.Name.Equals(hierarchicalElmtName + xmlElement.Name) ||
-                    type.Name.Equals(xmlElement.Name))
-                    found = true;
-            }
-            else
-            {
-                if (type.Name.Equals(xmlElement.QualifiedName.Name))
-                    found = true;
-            }
-
-            if (found)
-                return xmlElement;
-
-            var xmlComplexType = xmlElement.ElementSchemaType as XmlSchemaComplexType;
-            if (xmlComplexType != null)
-            {
-                var xmlSequence = xmlComplexType.ContentTypeParticle as XmlSchemaSequence;
-                if (xmlSequence != null)
-                {
-                    foreach (XmlSchemaObject item in xmlSequence.Items)
-                    {
-                        var currentXmlSchemaElement = item as XmlSchemaElement;
-                        if (currentXmlSchemaElement == null)
-                            continue;
-
-                        if (hierarchicalElmtName == xmlElement.QualifiedName.Name ||
-                            currentElementName == xmlElement.QualifiedName.Name)
-                            return null;
-
-                        XmlSchemaElement subItem = this.SearchElement(
-                                                                      type,
-                                                                      currentXmlSchemaElement,
-                                                                      xmlElement.QualifiedName.Name,
-                                                                      hierarchicalElmtName + xmlElement.QualifiedName.Name);
-                        if (subItem != null)
-                            return subItem;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Create CodeCommentStatement from schema documentation.
-        /// </summary>
-        /// <param name="codeStatementColl">CodeCommentStatementCollection collection</param>
-        /// <param name="xmlDoc">Schema documentation</param>
-        protected virtual void CreateCommentStatement(
-                                                     CodeCommentStatementCollection codeStatementColl,
-                                                     XmlSchemaDocumentation xmlDoc)
-        {
-            codeStatementColl.Clear();
-            foreach (XmlNode itemDoc in xmlDoc.Markup)
-            {
-                var textLine = itemDoc.InnerText.Trim();
-                if (textLine.Length > 0)
-                    CodeDomHelper.CreateSummaryComment(codeStatementColl, textLine);
-            }
-        }
-
-        /// <summary>
         /// Field process.
         /// </summary>
         /// <param name="member">CodeTypeMember member</param>
@@ -2087,52 +1979,10 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration</param>
         /// <param name="ns">The ns.</param>
         /// <param name="member">Type members include fields, methods, properties, constructors and nested types</param>
-        /// <param name="xmlElement">Represent the root element in schema</param>
         /// <param name="schema">XML Schema</param>
-        protected virtual void ProcessProperty(CodeTypeDeclaration type, CodeNamespace ns, CodeTypeMember member, XmlSchemaElement xmlElement, XmlSchema schema)
+        protected virtual void ProcessProperty(CodeTypeDeclaration type, CodeNamespace ns, CodeTypeMember member, XmlSchema schema)
         {
-            if (GeneratorContext.GeneratorParams.Miscellaneous.EnableSummaryComment)
-            {
-                if (xmlElement != null)
-                {
-                    var xmlComplexType = xmlElement.ElementSchemaType as XmlSchemaComplexType;
-                    bool foundInAttributes = false;
-                    if (xmlComplexType != null)
-                    {
-                        // Search property in attributes for summary comment generation
-                        foreach (XmlSchemaObject attribute in xmlComplexType.Attributes)
-                        {
-                            var xmlAttrib = attribute as XmlSchemaAttribute;
-                            if (xmlAttrib != null)
-                            {
-                                if (member.Name.Equals(xmlAttrib.QualifiedName.Name))
-                                {
-                                    this.CreateCommentFromAnnotation(xmlAttrib.Annotation, member.Comments);
-                                    foundInAttributes = true;
-                                }
-                            }
-                        }
-
-                        // Search property in XmlSchemaElement for summary comment generation
-                        if (!foundInAttributes)
-                        {
-                            var xmlSequence = xmlComplexType.ContentTypeParticle as XmlSchemaSequence;
-                            if (xmlSequence != null)
-                            {
-                                foreach (XmlSchemaObject item in xmlSequence.Items)
-                                {
-                                    var currentItem = item as XmlSchemaElement;
-                                    if (currentItem != null)
-                                    {
-                                        if (member.Name.Equals(currentItem.QualifiedName.Name))
-                                            this.CreateCommentFromAnnotation(currentItem.Annotation, member.Comments);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            SummaryCommentsHelper.ProcessPropertyComments(member, schema);
 
             var prop = (CodeMemberProperty)member;
 
@@ -2140,6 +1990,14 @@ namespace Xsd2Code.Library.Extensions
             {
                 prop.Type = this.GetCollectionType(prop.Type);
                 CollectionTypesFields.Add(prop.Name);
+
+                if (GeneratorContext.GeneratorParams.EnableInitializeFields && (GeneratorContext.GeneratorParams.CollectionObjectType != CollectionType.Array))
+                {
+                    if (prop.Type.BaseType != typeof(byte).FullName)
+                    {
+                        prop.HasSet = false;
+                    }
+                }
             }
 
             if (GeneratorContext.GeneratorParams.PropertyParams.EnableVirtualProperties)
@@ -2363,26 +2221,6 @@ namespace Xsd2Code.Library.Extensions
         }
 
         /// <summary>
-        /// Generate summary comment from XmlSchemaAnnotation 
-        /// </summary>
-        /// <param name="xmlSchemaAnnotation">XmlSchemaAnnotation from XmlSchemaElement or XmlSchemaAttribute</param>
-        /// <param name="codeCommentStatementCollection">codeCommentStatementCollection from member</param>
-        protected virtual void CreateCommentFromAnnotation(XmlSchemaAnnotation xmlSchemaAnnotation, CodeCommentStatementCollection codeCommentStatementCollection)
-        {
-            if (xmlSchemaAnnotation != null)
-            {
-                foreach (XmlSchemaObject annotation in xmlSchemaAnnotation.Items)
-                {
-                    var xmlDoc = annotation as XmlSchemaDocumentation;
-                    if (xmlDoc != null)
-                    {
-                        this.CreateCommentStatement(codeCommentStatementCollection, xmlDoc);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Get CodeTypeReference for collection
         /// </summary>
         /// <param name="codeType">The code Type.</param>
@@ -2449,7 +2287,12 @@ namespace Xsd2Code.Library.Extensions
             foreach (CodeTypeMember member in type.Members)
             {
                 if (member is CodeConstructor)
+                {
                     ctor = member as CodeConstructor;
+                    ctor.Name = type.Name;
+                    ctor.Comments.Clear();
+                    break;
+                }
             }
 
             if (ctor == null)
@@ -2563,47 +2406,6 @@ namespace Xsd2Code.Library.Extensions
             return baseClass;
         }
 
-        /// <summary>
-        /// Search XmlElement in schema.
-        /// </summary>
-        /// <param name="codeTypeDeclaration">Represents a type declaration for a class, structure, interface, or enumeration.</param>
-        /// <param name="schema">schema object</param>
-        /// <param name="visitedSchemas">The visited schemas.</param>
-        /// <returns>
-        /// return found XmlSchemaElement or null value
-        /// </returns>
-        private XmlSchemaElement SearchElementInSchema(CodeTypeDeclaration codeTypeDeclaration, XmlSchema schema, List<XmlSchema> visitedSchemas)
-        {
-            foreach (var item in schema.Items)
-            {
-                var xmlElement = item as XmlSchemaElement;
-                if (xmlElement == null)
-                {
-                    continue;
-                }
-
-                var xmlSubElement = this.SearchElement(codeTypeDeclaration, xmlElement, string.Empty, string.Empty);
-                if (xmlSubElement != null) return xmlSubElement;
-            }
-
-            // If not found search in schema inclusion
-            foreach (var item in schema.Includes)
-            {
-                var schemaInc = item as XmlSchemaInclude;
-
-                // avoid to follow cyclic refrence
-                if ((schemaInc == null) || visitedSchemas.Exists(loc => schemaInc.Schema == loc))
-                    continue;
-
-                visitedSchemas.Add(schemaInc.Schema);
-                var includeElmts = this.SearchElementInSchema(codeTypeDeclaration, schemaInc.Schema, visitedSchemas);
-                visitedSchemas.Remove(schemaInc.Schema);
-
-                if (includeElmts != null) return includeElmts;
-            }
-
-            return null;
-        }
         #endregion
     }
 }

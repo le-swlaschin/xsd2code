@@ -189,6 +189,11 @@
         /// </summary>
         public const string ENABLEINITIALIZEFIELDSTAG = "EnableInitializeFields";
 
+        /// <summary>
+        ///  Generate all types tag.
+        /// </summary>
+        public const string GENERATEALLTYPESTAG = "GenerateAllTypes";
+
         #region Fields
 
         /// <summary>

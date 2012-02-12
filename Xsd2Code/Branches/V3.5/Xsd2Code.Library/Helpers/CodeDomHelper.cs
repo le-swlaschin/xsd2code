@@ -25,13 +25,14 @@ namespace Xsd2Code.Library.Helpers
         /// </summary>
         /// <param name="codeStatmentColl">Collection of CodeCommentStatement</param>
         /// <param name="comment">summary text</param>
-        internal static void CreateSummaryComment(CodeCommentStatementCollection codeStatmentColl, string comment)
+        /// <param name="docComment">indicates documentation comment</param>
+        internal static void CreateSummaryComment(CodeCommentStatementCollection codeStatmentColl, string comment, bool docComment = true)
         {
-            codeStatmentColl.Add(new CodeCommentStatement("<summary>", true));
+            codeStatmentColl.Add(new CodeCommentStatement("<summary>", docComment));
             string[] lines = comment.Split(new[] { '\n' });
             foreach (string line in lines)
-                codeStatmentColl.Add(new CodeCommentStatement(line.Trim(), true));
-            codeStatmentColl.Add(new CodeCommentStatement("</summary>", true));
+                codeStatmentColl.Add(new CodeCommentStatement(docComment ? line.Trim() : "  " + line.Trim(), docComment));
+            codeStatmentColl.Add(new CodeCommentStatement("</summary>", docComment));
         }
 
 
@@ -478,8 +479,8 @@ namespace Xsd2Code.Library.Helpers
                 Type = new CodeTypeReference(propertyType)
             };
             property.CustomAttributes.Add(new CodeAttributeDeclaration("XmlIgnore"));
-            property.GetStatements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression(field.Name)));
-            property.SetStatements.Add(new CodeAssignStatement(new CodeVariableReferenceExpression(field.Name), new CodeVariableReferenceExpression("value")));
+            property.GetStatements.Add(new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), field.Name)));
+            property.SetStatements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), field.Name), new CodeVariableReferenceExpression("value")));
             type.Members.Add(property);
         }
 

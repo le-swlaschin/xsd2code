@@ -167,6 +167,7 @@
     <Compile Include="Extensions\SilverlightExtension.cs" />
     <Compile Include="Extensions\Net35Extension.cs" />
     <Compile Include="Extensions\Net30Extension.cs" />
+    <Compile Include="Helpers\SummaryCommentsHelper.cs" />
     <Compile Include="Extensions\TrackingChangesExtention.cs" />
     <Compile Include="GeneratorFactory.cs" />
     <Content Include="CodeTemplate\TrackableCollection.cs.txt" />
