@@ -375,7 +375,7 @@ namespace Xsd2Code.TestUnit
                 generatorParams.CollectionObjectType = CollectionType.List;
                 generatorParams.TargetFramework = TargetFramework.Net20;
                 generatorParams.PropertyParams.EnableLazyLoading = true;
-                generatorParams.EnableInitializeFields = true;
+                generatorParams.InitializeFields = InitializeFieldsType.All;
 
                 var xsdGen = new GeneratorFacade(generatorParams);
                 xsdGen.Generate();
@@ -398,7 +398,7 @@ namespace Xsd2Code.TestUnit
                 var generatorParams = GetGeneratorParams(inputFilePath);
                 generatorParams.CollectionObjectType = CollectionType.List;
                 generatorParams.TargetFramework = TargetFramework.Net20;
-                generatorParams.EnableInitializeFields = true;
+                generatorParams.InitializeFields = InitializeFieldsType.All;
 
                 var xsdGen = new GeneratorFacade(generatorParams);
                 xsdGen.Generate();

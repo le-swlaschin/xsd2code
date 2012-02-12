@@ -150,8 +150,9 @@ namespace Xsd2Code.Library.Extensions
                     foreach (var member in type.Members.OfType<CodeMemberProperty>().ToList())
                     {
                         var propReturnStatement = member.GetStatements[0] as CodeMethodReturnStatement;
-                        if ((member.GetStatements.Count == 1) && (propReturnStatement != null))
+                        if ((member.GetStatements.Count == 1) && (propReturnStatement != null) && member.HasSet)
                         {
+                            // XmlSerializer doesn't handle automatic property with private set. Properties without setter aren't converted.
                             var field = propReturnStatement.Expression as CodeFieldReferenceExpression;
                             if (field != null)
                             {
@@ -181,11 +182,10 @@ namespace Xsd2Code.Library.Extensions
                                     ExpressionToString(new CodeTypeReferenceExpression(member.Type)),
                                     member.Name,
                                     member.HasSet ? string.Empty : "private ");
-                                propertyText.AppendLine();
 
                                 var codeSnippet = new CodeSnippetTypeMember { Text = propertyText.ToString() };
                                 codeSnippet.Comments.AddRange(member.Comments);
-                                type.Members.Add(codeSnippet);
+                                type.Members.Insert(type.Members.IndexOf(member), codeSnippet);
                                 type.Members.Remove(member);
 
                                 // Check if private field need initialisation in ctor (defaut value).

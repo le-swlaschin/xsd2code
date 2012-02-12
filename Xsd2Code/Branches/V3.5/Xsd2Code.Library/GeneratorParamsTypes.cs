@@ -76,4 +76,23 @@ namespace Xsd2Code.Library
         UTF32,
         Default
     }
+
+    [DefaultValue(All)]
+    public enum InitializeFieldsType
+    {
+        /// <summary>
+        /// Enables initialisation of the collection fields in both Constructors, Lazy Properties.
+        /// </summary>
+        Collections,
+
+        /// <summary>
+        /// Disables initialisation of the all fields in both Constructors, Lazy Properties.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Enables initialisation of the all fields in both Constructors, Lazy Properties.
+        /// </summary>
+        All
+    }
 }

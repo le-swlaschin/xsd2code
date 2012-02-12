@@ -187,12 +187,13 @@
         /// <summary>
         ///  Enable/Disable Global initialisation of the fields in both Constructors, Lazy Properties. Maximum override
         /// </summary>
-        public const string ENABLEINITIALIZEFIELDSTAG = "EnableInitializeFields";
+        public const string INITIALIZEFIELDSTAG = "InitializeFields";
 
         /// <summary>
         ///  Generate all types tag.
         /// </summary>
         public const string GENERATEALLTYPESTAG = "GenerateAllTypes";
+
 
         #region Fields
 

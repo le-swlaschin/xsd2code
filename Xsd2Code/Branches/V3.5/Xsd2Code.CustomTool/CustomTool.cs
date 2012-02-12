@@ -65,7 +65,7 @@ namespace Xsd2Code.CustomTool
             var generatorParams = GeneratorParams.LoadFromFile(wszInputFilePath) ?? new GeneratorParams();
 
             generatorParams.InputFilePath = wszInputFilePath;
-            generatorParams.NameSpace = wszDefaultNamespace;
+			generatorParams.NameSpace = generatorParams.NameSpace ?? wszDefaultNamespace;
 
             var xsdGen = new GeneratorFacade(this.provider, generatorParams);
 

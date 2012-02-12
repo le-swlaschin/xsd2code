@@ -246,10 +246,10 @@ namespace Xsd2Code
 
                     case "/if":
                     case "/if+":
-                        generatorParams.EnableInitializeFields = true;
+                        generatorParams.InitializeFields = InitializeFieldsType.All;
                         break;
                     case "/if-":
-                        generatorParams.EnableInitializeFields = false;
+                        generatorParams.InitializeFields = InitializeFieldsType.None;
                         break;
 
                     case "/eit":

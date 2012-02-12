@@ -107,7 +107,7 @@
     <Compile Include="xsd\ArrayOfArray.Designer.cs" />
     <Compile Include="xsd\Choice.designer.cs" />
     <Compile Include="xsd\CircularClassReference.Designer.cs" />
-    <Compile Include="xsd\dvd.Designer.cs" />
+    <Compile Include="xsd\dvd.designer.cs" />
     <Compile Include="xsd\Gender.cs">
       <DependentUpon>Gender.xsd</DependentUpon>
     </Compile>

@@ -195,12 +195,13 @@ namespace Xsd2Code.Library
                         {
                             outputFile.IsReadOnly = false;
                         }
-                        catch
+                        catch 
                         {
                             var errorMessage = "Failed to generate code\n";
                             errorMessage += outputFilePath + " is write protect";
                             return new Result(false, MessageType.Error, errorMessage);
                         }
+
                     }
                 }
 

@@ -380,7 +380,7 @@ namespace Xsd2Code.Library
             this.Serialization.SerializeMethodName = "Serialize";
             this.GenericBaseClass.BaseClassName = "EntityBase";
             this.GenericBaseClass.Enabled = false;
-            this.EnableInitializeFields = true;
+            this.InitializeFields = InitializeFieldsType.All;
             this.Miscellaneous.ExcludeIncludedTypes = false;
             this.Miscellaneous.GenerateAllTypes = true;
             this.TrackingChanges.PropertyChanged += TrackingChangesPropertyChanged;
@@ -654,9 +654,9 @@ namespace Xsd2Code.Library
         /// Gets or sets a value indicating whether accessing a property will initialize it
         /// </summary>
         [Category("Behavior")]
-        [DefaultValue(true)]
+        [DefaultValue(InitializeFieldsType.All)]
         [Description("Enable/Disable Global initialisation of the fields in both Constructors, Lazy Properties. Maximum override")]
-        public bool EnableInitializeFields { get; set; }
+        public InitializeFieldsType InitializeFields { get; set; }
 
         /// <summary>
         /// Loads from file.
@@ -771,7 +771,7 @@ namespace Xsd2Code.Library
                 parameters.GenericBaseClass.Enabled = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.USEGENERICBASECLASSTAG));
                 parameters.GenericBaseClass.GenerateBaseClass = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEBASECLASSTAG));
                 parameters.PropertyParams.GenerateShouldSerializeProperty = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATESHOULDSERIALIZETAG));
-                parameters.EnableInitializeFields = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.ENABLEINITIALIZEFIELDSTAG), true);
+                parameters.InitializeFields = Utility.ToEnum<InitializeFieldsType>(optionLine.ExtractStrFromXML(GeneratorContext.INITIALIZEFIELDSTAG));
                 parameters.Miscellaneous.ExcludeIncludedTypes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.EXCLUDEINCLUDEDTYPESTAG));
                 parameters.PropertyParams.GeneratePropertyNameSpecified = Utility.ToEnum<PropertyNameSpecifiedType>(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEPROPERTYNAMESPECIFIEDTAG));
                 parameters.Miscellaneous.GenerateAllTypes = Utility.ToBoolean(optionLine.ExtractStrFromXML(GeneratorContext.GENERATEALLTYPESTAG), true);
@@ -883,7 +883,7 @@ namespace Xsd2Code.Library
             }
 
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.EXCLUDEINCLUDEDTYPESTAG, this.Miscellaneous.ExcludeIncludedTypes.ToString()));
-            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.ENABLEINITIALIZEFIELDSTAG, this.EnableInitializeFields.ToString()));
+            optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.INITIALIZEFIELDSTAG, this.InitializeFields.ToString()));
             optionsLine.Append(XmlHelper.InsertXMLFromStr(GeneratorContext.GENERATEALLTYPESTAG, this.Miscellaneous.GenerateAllTypes.ToString()));
 
             return optionsLine.ToString();
