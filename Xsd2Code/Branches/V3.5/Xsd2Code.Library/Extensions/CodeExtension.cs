@@ -796,7 +796,7 @@ namespace Xsd2Code.Library.Extensions
 
             // Deserialize
             type.Members.AddRange(this.GetOverrideDeserializeMethods(type));
-            type.Members.Add(this.GetDeserializeMethod(type));
+            type.Members.AddRange(this.GetDeserializeMethods(type));
 
             // SaveToFile
             type.Members.AddRange(this.GetOverrideSaveToFileMethods(type));
@@ -971,8 +971,9 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">represent a type declaration of class</param>
         /// <returns>Deserialize CodeMemberMethod</returns>
-        protected virtual CodeMemberMethod GetDeserializeMethod(CodeTypeDeclaration type)
+        protected virtual CodeMemberMethod[] GetDeserializeMethods(CodeTypeDeclaration type)
         {
+            var methods = new CodeMemberMethod[2];
             var deserializeTypeName = GeneratorContext.GeneratorParams.GenericBaseClass.Enabled ? "T" : type.Name;
 
             // ---------------------------------------
@@ -1036,7 +1037,40 @@ namespace Xsd2Code.Library.Extensions
             var tryfinallyStmt = new CodeTryCatchFinallyStatement(tryStatmanentsCol.ToArray(), new CodeCatchClause[0], finallyStatmanentsCol.ToArray());
             deserializeMethod.Statements.Add(tryfinallyStmt);
 
-            return deserializeMethod;
+            methods[0] = deserializeMethod;
+
+            // ---------------------------------------
+            // public static T Deserialize(Stream s)
+            // ---------------------------------------
+            var deserializeFromStreamMethod = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = GeneratorContext.GeneratorParams.Serialization.DeserializeMethodName
+            };
+
+            deserializeFromStreamMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(Stream), "s"));
+            deserializeFromStreamMethod.ReturnType = new CodeTypeReference(deserializeTypeName);
+                        
+
+            // ----------------------------------------------------------
+            // obj = (ClassName)serializer.Deserialize(xmlReader);
+            // return true;
+            // ----------------------------------------------------------
+            deserialize = CodeDomHelper.GetInvokeMethod(
+                                                            "Serializer",
+                                                            "Deserialize",
+                                                            new CodeExpression[]
+                                                            {
+                                                                new CodeArgumentReferenceExpression("s")
+                                                            });
+
+            castExpr = new CodeCastExpression(deserializeTypeName, deserialize);
+            returnStmt = new CodeMethodReturnStatement(castExpr);
+            deserializeFromStreamMethod.Statements.Add(returnStmt);
+
+            methods[1] = deserializeFromStreamMethod;
+
+            return methods;
         }
 
         /// <summary>

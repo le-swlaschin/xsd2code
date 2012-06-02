@@ -228,9 +228,16 @@ namespace Xsd2Code.Library.Helpers
         /// </summary>
         /// <param name="objectName">Name of the object.</param>
         /// <returns>return dispose CodeDom</returns>
-        internal static CodeConditionStatement GetDispose(string objectName)
+        internal static CodeConditionStatement GetDispose(string objectName, CodeExpression[] otherCleanupStatements = null)
         {
             var statments = new CodeStatementCollection();
+            if (otherCleanupStatements != null)
+            {
+                foreach (var expression in otherCleanupStatements)
+                {
+                    statments.Add(expression);
+                }
+            }
             statments.Add(GetInvokeMethod(objectName, "Dispose"));
             return
                 new CodeConditionStatement(
