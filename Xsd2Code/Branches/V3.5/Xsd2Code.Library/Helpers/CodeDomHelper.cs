@@ -53,6 +53,23 @@ namespace Xsd2Code.Library.Helpers
             return CreateObject(objectType, objectName, ce.ToArray());
         }
 
+
+         internal static bool IsPropertyNeedInstance(CodeMemberProperty property)
+         {
+             if (property.Type.BaseType == new CodeTypeReference(typeof(long)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(string)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(DateTime)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(Byte)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(float)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(double)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(int)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(bool)).BaseType ||
+                 property.Type.BaseType == new CodeTypeReference(typeof(decimal)).BaseType)
+                 return false;
+
+             return true;
+         }
+
         /// <summary>
         /// Creates the object.
         /// </summary>

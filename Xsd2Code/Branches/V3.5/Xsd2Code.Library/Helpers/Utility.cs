@@ -126,18 +126,6 @@ namespace Xsd2Code.Library.Helpers
         public static string GetOutputFilePath(string xsdFilePath, GenerationLanguage language)
         {
             return GetOutputFilePath(xsdFilePath, CodeDomProviderFactory.GetProvider(language));
-
-            /* DCM REMOVED CodeDom Provider has FileExtension
-            switch (language)
-            {
-                case GenerationLanguage.VisualBasic:
-                    return Path.ChangeExtension(xsdFilePath, ".Designer.vb");
-                case GenerationLanguage.VisualCpp:
-                    return Path.ChangeExtension(xsdFilePath, ".Designer.cpp");
-                default:
-                    return Path.ChangeExtension(xsdFilePath, ".Designer.cs");
-            }
-             */ 
         }
         
         /// <summary>

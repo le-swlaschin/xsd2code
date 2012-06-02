@@ -10,17 +10,17 @@
 // </remarks>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.CodeDom;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.Schema;
+using Xsd2Code.Library.Helpers;
+
 namespace Xsd2Code.Library.Extensions
 {
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.Schema;
-    using Helpers;
-
     /// <summary>
     /// Implements code generation extension for .Net Framework 3.0
     /// </summary>
@@ -37,6 +37,8 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration</param>
         protected override void ProcessClass(CodeNamespace codeNamespace, XmlSchema schema, CodeTypeDeclaration type)
         {
+            RemoveFieldsForAutomaticProperties(type);
+
             base.ProcessClass(codeNamespace, schema, type);
 
             // generate automatic properties
@@ -56,13 +58,16 @@ namespace Xsd2Code.Library.Extensions
             {
                 var attributeType = new CodeTypeReference("System.Runtime.Serialization.DataContractAttribute");
                 var codeAttributeArgument = new List<CodeAttributeArgument>
-                    {
-                        new CodeAttributeArgument("Name", new CodePrimitiveExpression(type.Name))
-                    };
+                                                {
+                                                    new CodeAttributeArgument("Name",
+                                                                              new CodePrimitiveExpression(type.Name))
+                                                };
 
                 if (!string.IsNullOrEmpty(schema.TargetNamespace))
                 {
-                    codeAttributeArgument.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(schema.TargetNamespace)));
+                    codeAttributeArgument.Add(new CodeAttributeArgument("Namespace",
+                                                                        new CodePrimitiveExpression(
+                                                                            schema.TargetNamespace)));
                 }
 
                 type.CustomAttributes.Add(new CodeAttributeDeclaration(attributeType, codeAttributeArgument.ToArray()));
@@ -101,6 +106,7 @@ namespace Xsd2Code.Library.Extensions
         #endregion
 
         #region static methods
+
         /// <summary>
         /// Outputs the attribute argument.
         /// </summary>
@@ -109,7 +115,8 @@ namespace Xsd2Code.Library.Extensions
         private static string AttributeArgumentToString(CodeAttributeArgument arg)
         {
             var strWriter = new StringWriter();
-            var provider = CodeDomProviderFactory.GetProvider(GeneratorContext.GeneratorParams.Language);
+            CodeDomProvider provider =
+                Helpers.CodeDomProviderFactory.GetProvider(GeneratorContext.GeneratorParams.Language);
 
             if (!string.IsNullOrEmpty(arg.Name))
             {
@@ -129,9 +136,43 @@ namespace Xsd2Code.Library.Extensions
         private static string ExpressionToString(CodeExpression arg)
         {
             var strWriter = new StringWriter();
-            var provider = CodeDomProviderFactory.GetProvider(GeneratorContext.GeneratorParams.Language);
+            CodeDomProvider provider =
+                Helpers.CodeDomProviderFactory.GetProvider(GeneratorContext.GeneratorParams.Language);
             provider.GenerateCodeFromExpression(arg, strWriter, new CodeGeneratorOptions());
             return strWriter.ToString();
+        }
+
+        private static void RemoveFieldsForAutomaticProperties(CodeTypeDeclaration type)
+        {
+            // Generate automatic properties.
+            if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
+            {
+                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties
+                    && !GeneratorContext.GeneratorParams.EnableDataBinding)
+                {
+                    var ctor = type.Members.OfType<CodeConstructor>().FirstOrDefault();
+                    foreach (CodeMemberProperty member in type.Members.OfType<CodeMemberProperty>().ToList())
+                    {
+                        if (CodeDomHelper.IsPropertyNeedInstance(member))
+                            continue;
+
+                        var propReturnStatement = member.GetStatements[0] as CodeMethodReturnStatement;
+                        if ((member.GetStatements.Count == 1) && (propReturnStatement != null) && member.HasSet)
+                        {
+                            // XmlSerializer doesn't handle automatic property with private set. Properties without setter aren't converted.
+                            var field = propReturnStatement.Expression as CodeFieldReferenceExpression;
+                            if (field != null)
+                            {
+                                CodeMemberField fieldToRemove = type.Members.OfType<CodeMemberField>().FirstOrDefault(currentField => currentField.Name.Equals(field.FieldName));
+                                if (fieldToRemove != null)
+                                {
+                                    type.Members.Remove(fieldToRemove);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -147,7 +188,7 @@ namespace Xsd2Code.Library.Extensions
                     && !GeneratorContext.GeneratorParams.EnableDataBinding)
                 {
                     var ctor = type.Members.OfType<CodeConstructor>().FirstOrDefault();
-                    foreach (var member in type.Members.OfType<CodeMemberProperty>().ToList())
+                    foreach (CodeMemberProperty member in type.Members.OfType<CodeMemberProperty>().ToList())
                     {
                         var propReturnStatement = member.GetStatements[0] as CodeMethodReturnStatement;
                         if ((member.GetStatements.Count == 1) && (propReturnStatement != null) && member.HasSet)
@@ -157,12 +198,16 @@ namespace Xsd2Code.Library.Extensions
                             if (field != null)
                             {
                                 // property isn't lazy loaded, is convertible to automatic
-                                StringBuilder propertyText = new StringBuilder();
-                                foreach (var attribute in member.CustomAttributes.OfType<CodeAttributeDeclaration>())
+                                var propertyText = new StringBuilder();
+                                foreach (
+                                    CodeAttributeDeclaration attribute in
+                                        member.CustomAttributes.OfType<CodeAttributeDeclaration>())
                                 {
                                     propertyText.AppendFormat("        [{0}(", attribute.Name);
                                     bool first = true;
-                                    foreach (var argument in attribute.Arguments.OfType<CodeAttributeArgument>())
+                                    foreach (
+                                        CodeAttributeArgument argument in
+                                            attribute.Arguments.OfType<CodeAttributeArgument>())
                                     {
                                         if (!first)
                                         {
@@ -178,7 +223,9 @@ namespace Xsd2Code.Library.Extensions
 
                                 propertyText.AppendFormat(
                                     "        public {0}{1} {2} {{ get; {3}set; }}",
-                                    GeneratorContext.GeneratorParams.PropertyParams.EnableVirtualProperties ? "virtual " : string.Empty,
+                                    GeneratorContext.GeneratorParams.PropertyParams.EnableVirtualProperties
+                                        ? "virtual "
+                                        : string.Empty,
                                     ExpressionToString(new CodeTypeReferenceExpression(member.Type)),
                                     member.Name,
                                     member.HasSet ? string.Empty : "private ");
@@ -191,7 +238,7 @@ namespace Xsd2Code.Library.Extensions
                                 // Check if private field need initialisation in ctor (defaut value).
                                 if (ctor != null)
                                 {
-                                    var ctorInitAssignment =
+                                    CodeAssignStatement ctorInitAssignment =
                                         ctor.Statements.OfType<CodeAssignStatement>().FirstOrDefault(
                                             stat =>
                                             stat.Left is CodeFieldReferenceExpression
@@ -204,19 +251,21 @@ namespace Xsd2Code.Library.Extensions
                                     }
                                 }
 
-                                var fieldToRemove =
-                                    type.Members.OfType<CodeMemberField>().FirstOrDefault(
-                                        currentField => currentField.Name.Equals(field.FieldName));
-                                if (fieldToRemove != null)
-                                {
-                                    type.Members.Remove(fieldToRemove);
-                                }
+                                //CodeMemberField fieldToRemove =
+                                //    type.Members.OfType<CodeMemberField>().FirstOrDefault(
+                                //        currentField => currentField.Name.Equals(field.FieldName));
+
+                                //if (fieldToRemove != null)
+                                //{
+                                //    type.Members.Remove(fieldToRemove);
+                                //}
                             }
                         }
                     }
                 }
             }
         }
+
         #endregion
     }
 }
