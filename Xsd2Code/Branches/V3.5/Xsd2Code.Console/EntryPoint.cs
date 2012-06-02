@@ -332,6 +332,10 @@ namespace Xsd2Code
                         generatorParams.PropertyParams.GenerateShouldSerializeProperty = false;
                         break;
 
+                    case "/gs":
+                        generatorParams.PropertyParams.GeneratePropertyNameSpecified = PropertyNameSpecifiedType.All;
+                        break;
+
                     case "/s":
                     case "/s+":
                     case "/is":

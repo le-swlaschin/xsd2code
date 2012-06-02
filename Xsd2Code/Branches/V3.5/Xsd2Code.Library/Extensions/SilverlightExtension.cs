@@ -160,7 +160,7 @@ namespace Xsd2Code.Library.Extensions
         /// </summary>
         /// <param name="type">CodeTypeDeclaration type.</param>
         /// <returns>return the save to file code DOM method statment </returns>
-        protected override CodeMemberMethod GetSaveToFileMethod()
+        protected override CodeMemberMethod GetSaveToFileMethod(CodeTypeDeclaration type)
         {
             // -----------------------------------------------
             // public virtual void SaveToFile(string fileName)
@@ -170,6 +170,9 @@ namespace Xsd2Code.Library.Extensions
                 Attributes = MemberAttributes.Public,
                 Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
             };
+
+            if (type.BaseTypes.Count > 0)
+                saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
 

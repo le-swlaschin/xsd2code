@@ -198,10 +198,13 @@ namespace Xsd2Code.Library.Extensions
 
                 // Remove default .Net 2.0 XML attributes if disabled or silverlight project.
                 // Fixes http://xsd2code.codeplex.com/workitem/11761
-                if (!GeneratorContext.GeneratorParams.Serialization.GenerateXmlAttributes
-                    || GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight)
+                if (!GeneratorContext.GeneratorParams.Serialization.GenerateXmlAttributes)
                 {
                     this.RemoveDefaultXmlAttributes(type.CustomAttributes);
+                }
+                else if (GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight)
+                {
+                    this.RemoveNonSilverlightXmlAttributes(type.CustomAttributes);
                 }
 
                 if (!type.IsClass && !type.IsStruct)
@@ -385,10 +388,13 @@ namespace Xsd2Code.Library.Extensions
 
                 // Remove default .Net 2.0 XML attributes if disabled or silverlight project.
                 // Fixes http://xsd2code.codeplex.com/workitem/11761
-                if (!GeneratorContext.GeneratorParams.Serialization.GenerateXmlAttributes
-                    || GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight)
+                if (!GeneratorContext.GeneratorParams.Serialization.GenerateXmlAttributes)
                 {
                     this.RemoveDefaultXmlAttributes(member.CustomAttributes);
+                }
+                else if (GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight)
+                {
+                    this.RemoveNonSilverlightXmlAttributes(member.CustomAttributes);
                 }
 
 
@@ -489,7 +495,7 @@ namespace Xsd2Code.Library.Extensions
             }
 
             //DCM: Moved From GeneraterFacade File based removal to CodeDom Style Attribute-based removal
-            if (GeneratorContext.GeneratorParams.Miscellaneous.DisableDebug)
+            if (!GeneratorContext.GeneratorParams.Miscellaneous.DisableDebug)
             {
                 this.RemoveDebugAttributes(type.CustomAttributes);
             }
@@ -589,7 +595,7 @@ namespace Xsd2Code.Library.Extensions
 
                     if (specifiedProperty != null)
                     {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.None || isAttribute)
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.None)
                         {
                             type.Members.Remove(specifiedProperty);
                             var field = CodeDomHelper.FindField(type, CodeDomHelper.GetSpecifiedFieldName(propertyName));
@@ -601,9 +607,8 @@ namespace Xsd2Code.Library.Extensions
                     }
                     else
                     {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All && !isAttribute)
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All)
                         {
-
                             CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
                         }
                     }
@@ -622,60 +627,67 @@ namespace Xsd2Code.Library.Extensions
                 if (!propertyName.EndsWith("Specified"))
                 {
                     var property = CodeDomHelper.FindProperty(type, propertyName);
-                    CodeMemberProperty specifiedProperty = null;
                     // Search in all properties if PropertyNameSpecified exist
                     string searchPropertyName = string.Format("{0}Specified", propertyName);
-                    specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
-
-                    var attrs = property.CustomAttributes.Cast<CodeAttributeDeclaration>();
-                    //We check for this, because I decided not to generate "specified" methods for attributes as attributes behave
-                    //slightly differently to elements (they can't be complex types such as nullables).
-                    //I plan to address this differently by generating them (without nullable) and adding an extra clause 
-                    //to automatically set the specified property to true in the property setter
-                    var isAttribute = attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
+                    CodeMemberProperty specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
 
                     if (specifiedProperty != null)
                     {
                         if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.Default)
                         {
-                            if (isAttribute)
-                            {
-                                type.Members.Remove(specifiedProperty);
-                                var field = CodeDomHelper.FindField(type, CodeDomHelper.GetSpecifiedFieldName(propertyName));
-                                if (field != null)
-                                {
-                                    type.Members.Remove(field);
-                                }
-                            }
-                            else
-                            {
-                                specifiedProperty.SetStatements.Clear();
-                                specifiedProperty.GetStatements.Clear();
-                                specifiedProperty.GetStatements.Add(
-                                    new CodeMethodReturnStatement(new CodeSnippetExpression(property.Name + ".HasValue")));
-                                var field = CodeDomHelper.FindField(type,
-                                                                    CodeDomHelper.GetSpecifiedFieldName(propertyName));
-                                if (field != null)
-                                {
-                                    type.Members.Remove(field);
-                                }
+                            // find field
+                            var propertyField = CodeDomHelper.FindField(type, CodeDomHelper.GetFieldName(propertyName));
 
-                                var propertyField = CodeDomHelper.FindField(type,
-                                                                            CodeDomHelper.GetFieldName(propertyName));
-                                var typeCopy = propertyField.Type;
-                                propertyField.Type = new CodeTypeReference(typeof(System.Nullable<>));
-                                propertyField.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
-                                property.Type = new CodeTypeReference(typeof(System.Nullable<>));
-                                property.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
-                            }
+                            // generate some code stubs
+                            // this.<fieldName>
+                            var propertyFieldExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), propertyField.Name);
+                            // this.<fieldName>.Value
+                            var valueExpression = new CodePropertyReferenceExpression(propertyFieldExpression, "Value");
+                            // this.<fieldName>.HasValue
+                            var hasValueExpression = new CodePropertyReferenceExpression(propertyFieldExpression, "HasValue");
+                            // default(<fieldType>)
+                            var defaultValueExpression = new CodeDefaultValueExpression(property.Type);
+
+                            // change field type to Nullable<>
+                            var typeCopy = propertyField.Type;
+                            propertyField.Type = new CodeTypeReference(typeof(Nullable<>));
+                            propertyField.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
+
+                            // generate (rewrite) SPECIFIED getter
+                            specifiedProperty.GetStatements.Clear();
+                            // return this.<fieldName>.HasValue;
+                            specifiedProperty.GetStatements.Add(new CodeMethodReturnStatement(hasValueExpression));
+
+                            // generate (rewrite) SPECIFIED setter
+                            specifiedProperty.SetStatements.Clear();
+                            // "if (value==false)" - value is boolean
+                            var ifExpression = new CodeSnippetExpression("value==false");
+                            // this.<fieldName> = null
+                            var trueExpression = new CodeAssignStatement(propertyFieldExpression, new CodeSnippetExpression("null"));
+                            // generate if statement
+                            var ifStatement = new CodeConditionStatement(ifExpression, new CodeStatement[] { trueExpression });
+                            specifiedProperty.SetStatements.Add(ifStatement);
+
+                            // find and remove separate specified field - not needed anymore
+                            var field = CodeDomHelper.FindField(type, CodeDomHelper.GetSpecifiedFieldName(propertyName));
+                            if (field != null)
+                                type.Members.Remove(field);
+
+                            // change type - why?
+                            //property.Type = new CodeTypeReference(typeCopy.BaseType);
+
+                            // change getter -> return this.<propertyField>.Value ?? default
+                            property.GetStatements.Clear();
+                            var returnValueStatement = new CodeMethodReturnStatement(valueExpression);
+                            var returnDefaultStatement = new CodeMethodReturnStatement(defaultValueExpression);
+                            var conditionalReturnStatement = new CodeConditionStatement(hasValueExpression, new CodeStatement[] { returnValueStatement }, new CodeStatement[] { returnDefaultStatement });
+                            property.GetStatements.Add(conditionalReturnStatement);
                         }
-
                     }
                     else
                     {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All && !isAttribute)
+                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified == PropertyNameSpecifiedType.All)
                         {
-
                             CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
                         }
                     }
@@ -788,7 +800,7 @@ namespace Xsd2Code.Library.Extensions
 
             // SaveToFile
             type.Members.AddRange(this.GetOverrideSaveToFileMethods(type));
-            type.Members.Add(this.GetSaveToFileMethod());
+            type.Members.Add(this.GetSaveToFileMethod(type));
 
             // LoadFromFile
             type.Members.AddRange(this.GetOverrideLoadFromFileMethods(type));
@@ -809,6 +821,9 @@ namespace Xsd2Code.Library.Extensions
                                           Attributes = MemberAttributes.Public,
                                           Name = GeneratorContext.GeneratorParams.Serialization.SerializeMethodName
                                       };
+
+            if (type.BaseTypes.Count > 0)
+                serializeMethod.Attributes |= MemberAttributes.Override;
 
             var tryStatmanentsCol = new CodeStatementCollection();
             var finallyStatmanentsCol = new CodeStatementCollection();
@@ -968,6 +983,9 @@ namespace Xsd2Code.Library.Extensions
                 Attributes = MemberAttributes.Public | MemberAttributes.Static,
                 Name = GeneratorContext.GeneratorParams.Serialization.DeserializeMethodName
             };
+
+            if (type.BaseTypes.Count > 0)
+                deserializeMethod.Attributes |= MemberAttributes.New;
 
             deserializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "xml"));
             deserializeMethod.ReturnType = new CodeTypeReference(deserializeTypeName);
@@ -1153,7 +1171,7 @@ namespace Xsd2Code.Library.Extensions
         /// <returns>
         /// return the save to file code DOM method statment
         /// </returns>
-        protected virtual CodeMemberMethod GetSaveToFileMethod()
+        protected virtual CodeMemberMethod GetSaveToFileMethod(CodeTypeDeclaration type)
         {
             // -----------------------------------------------
             // public virtual void SaveToFile(string fileName)
@@ -1163,6 +1181,9 @@ namespace Xsd2Code.Library.Extensions
                 Attributes = MemberAttributes.Public,
                 Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
             };
+
+            if (type.BaseTypes.Count > 0)
+                saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
 
@@ -1282,6 +1303,9 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
+            if (type.BaseTypes.Count > 0)
+                saveToFileMethod.Attributes |= MemberAttributes.Override;
+
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
 
             if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
@@ -1366,6 +1390,9 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
+                if (type.BaseTypes.Count > 0)
+                    saveToFileMethod.Attributes |= MemberAttributes.Override;
+
                 CodeExpression[] encodeingArgs;
                 encodeingArgs = new CodeExpression[]
                                         {
@@ -1398,6 +1425,9 @@ namespace Xsd2Code.Library.Extensions
                                            Attributes = MemberAttributes.Public,
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
+
+                if (type.BaseTypes.Count > 0)
+                    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
                 var encodeingArgs = new CodeExpression[]
                                         {
@@ -1435,6 +1465,9 @@ namespace Xsd2Code.Library.Extensions
                 Attributes = MemberAttributes.Public | MemberAttributes.Static,
                 Name = GeneratorContext.GeneratorParams.Serialization.LoadFromFileMethodName
             };
+
+            if (type.BaseTypes.Count > 0)
+                loadFromFileMethod.Attributes |= MemberAttributes.New;
 
             loadFromFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fileName"));
             if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
@@ -2079,7 +2112,7 @@ namespace Xsd2Code.Library.Extensions
                     }
                     else
                     {
-                        propertyChangeParams = new CodeExpression[] {new CodePrimitiveExpression(prop.Name)};
+                        propertyChangeParams = new CodeExpression[] { new CodePrimitiveExpression(prop.Name) };
                     }
 
                     var propChange =
@@ -2097,7 +2130,7 @@ namespace Xsd2Code.Library.Extensions
 
                             if (cfreL != null)
                             {
-                                var setValueCondition = new CodeStatementCollection {propAssignStatment, propChange};
+                                var setValueCondition = new CodeStatementCollection { propAssignStatment, propChange };
 
                                 // ---------------------------------------------
                                 // (this.descriptionField == null)
@@ -2127,13 +2160,13 @@ namespace Xsd2Code.Library.Extensions
                                 var property = member as CodeMemberProperty;
                                 if (property != null)
                                 {
-                                    if (property.Type.BaseType != new CodeTypeReference(typeof (long)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (DateTime)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (float)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (double)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (int)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (bool)).BaseType &&
-                                        property.Type.BaseType != new CodeTypeReference(typeof (decimal)).BaseType &&
+                                    if (property.Type.BaseType != new CodeTypeReference(typeof(long)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(DateTime)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(float)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(double)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(int)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(bool)).BaseType &&
+                                        property.Type.BaseType != new CodeTypeReference(typeof(decimal)).BaseType &&
                                         property.Type.BaseType !=
                                         new CodeTypeReference("System.Numerics.BigInteger").BaseType &&
                                         enumListField.IndexOf(property.Type.BaseType) == -1)
@@ -2220,6 +2253,30 @@ namespace Xsd2Code.Library.Extensions
                     attrib.Name == "System.SerializableAttribute" ||
                     attrib.Name == "System.ComponentModel.DesignerCategoryAttribute" ||
                     attrib.Name == "System.Xml.Serialization.XmlRootAttribute")
+                {
+                    codeAttributes.Add(attrib);
+                }
+            }
+
+            foreach (var item in codeAttributes)
+            {
+                customAttributes.Remove(item);
+            }
+        }
+
+        protected virtual void RemoveNonSilverlightXmlAttributes(CodeAttributeDeclarationCollection customAttributes)
+        {
+            var codeAttributes = new List<CodeAttributeDeclaration>();
+            foreach (var attribute in customAttributes)
+            {
+                var attrib = attribute as CodeAttributeDeclaration;
+                if (attrib == null)
+                {
+                    continue;
+                }
+
+                if (attrib.Name == "System.SerializableAttribute" ||
+                    attrib.Name == "System.ComponentModel.DesignerCategoryAttribute")
                 {
                     codeAttributes.Add(attrib);
                 }
