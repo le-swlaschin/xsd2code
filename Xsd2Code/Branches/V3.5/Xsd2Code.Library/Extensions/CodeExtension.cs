@@ -306,6 +306,9 @@ namespace Xsd2Code.Library.Extensions
                                       ReturnType = new CodeTypeReference(typeName)
                                   };
 
+            if (type.BaseTypes.Count > 0)
+                cloneMethod.Attributes |= MemberAttributes.New;
+
             CodeDomHelper.CreateSummaryComment(
                 cloneMethod.Comments,
                 string.Format("Create a clone of this {0} object", typeName));
@@ -861,9 +864,8 @@ namespace Xsd2Code.Library.Extensions
                                           Name = GeneratorContext.GeneratorParams.Serialization.SerializeMethodName
                                       };
 
-
-            //if (type.BaseTypes.Count > 0)
-            //    serializeMethod.Attributes |= MemberAttributes.Override;
+            if (type.BaseTypes.Count > 0)
+                serializeMethod.Attributes |= MemberAttributes.Override;
 
             var tryStatmanentsCol = new CodeStatementCollection();
             var finallyStatmanentsCol = new CodeStatementCollection();
@@ -1108,6 +1110,9 @@ namespace Xsd2Code.Library.Extensions
                                                           DeserializeMethodName
                                                   };
 
+            if (type.BaseTypes.Count > 0)
+                deserializeFromStreamMethod.Attributes |= MemberAttributes.New;
+
             deserializeFromStreamMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (Stream), "s"));
             deserializeFromStreamMethod.ReturnType = new CodeTypeReference(deserializeTypeName);
 
@@ -1285,8 +1290,8 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-            //if (type.BaseTypes.Count > 0)
-            //    saveToFileMethod.Attributes |= MemberAttributes.Override;
+            if (type.BaseTypes.Count > 0)
+                saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (string), "fileName"));
 
@@ -1409,8 +1414,8 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-            //if (type.BaseTypes.Count > 0)
-            //    saveToFileMethod.Attributes |= MemberAttributes.Override;
+            if (type.BaseTypes.Count > 0)
+                saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (string), "fileName"));
 
@@ -1503,8 +1508,8 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-                //if (type.BaseTypes.Count > 0)
-                //    saveToFileMethod.Attributes |= MemberAttributes.Override;
+                if (type.BaseTypes.Count > 0)
+                    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
                 CodeExpression[] encodeingArgs;
                 encodeingArgs = new CodeExpression[]
@@ -1539,8 +1544,8 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-                //if (type.BaseTypes.Count > 0)
-                //    saveToFileMethod.Attributes |= MemberAttributes.Override;
+                if (type.BaseTypes.Count > 0)
+                    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
                 var encodeingArgs = new CodeExpression[]
                                         {
