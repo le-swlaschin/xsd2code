@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xsd2Code.Library;
 using Xsd2Code.Library.Helpers;
+using Xsd2Code.TestUnit.Helpers;
 using Xsd2Code.TestUnit.Properties;
 
 namespace Xsd2Code.TestUnit
@@ -423,6 +424,12 @@ namespace Xsd2Code.TestUnit
                 igm.Value = ms.ToArray();
 
                 igm.SaveToFile(@"c:\temp\bitmap.xml");
+
+                var igmLoaded = ImageElement.LoadFromFile(@"c:\temp\bitmap.xml");
+                Stream s = new MemoryStream(igmLoaded.Value);
+                var img = Image.FromStream(s);
+                img.Save(@"c:\temp\bitmap.jpg");
+
             }
         }
 
@@ -688,10 +695,11 @@ namespace Xsd2Code.TestUnit
 
                 Assert.IsTrue(result.Success, result.Messages.ToString());
 
-                //var compileResult = CompileCSFile(generatorParams.OutputFilePath);
-                //Assert.IsTrue(compileResult.Success, compileResult.Messages.ToString());
+                Build(generatorParams.OutputFilePath, TargetFramework.Net30);
+                Build(generatorParams.OutputFilePath, TargetFramework.Net40);
             }
         }
+
 
         [TestMethod]
         public void AutomaticProperties()
@@ -709,16 +717,14 @@ namespace Xsd2Code.TestUnit
                 generatorParams.Miscellaneous.EnableSummaryComment = false;
                 generatorParams.GenerateDataContracts = false;
                 generatorParams.PropertyParams.AutomaticProperties = true;
-                generatorParams.Serialization.GenerateXmlAttributes = true;
+                generatorParams.Serialization.GenerateXmlAttributes = false;
                 generatorParams.OutputFilePath = Path.ChangeExtension(generatorParams.InputFilePath, ".autoProp.cs");
 
                 var xsdGen = new GeneratorFacade(generatorParams);
                 var result = xsdGen.Generate();
 
                 Assert.IsTrue(result.Success, result.Messages.ToString());
-
-                var compileResult = CompileCSFile(generatorParams.OutputFilePath);
-                Assert.IsTrue(compileResult.Success, compileResult.Messages.ToString());
+                Build(generatorParams.OutputFilePath, TargetFramework.Net30);
             }
         }
 
@@ -773,6 +779,61 @@ namespace Xsd2Code.TestUnit
                 deserilizeChoice.SaveToFile(@"c:\temp\choiceD.xml");
             }
         }
+
+        /// <summary>
+        /// Builds the specified source file path.
+        /// </summary>
+        /// <param name="sourceFilePath">The source file path.</param>
+        public void Build(string sourceFilePath, TargetFramework targetFramework)
+        {
+            lock (testLock)
+            {
+                var buildDirectory = Path.Combine(OutputFolder, "Build");
+                if (Directory.Exists(buildDirectory))
+                    Directory.Delete(buildDirectory, true);
+
+                DirectoryHelper.CopyAll(@"D:\MyDeveloppement\Xsd2Code\Branches\V3.5\Xsd2Code.Test.Console", buildDirectory, false);
+
+
+                var csProjFile = Path.Combine(buildDirectory, "Xsd2Code.Test.Console.csproj");
+                var strFile = File.ReadAllText(csProjFile);
+
+                switch (targetFramework)
+                {
+                    case TargetFramework.Net20:
+                        {
+
+                            strFile = strFile.Replace("<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>", "<TargetFrameworkVersion>v2.0</TargetFrameworkVersion>");
+                        }
+                        break;
+                    case TargetFramework.Net30:
+                        {
+                            strFile = strFile.Replace("<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>", "<TargetFrameworkVersion>v3.0</TargetFrameworkVersion>");
+                            strFile = strFile.Replace("<Reference Include=\"System.Data.DataSetExtensions\" />", "<Reference Include=\"WindowsBase\" />");
+                        }
+                        break;
+                    case TargetFramework.Net35:
+                        {
+                            strFile = strFile.Replace("<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>", "<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>");
+                        }
+                        break;
+                    case TargetFramework.Silverlight:
+                        break;
+                }
+
+                File.WriteAllText(csProjFile, strFile);
+                File.Copy(sourceFilePath, Path.Combine(buildDirectory, "SourceFile.cs"), true);
+
+                string errorMessage;
+                if (!SolutionBuilder.CompileSolution(Path.Combine(buildDirectory, "Xsd2Code.Test.Console.csproj"), out errorMessage))
+                {
+                    File.WriteAllText(Path.Combine(buildDirectory,"ErrorList.txt"), errorMessage);
+                    Assert.Fail(errorMessage);
+                }
+            }
+        }
+
+
 
         [TestMethod]
         public void TestAnnotations()
@@ -907,6 +968,8 @@ namespace Xsd2Code.TestUnit
             return Path.ChangeExtension(inputFilePath, ".TestGenerated.cs");
         }
 
+
+
         /// <summary>
         /// Compile file
         /// </summary>
@@ -986,4 +1049,5 @@ namespace Xsd2Code.TestUnit
         }
 
     }
+
 }

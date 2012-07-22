@@ -250,15 +250,6 @@ namespace Xsd2Code.Library.Extensions
                                         ((CodeFieldReferenceExpression)ctorInitAssignment.Left).FieldName = member.Name;
                                     }
                                 }
-
-                                //CodeMemberField fieldToRemove =
-                                //    type.Members.OfType<CodeMemberField>().FirstOrDefault(
-                                //        currentField => currentField.Name.Equals(field.FieldName));
-
-                                //if (fieldToRemove != null)
-                                //{
-                                //    type.Members.Remove(fieldToRemove);
-                                //}
                             }
                         }
                     }

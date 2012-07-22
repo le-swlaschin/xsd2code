@@ -23,6 +23,13 @@
             </xs:documentation>
           </xs:annotation>
         </xs:element>
+        <xs:element name="picture" type="xs:hexBinary">
+          <xs:annotation>
+            <xs:documentation>
+              Picture of actor
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
       </xs:sequence>
       <xs:attribute name="PrincipalActor" type="xs:boolean" />
       <xs:attribute default="US" name="nationality" type="xs:string">
