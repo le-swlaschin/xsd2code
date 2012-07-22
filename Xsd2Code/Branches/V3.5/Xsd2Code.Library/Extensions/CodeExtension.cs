@@ -305,9 +305,9 @@ namespace Xsd2Code.Library.Extensions
                                       Name = "Clone",
                                       ReturnType = new CodeTypeReference(typeName)
                                   };
-
-            if (type.BaseTypes.Count > 0)
-                cloneMethod.Attributes |= MemberAttributes.New;
+            // TODO:Check if base class is used
+            //if (type.BaseTypes.Count > 0)
+            //    cloneMethod.Attributes |= MemberAttributes.New;
 
             CodeDomHelper.CreateSummaryComment(
                 cloneMethod.Comments,
@@ -864,8 +864,9 @@ namespace Xsd2Code.Library.Extensions
                                           Name = GeneratorContext.GeneratorParams.Serialization.SerializeMethodName
                                       };
 
-            if (type.BaseTypes.Count > 0)
-                serializeMethod.Attributes |= MemberAttributes.Override;
+            // TODO:Check if base class is used
+            //if (type.BaseTypes.Count > 0)
+            //    serializeMethod.Attributes |= MemberAttributes.Override;
 
             var tryStatmanentsCol = new CodeStatementCollection();
             var finallyStatmanentsCol = new CodeStatementCollection();
@@ -1109,9 +1110,9 @@ namespace Xsd2Code.Library.Extensions
                                                           GeneratorContext.GeneratorParams.Serialization.
                                                           DeserializeMethodName
                                                   };
-
-            if (type.BaseTypes.Count > 0)
-                deserializeFromStreamMethod.Attributes |= MemberAttributes.New;
+// TODO:Check if base class is used
+            //if (type.BaseTypes.Count > 0)
+            //    deserializeFromStreamMethod.Attributes |= MemberAttributes.New;
 
             deserializeFromStreamMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (Stream), "s"));
             deserializeFromStreamMethod.ReturnType = new CodeTypeReference(deserializeTypeName);
@@ -1289,9 +1290,9 @@ namespace Xsd2Code.Library.Extensions
                                            Attributes = MemberAttributes.Public,
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
-
-            if (type.BaseTypes.Count > 0)
-                saveToFileMethod.Attributes |= MemberAttributes.Override;
+// TODO:Check if base class is used
+            //if (type.BaseTypes.Count > 0)
+            //    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (string), "fileName"));
 
@@ -1413,9 +1414,9 @@ namespace Xsd2Code.Library.Extensions
                                            Attributes = MemberAttributes.Public,
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
-
-            if (type.BaseTypes.Count > 0)
-                saveToFileMethod.Attributes |= MemberAttributes.Override;
+// TODO:Check if base class is used
+            //if (type.BaseTypes.Count > 0)
+            //    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
             saveToFileMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof (string), "fileName"));
 
@@ -1508,8 +1509,9 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-                if (type.BaseTypes.Count > 0)
-                    saveToFileMethod.Attributes |= MemberAttributes.Override;
+// TODO:Check if base class is used
+                //if (type.BaseTypes.Count > 0)
+                //    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
                 CodeExpression[] encodeingArgs;
                 encodeingArgs = new CodeExpression[]
@@ -1544,8 +1546,9 @@ namespace Xsd2Code.Library.Extensions
                                            Name = GeneratorContext.GeneratorParams.Serialization.SaveToFileMethodName
                                        };
 
-                if (type.BaseTypes.Count > 0)
-                    saveToFileMethod.Attributes |= MemberAttributes.Override;
+// TODO:Check if base class is used
+                //if (type.BaseTypes.Count > 0)
+                //    saveToFileMethod.Attributes |= MemberAttributes.Override;
 
                 var encodeingArgs = new CodeExpression[]
                                         {
@@ -2197,19 +2200,9 @@ namespace Xsd2Code.Library.Extensions
 
             if (prop.Type.ArrayElementType != null)
             {
-                prop.Type = GetCollectionType(prop.Type);
+                prop.Type = this.GetCollectionType(prop.Type);
                 CollectionTypesFields.Add(prop.Name);
-
-                if (GeneratorContext.GeneratorParams.InitializeFields != InitializeFieldsType.None &&
-                    (GeneratorContext.GeneratorParams.CollectionObjectType != CollectionType.Array))
-                {
-                    if (prop.Type.BaseType != typeof (byte).FullName)
-                    {
-                        prop.HasSet = false;
-                    }
-                }
             }
-
             if (GeneratorContext.GeneratorParams.PropertyParams.EnableVirtualProperties)
             {
                 prop.Attributes ^= MemberAttributes.Final;
@@ -2388,7 +2381,7 @@ namespace Xsd2Code.Library.Extensions
         protected virtual void RemoveDefaultXmlAttributes(CodeAttributeDeclarationCollection customAttributes)
         {
             var codeAttributes = new List<CodeAttributeDeclaration>();
-            foreach (object attribute in customAttributes)
+            foreach (var attribute in customAttributes)
             {
                 var attrib = attribute as CodeAttributeDeclaration;
                 if (attrib == null)
@@ -2396,19 +2389,43 @@ namespace Xsd2Code.Library.Extensions
                     continue;
                 }
 
-                if (attrib.Name == "System.Xml.Serialization.XmlAttributeAttribute" ||
+                //Since we can get in here if the TargetFramework is Silverlight, we need to check again to see
+                //if the GenerateXmlAttributes is actually True. Is so, Silverlight needs the other attributes to properly 
+                //serialize XML so it can be compatible with generated XML from a regular C#, .Net (2.0+) application 
+                //(that also use the Serialization.GenerateXmlAttributes support).
+                //Silverlight doesn't support the two I left in, so we remove those. 
+                //If we aren't wanting to GenerateXMLAttributes when TF=Silverlight, then we remove all the attrib. markers.
+                //Fixes http://xsd2code.codeplex.com/workitem/14052
+                if (GeneratorContext.GeneratorParams.Serialization.GenerateXmlAttributes && 
+                    GeneratorContext.GeneratorParams.TargetFramework == TargetFramework.Silverlight)
+                {
+                    if (
+                        attrib.Name == "System.SerializableAttribute" ||
+                        attrib.Name == "System.ComponentModel.DesignerCategoryAttribute"
+                        )
+                    {
+                        codeAttributes.Add(attrib);
+                    }
+                }
+                else
+                {
+                    if (
+                        attrib.Name == "System.Xml.Serialization.XmlAttributeAttribute" ||
                     attrib.Name == "System.Xml.Serialization.XmlTypeAttribute" ||
                     attrib.Name == "System.Xml.Serialization.XmlElementAttribute" ||
                     attrib.Name == "System.CodeDom.Compiler.GeneratedCodeAttribute" ||
                     attrib.Name == "System.SerializableAttribute" ||
                     attrib.Name == "System.ComponentModel.DesignerCategoryAttribute" ||
-                    attrib.Name == "System.Xml.Serialization.XmlRootAttribute")
+                        attrib.Name == "System.Xml.Serialization.XmlRootAttribute"
+                        )
                 {
                     codeAttributes.Add(attrib);
                 }
             }
 
-            foreach (CodeAttributeDeclaration item in codeAttributes)
+            }
+
+            foreach (var item in codeAttributes)
             {
                 customAttributes.Remove(item);
             }
