@@ -36,14 +36,16 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.\bin\Debug\</OutputPath>
+    <OutputPath>..\Xsd2Code.Binaries\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -57,7 +59,7 @@
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisLogFile>bin\Debug\Xsd2Code.TestUnit.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
@@ -126,7 +128,7 @@
     <Compile Include="xsd\hierarchy.designer.cs" />
     <Compile Include="xsd\Inheritance.designer.cs" />
     <Compile Include="xsd\LazyLoading.designer.cs" />
-    <Compile Include="xsd\mailxml_base.designer.cs" />
+    <Compile Include="xsd\MailXML\mailxml_base.designer.cs" />
     <Compile Include="xsd\PersonTypeAnnotation.designer.cs" />
     <Compile Include="xsd\ReproSchema.Designer.cs" />
     <Compile Include="xsd\TestOptionalElement.designer.cs" />
@@ -176,10 +178,13 @@
     <None Include="xsd\LazyLoading.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="xsd\mailxml_base.xsd">
+    <None Include="xsd\MailXML\mailxml_base.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="xsd\mailxml_base_120108.xsd">
+    <None Include="xsd\MailXML\mailxml_base_120108.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="xsd\MusicXML\musicxml.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="xsd\PersonTypeAnnotation.xsd">
@@ -194,12 +199,6 @@
     <None Include="xsd\XMLSchema.xsd">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Xsd2Code.Library\Xsd2Code.Library.csproj">
-      <Project>{1B59FB12-699C-4927-ACA3-D7F0E0F79100}</Project>
-      <Name>Xsd2Code.Library</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -223,6 +222,14 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Xsd2Code.Library\Xsd2Code.Library.csproj">
+      <Project>{1B59FB12-699C-4927-ACA3-D7F0E0F79100}</Project>
+      <Name>Xsd2Code.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
 </Project>

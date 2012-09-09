@@ -6,8 +6,6 @@ using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 
-//using Microsoft.Build.BuildEngine;
-
 namespace Xsd2Code.TestUnit
 {
     public class SolutionBuilder
@@ -20,15 +18,14 @@ namespace Xsd2Code.TestUnit
             var b = new BasicFileLogger();
             b.Parameters = Path.Combine(Path.GetTempPath(), "Compil_" + Path.GetRandomFileName());
             b.register();
-            
+
             var loggers = new List<ILogger>();
-            //loggers.Add(new ConsoleLogger());
             loggers.Add(b);
 
             var projectCollection = new ProjectCollection();
             projectCollection.RegisterLoggers(loggers);
 
-            var project = projectCollection.LoadProject(solutionName); 
+            var project = projectCollection.LoadProject(solutionName);
             try
             {
                 compilResult = project.Build();
@@ -42,9 +39,9 @@ namespace Xsd2Code.TestUnit
             errorMessage = b.getLogoutput();
             errorMessage += "\n\t" + b.Warningcount + " Warnings. ";
             errorMessage += "\n\t" + b.Errorcount + " Errors. ";
-            
+
             b.Shutdown();
-            
+
             return compilResult;
         }
     }

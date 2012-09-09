@@ -28,7 +28,8 @@
 
   <xs:complexType name="Plane">
     <xs:sequence>
-      <xs:element name="Speed" type="xs:int" />
+      <xs:element name="Speed" type="xs:double" />
+      <xs:element name="EngineNumber" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
 

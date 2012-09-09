@@ -90,7 +90,7 @@ namespace Xsd2Code.Library
 
         [Category("Property")]
         [DefaultValue(false)]
-        [Description("Enable/Disable virtual properties. Use with NHibernate.")]
+        [Description("Add virtual keyword on every properties.")]
         public bool EnableVirtualProperties { get; set; }
 
         /// <summary>

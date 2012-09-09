@@ -142,12 +142,6 @@
   <data name="TestAnnotations" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\xsd\testannotations.xsd;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="mailxml_base" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\xsd\mailxml_base.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="mailxml_base_120108" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\xsd\mailxml_base_120108.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="LazyLoading" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\xsd\lazyloading.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -162,5 +156,14 @@
   </data>
   <data name="hexBinary" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\xsd\hexbinary.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="mailxml_base" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\xsd\mailxml\mailxml_base.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="mailxml_base_120108" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\xsd\mailxml\mailxml_base_120108.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="musicxml" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\xsd\musicxml\musicxml.xsd;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

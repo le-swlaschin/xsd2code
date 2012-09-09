@@ -77,5 +77,5 @@
 				 Issue #13228 XmlRootAttribute is now generated only on right classes. Added switch to generate all classes from xsd.
 				 Issue #12949, #7365 XML documentation comments generation code is complete rewirked, because isn't working. Now are comments generated in all cases, with exception of generated properties, which doesn't have equivalent in xsd (xxxxxSpecified). 
 				 
-				 
-				 
+2012-08-11, PC:  Issue #15483 : With PascalCaseProperty, type of collection not renamed.
+				 Introduce new program console (Xsd2Code.Test.Console) with allow to build generated class in test unit library.

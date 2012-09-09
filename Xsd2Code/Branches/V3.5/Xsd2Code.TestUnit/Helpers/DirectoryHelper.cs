@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace Xsd2Code.TestUnit.Helpers
 {
     internal static class DirectoryHelper
     {
-        public static void CopyAll(string sourcePath, string targetPath, bool recursive)
+        public static void CopyAll(string sourcePath, string targetPath, bool recursive, bool setDefaultAttribute)
         {
             var source = new DirectoryInfo(sourcePath);
             var target = new DirectoryInfo(targetPath);
@@ -27,7 +23,10 @@ namespace Xsd2Code.TestUnit.Helpers
             // Copy each file into it's new directory.
             foreach (FileInfo fi in source.GetFiles())
             {
-                fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
+                var destFileName = Path.Combine(target.ToString(), fi.Name);
+                fi.CopyTo(destFileName, true);
+                if (setDefaultAttribute)
+                    File.SetAttributes(destFileName, FileAttributes.Normal);
             }
 
             // Copy each subdirectory using recursion.
@@ -36,7 +35,7 @@ namespace Xsd2Code.TestUnit.Helpers
                 foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
                 {
                     DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-                    CopyAll(diSourceSubDir.FullName, nextTargetSubDir.FullName, true);
+                    CopyAll(diSourceSubDir.FullName, nextTargetSubDir.FullName, true, true);
                 }
             }
         }

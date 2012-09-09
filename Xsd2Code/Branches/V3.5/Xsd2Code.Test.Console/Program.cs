@@ -1,4 +1,5 @@
-﻿namespace Xsd2Code.Test.Console
+﻿
+namespace Xsd2Code.Test.Console
 {
     class Program
     {
