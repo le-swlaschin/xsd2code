@@ -170,7 +170,14 @@ namespace Xsd2Code.Library
 
                     var ns = result.Entity;
                     using (var outputStream = new StreamWriter(outputFilePath + ".tmp", false))
-                        this.providerField.GenerateCodeFromNamespace(ns, outputStream, new CodeGeneratorOptions());
+                    {
+                        var codeOption = new CodeGeneratorOptions();
+                        if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
+                        {
+                            codeOption.BracingStyle = "C";
+                        }
+                        providerField.GenerateCodeFromNamespace(ns, outputStream, codeOption);
+                    }
                 }
                 catch (Exception e)
                 {

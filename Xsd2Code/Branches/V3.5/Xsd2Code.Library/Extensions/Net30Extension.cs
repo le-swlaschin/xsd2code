@@ -38,11 +38,11 @@ namespace Xsd2Code.Library.Extensions
         protected override void ProcessClass(CodeNamespace codeNamespace, XmlSchema schema, CodeTypeDeclaration type)
         {
             RemoveFieldsForAutomaticProperties(type);
-
             base.ProcessClass(codeNamespace, schema, type);
 
             // generate automatic properties
             GenerateAutomaticProperties(type);
+
         }
 
         /// <summary>
@@ -248,6 +248,16 @@ namespace Xsd2Code.Library.Extensions
                                     if (ctorInitAssignment != null)
                                     {
                                         ((CodeFieldReferenceExpression)ctorInitAssignment.Left).FieldName = member.Name;
+
+                                        CodeMemberField fieldToRemove =
+                                            type.Members.OfType<CodeMemberField>()
+                                                .FirstOrDefault(
+                                                    currentField => currentField.Name.Equals(field.FieldName));
+
+                                        if (fieldToRemove != null)
+                                        {
+                                            type.Members.Remove(fieldToRemove);
+                                        }
                                     }
                                 }
                             }

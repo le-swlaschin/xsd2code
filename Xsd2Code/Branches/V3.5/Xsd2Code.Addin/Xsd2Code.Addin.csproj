@@ -168,6 +168,7 @@
   <ItemGroup>
     <Content Include="Xsd2Code.AddIn.AddIn">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

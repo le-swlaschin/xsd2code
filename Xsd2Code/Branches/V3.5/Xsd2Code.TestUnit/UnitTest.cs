@@ -656,6 +656,35 @@ namespace Xsd2Code.TestUnit
         }
 
         /// <summary>
+        /// Test PropertyNameSpecified
+        /// </summary>
+        [TestMethod]
+        public void ExcludeIncludedType()
+        {
+            lock (testLock)
+            {
+                // Copy resource file to the run-time directory
+                GetInputFilePath("Actor.xsd", Resources.Actor);
+
+                // Copy resource file to the run-time directory
+                string inputFilePath = GetInputFilePath("Dvd.xsd", Resources.dvd);
+                var generatorParams = GetGeneratorParams(inputFilePath);
+                generatorParams.CollectionObjectType = CollectionType.List;
+                generatorParams.TargetFramework = TargetFramework.Net20;
+                generatorParams.Serialization.GenerateXmlAttributes = true;
+                generatorParams.Miscellaneous.ExcludeIncludedTypes = true;
+
+                var xsdGen = new GeneratorFacade(generatorParams);
+                var result = xsdGen.Generate();
+                if (!result.Success)
+                {
+                    Assert.Fail(result.Messages[0].Text);    
+                }
+
+                //Build(generatorParams.OutputFilePath, generatorParams.TargetFramework);
+            }
+        }
+        /// <summary>
         /// Genders this instance.
         /// </summary>
         [TestMethod]

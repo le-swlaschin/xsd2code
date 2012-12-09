@@ -41,7 +41,11 @@ namespace Xsd2Code.SetupLibrary
         /// </summary>
         private const string savedStateVs2010Key = "vs2010AddinPath";
 
-
+        /// <summary>
+        /// Saved state key  
+        /// </summary>
+        private const string savedStateVs2012Key = "vs2012AddinPath";
+       
         /// <summary>
         /// Vs2008 registry key
         /// </summary>
@@ -52,7 +56,10 @@ namespace Xsd2Code.SetupLibrary
         /// </summary>
         private const string vs2010Key = @"SOFTWARE\Microsoft\VisualStudio\10.0";
 
-
+        /// <summary>
+        /// Vs2010 registry key
+        /// </summary>
+        private const string vs2012Key = @"SOFTWARE\Microsoft\VisualStudio\11.0";
         /// <summary>
         /// Constructor. Initializes components.
         /// </summary>
@@ -77,6 +84,8 @@ namespace Xsd2Code.SetupLibrary
             string vs2008AddinTarget = Path.Combine(this.Context.Parameters["personal"].TrimEnd(null), @"Visual Studio 2008\Addins");
 
             string vs2010AddinTarget = Path.Combine(this.Context.Parameters["personal"].TrimEnd(null), @"Visual Studio 2010\Addins");
+
+            string vs2012AddinTarget = Path.Combine(this.Context.Parameters["personal"].TrimEnd(null), @"Visual Studio 2012\Addins");
 
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             try
@@ -121,6 +130,15 @@ namespace Xsd2Code.SetupLibrary
                     savedState.Add(savedStateVs2010Key, targetFile);
                 }
 
+                if (!string.IsNullOrEmpty(GetRegisteryValue(Registry.LocalMachine, vs2012Key, "InstallDir")))
+                {
+                    var targetFolder = new DirectoryInfo(vs2012AddinTarget);
+                    if (!targetFolder.Exists) targetFolder.Create();
+
+                    string targetFile = Path.Combine(vs2012AddinTarget, addinControlFileName);
+                    File.Copy(sourceFile, targetFile, true);
+                    savedState.Add(savedStateVs2012Key, targetFile);
+                }
             }
             catch (Exception ex)
             {
@@ -181,6 +199,12 @@ namespace Xsd2Code.SetupLibrary
                 }
 
                 fileName = (string)savedState[savedStateVs2010Key];
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    if (File.Exists(fileName)) File.Delete(fileName);
+                }
+
+                fileName = (string)savedState[savedStateVs2012Key];
                 if (!string.IsNullOrEmpty(fileName))
                 {
                     if (File.Exists(fileName)) File.Delete(fileName);

@@ -79,3 +79,7 @@
 				 
 2012-08-11, PC:  Issue #15483 : With PascalCaseProperty, type of collection not renamed.
 				 Introduce new program console (Xsd2Code.Test.Console) with allow to build generated class in test unit library.
+2012-12-08, PC:  Issue #15266 : Field not used warning when using automatic property - http://xsd2code.codeplex.com/workitem/15266
+                 Issue #15381 : Visual Studio 2012 Support - http://xsd2code.codeplex.com/workitem/15381
+				 Issue #8781 : Import directive of many files duplicate types - http://xsd2code.codeplex.com/workitem/8781
+				 Issue #6944 : Add possibility to do not generate types from referenced schemas - http://xsd2code.codeplex.com/workitem/6944

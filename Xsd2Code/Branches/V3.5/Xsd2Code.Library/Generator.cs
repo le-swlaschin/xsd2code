@@ -107,9 +107,10 @@ namespace Xsd2Code.Library
                 var schemas = new XmlSchemas();
 
                 reader = XmlReader.Create(generatorParams.InputFilePath);
-                xsd = XmlSchema.Read(reader, new ValidationEventHandler(Validate));
+                xsd = XmlSchema.Read(reader, Validate);
 
                 var schemaSet = new XmlSchemaSet();
+
                 schemaSet.Add(xsd);
                 schemaSet.Compile();
 
@@ -119,7 +120,7 @@ namespace Xsd2Code.Library
                 }
 
                 var exporter = new XmlCodeExporter(ns);
-                CodeGenerationOptions generationOptions = CodeGenerationOptions.None;
+                var generationOptions = CodeGenerationOptions.None;
                 if (generatorParams.Serialization.GenerateOrderXmlAttributes)
                 {
                     generationOptions = CodeGenerationOptions.GenerateOrder;
@@ -128,8 +129,17 @@ namespace Xsd2Code.Library
 
                 foreach (XmlSchemaElement element in xsd.Elements.Values)
                 {
-                    var mapping = importer.ImportTypeMapping(element.QualifiedName);
-                    exporter.ExportTypeMapping(mapping);
+                    if (GeneratorContext.GeneratorParams.Miscellaneous.ExcludeIncludedTypes)
+                    {
+                        if (!SchemaHelper.IsIncludedType(xsd.Includes, element.QualifiedName.Name))
+                        {
+                            exporter.ExportTypeMapping(importer.ImportTypeMapping(element.QualifiedName));
+                        }
+                    }
+                    else
+                    {
+                        exporter.ExportTypeMapping(importer.ImportTypeMapping(element.QualifiedName));
+                    }
                 }
 
                 if (generatorParams.Miscellaneous.GenerateAllTypes)
@@ -147,7 +157,6 @@ namespace Xsd2Code.Library
                         }
                     }
                 }
-
                 #endregion
 
                 #region Execute extensions

@@ -2,9 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Xsd2Code.Library.Properties;
 
 namespace Xsd2Code.Library.Extensions

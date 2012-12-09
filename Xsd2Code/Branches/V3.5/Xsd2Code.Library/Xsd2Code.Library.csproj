@@ -176,6 +176,7 @@
     <Compile Include="GeneratorParamsTypes.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\SchemaHelper.cs" />
     <Compile Include="Helpers\SummaryCommentsHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

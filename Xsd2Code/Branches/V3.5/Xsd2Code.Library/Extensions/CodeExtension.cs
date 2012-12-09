@@ -199,10 +199,9 @@ namespace Xsd2Code.Library.Extensions
                 if (GeneratorContext.GeneratorParams.Miscellaneous.ExcludeIncludedTypes)
                 {
                     //if the typeName is NOT defined in the current schema, skip it.
-                    if (!ContainsTypeName(schema, type))
+                    if (SchemaHelper.IsIncludedType(schema.Includes, type.Name))
                     {
                         code.Types.Remove(type);
-                        continue;
                     }
                 }
 
@@ -263,6 +262,14 @@ namespace Xsd2Code.Library.Extensions
                         return true;
                     }
                 }
+                var simpleItem = item as XmlSchemaSimpleType;
+                if (simpleItem != null)
+                {
+                    if (simpleItem.Name == type.Name)
+                    {
+                        return true;
+                    }
+                }
             }
 
             //TODO: Does not work for combined anonymous types 
@@ -292,46 +299,7 @@ namespace Xsd2Code.Library.Extensions
 
         #region protedted methods
 
-        /// <summary>
-        /// Generate defenition of the Clone() method
-        /// </summary>
-        /// <param name="type">Represents a type declaration for a class, structure, interface, or enumeration</param>
-        /// <returns>return CodeDom clone method</returns>
-        protected static CodeTypeMember GetCloneMethod(CodeTypeDeclaration type)
-        {
-            string typeName = GeneratorContext.GeneratorParams.GenericBaseClass.Enabled ? "T" : type.Name;
 
-            // ----------------------------------------------------------------------
-            // /// <summary>
-            // /// Create clone of this TClass object
-            // /// </summary>
-            // public TClass Clone()
-            // {
-            //    return ((TClass)this.MemberwiseClone());
-            // }
-            // ----------------------------------------------------------------------
-            var cloneMethod = new CodeMemberMethod
-                                  {
-                                      Attributes = MemberAttributes.Public,
-                                      Name = "Clone",
-                                      ReturnType = new CodeTypeReference(typeName)
-                                  };
-            // TODO:Check if base class is used
-            //if (type.BaseTypes.Count > 0)
-            //    cloneMethod.Attributes |= MemberAttributes.New;
-
-            CodeDomHelper.CreateSummaryComment(
-                cloneMethod.Comments,
-                string.Format("Create a clone of this {0} object", typeName));
-
-            var memberwiseCloneMethod = new CodeMethodInvokeExpression(
-                new CodeThisReferenceExpression(),
-                "MemberwiseClone");
-
-            var statement = new CodeMethodReturnStatement(new CodeCastExpression(typeName, memberwiseCloneMethod));
-            cloneMethod.Statements.Add(statement);
-            return cloneMethod;
-        }
 
         protected static CodeTypeMember GetShouldSerializeMethod(string propertyName)
         {
@@ -493,7 +461,7 @@ namespace Xsd2Code.Library.Extensions
                                                                              new CodePrimitiveExpression(
                                                                                  codeMemberProperty.Name)));
                             //This is almost certainly the wrong place to address this issue
-                            FixBadTypeMapping(type, codeMemberProperty, xmlElAtt);
+                            CodeDomHelper.FixBadTypeMapping(type, codeMemberProperty, xmlElAtt);
                         }
                         else if (!attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute") &&
                                  !attrs.Any(att => att.Name == "System.Xml.Serialization.XmlArrayAttribute"))
@@ -511,7 +479,7 @@ namespace Xsd2Code.Library.Extensions
                                                                               new CodePrimitiveExpression(
                                                                                   codeMemberProperty.Name)));
                             //This is almost certainly the wrong place to address this issue
-                            FixBadTypeMapping(type, codeMemberProperty, xmlAttAtt);
+                            CodeDomHelper.FixBadTypeMapping(type, codeMemberProperty, xmlAttAtt);
                         }
 
                         codeMemberProperty.Name = CodeDomHelper.GetPascalCaseName(codeMemberProperty.Name);
@@ -589,188 +557,15 @@ namespace Xsd2Code.Library.Extensions
             if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified !=
                 PropertyNameSpecifiedType.Default)
             {
-                GeneratePropertyNameSpecified(type);
+                CodeDomHelper.GeneratePropertyNameSpecified(type, ref PropertiesListFields);
             }
             else
             {
-                GeneratePropertyNameSpecifiedNullable(type);
+                CodeDomHelper.GeneratePropertyNameSpecifiedNullable(type, ref PropertiesListFields);
             }
         }
 
-        /// <summary>
-        /// Fixes bad type mappings caused to missing value types in older versions of .net.
-        /// </summary>
-        private static void FixBadTypeMapping(CodeTypeDeclaration type, CodeMemberProperty property,
-                                              CodeAttributeDeclaration attribute)
-        {
-            foreach (CodeAttributeArgument arg in attribute.Arguments)
-            {
-                if (arg.Name == "DataType")
-                {
-                    var value = arg.Value as CodePrimitiveExpression;
-                    if (value != null && value.Value != null && value.Value is string)
-                    {
-                        //Add extra if typeName == statements for dealing with other types
-                        var typeName = (string)value.Value;
-                        if (typeName == "integer")
-                        {
-                            CodeMemberField field = CodeDomHelper.FindField(type,
-                                                                            CodeDomHelper.GetFieldName(property.Name));
-                            field.Type.BaseType = "System.Numerics.BigInteger";
-                            property.Type.BaseType = "System.Numerics.BigInteger";
-                        }
-                    }
-                }
-            }
-        }
 
-        /// <summary>
-        /// Generates the property name specified.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        private static void GeneratePropertyNameSpecified(CodeTypeDeclaration type)
-        {
-            foreach (string propertyName in PropertiesListFields)
-            {
-                if (!propertyName.EndsWith("Specified"))
-                {
-                    CodeMemberProperty property = CodeDomHelper.FindProperty(type, propertyName);
-                    CodeMemberProperty specifiedProperty = null;
-                    // Search in all properties if PropertyNameSpecified exist
-                    string searchPropertyName = string.Format("{0}Specified", propertyName);
-                    specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
-
-                    IEnumerable<CodeAttributeDeclaration> attrs =
-                        property.CustomAttributes.Cast<CodeAttributeDeclaration>();
-
-                    //We check for this, because I decided not to generate "specified" methods for attributes as attributes behave
-                    //slightly differently to elements (they can't be complex types such as nullables).
-                    //I plan to address this differently by generating them (without nullable) and adding an extra clause 
-                    //to automatically set the specified property to true in the property setter
-                    bool isAttribute = attrs.Any(att => att.Name == "System.Xml.Serialization.XmlAttributeAttribute");
-
-                    if (specifiedProperty != null)
-                    {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified ==
-                            PropertyNameSpecifiedType.None)
-                        {
-                            type.Members.Remove(specifiedProperty);
-                            CodeMemberField field = CodeDomHelper.FindField(type,
-                                                                            CodeDomHelper.GetSpecifiedFieldName(
-                                                                                propertyName));
-                            if (field != null)
-                            {
-                                type.Members.Remove(field);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified ==
-                            PropertyNameSpecifiedType.All)
-                        {
-                            CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Generates the property name specified.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        private static void GeneratePropertyNameSpecifiedNullable(CodeTypeDeclaration type)
-        {
-            foreach (string propertyName in PropertiesListFields)
-            {
-                if (!propertyName.EndsWith("Specified"))
-                {
-                    CodeMemberProperty property = CodeDomHelper.FindProperty(type, propertyName);
-                    // Search in all properties if PropertyNameSpecified exist
-                    string searchPropertyName = string.Format("{0}Specified", propertyName);
-                    CodeMemberProperty specifiedProperty = CodeDomHelper.FindProperty(type, searchPropertyName);
-
-                    if (specifiedProperty != null)
-                    {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified ==
-                            PropertyNameSpecifiedType.Default)
-                        {
-                            // find field
-                            CodeMemberField propertyField = CodeDomHelper.FindField(type,
-                                                                                    CodeDomHelper.GetFieldName(
-                                                                                        propertyName));
-
-                            if (propertyField != null)
-                            {
-                                // generate some code stubs
-                                // this.<fieldName>
-                                var propertyFieldExpression =
-                                    new CodePropertyReferenceExpression(new CodeThisReferenceExpression(),
-                                                                        propertyField.Name);
-                                // this.<fieldName>.Value
-                                var valueExpression = new CodePropertyReferenceExpression(propertyFieldExpression,
-                                                                                          "Value");
-                                // this.<fieldName>.HasValue
-                                var hasValueExpression = new CodePropertyReferenceExpression(propertyFieldExpression,
-                                                                                             "HasValue");
-                                // default(<fieldType>)
-                                var defaultValueExpression = new CodeDefaultValueExpression(property.Type);
-
-                                // change field type to Nullable<>
-                                CodeTypeReference typeCopy = propertyField.Type;
-                                propertyField.Type = new CodeTypeReference(typeof(Nullable<>));
-                                propertyField.Type.TypeArguments.Add(new CodeTypeReference(typeCopy.BaseType));
-
-                                // generate (rewrite) SPECIFIED getter
-                                specifiedProperty.GetStatements.Clear();
-                                // return this.<fieldName>.HasValue;
-                                specifiedProperty.GetStatements.Add(new CodeMethodReturnStatement(hasValueExpression));
-
-                                // generate (rewrite) SPECIFIED setter
-                                specifiedProperty.SetStatements.Clear();
-                                // "if (value==false)" - value is boolean
-                                var ifExpression = new CodeSnippetExpression("value==false");
-                                // this.<fieldName> = null
-                                var trueExpression = new CodeAssignStatement(propertyFieldExpression,
-                                                                             new CodeSnippetExpression("null"));
-                                // generate if statement
-                                var ifStatement = new CodeConditionStatement(ifExpression,
-                                                                             new CodeStatement[] { trueExpression });
-                                specifiedProperty.SetStatements.Add(ifStatement);
-
-                                // find and remove separate specified field - not needed anymore
-                                CodeMemberField field = CodeDomHelper.FindField(type,
-                                                                                CodeDomHelper.GetSpecifiedFieldName(
-                                                                                    propertyName));
-                                if (field != null)
-                                    type.Members.Remove(field);
-
-                                // change type - why?
-                                //property.Type = new CodeTypeReference(typeCopy.BaseType);
-
-                                // change getter -> return this.<propertyField>.Value ?? default
-                                property.GetStatements.Clear();
-                                var returnValueStatement = new CodeMethodReturnStatement(valueExpression);
-                                var returnDefaultStatement = new CodeMethodReturnStatement(defaultValueExpression);
-                                var conditionalReturnStatement = new CodeConditionStatement(hasValueExpression,
-                                                                                            new CodeStatement[] { returnValueStatement },
-                                                                                            new CodeStatement[] { returnDefaultStatement });
-                                property.GetStatements.Add(conditionalReturnStatement);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (GeneratorContext.GeneratorParams.PropertyParams.GeneratePropertyNameSpecified ==
-                            PropertyNameSpecifiedType.All)
-                        {
-                            CodeDomHelper.CreateBasicProperty(type, propertyName, typeof(bool), true);
-                        }
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Creates the change tracker property.
@@ -854,7 +649,7 @@ namespace Xsd2Code.Library.Extensions
         /// <param name="codeTypeDeclaration">Represents a type declaration for a class, structure, interface, or enumeration.</param>
         protected virtual void CreateCloneMethod(CodeTypeDeclaration codeTypeDeclaration)
         {
-            CodeTypeMember cloneMethod = GetCloneMethod(codeTypeDeclaration);
+            CodeTypeMember cloneMethod = CodeDomHelper.GetCloneMethod(codeTypeDeclaration);
             cloneMethod.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.Start, "Clone method"));
             cloneMethod.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, "Clone method"));
             codeTypeDeclaration.Members.Add(cloneMethod);
@@ -937,16 +732,6 @@ namespace Xsd2Code.Library.Extensions
 
 
             var textWriterOrStreamRef = new CodeTypeReferenceExpression("memoryStream");
-            //if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
-            //{
-            //    textWriterOrStreamRef = new CodeTypeReferenceExpression("xmlTextWriter");
-            //    tryStatmanentsCol.Add(
-            //        new CodeVariableDeclarationStatement(
-            //            new CodeTypeReference(typeof(XmlTextWriter)),
-            //            "xmlTextWriter",
-            //            CodeDomHelper.CreateInstance(typeof(XmlTextWriter), "memoryStream", "encoding")));
-            //}
-
 
             if (GeneratorContext.GeneratorParams.Serialization.EnableEncoding)
             {
@@ -2148,7 +1933,7 @@ namespace Xsd2Code.Library.Extensions
             }
             else
             {
-                statement = CollectionInitilializerStatement(name, type, parameters);
+                statement = CodeDomHelper.CollectionInitilializerStatement(name, type, parameters);
             }
 
             return
@@ -2177,37 +1962,8 @@ namespace Xsd2Code.Library.Extensions
             }
             else
             {
-                statement = CollectionInitilializerStatement(name, type);
+                statement = CodeDomHelper.CollectionInitilializerStatement(name, type);
             }
-            return statement;
-        }
-
-
-        /// <summary>
-        /// Collections the initilializer statement.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        private static CodeAssignStatement CollectionInitilializerStatement(string name, CodeTypeReference type,
-                                                                            params CodeExpression[] parameters)
-        {
-            CodeAssignStatement statement;
-            // in case of Interface type the new statement must contain concrete class
-            if (type.BaseType == typeof(IList<>).Name || type.BaseType == typeof(IList<>).FullName)
-            {
-                var cref = new CodeTypeReference(typeof(List<>));
-                cref.TypeArguments.AddRange(type.TypeArguments);
-                statement =
-                    new CodeAssignStatement(
-                        new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), name),
-                        new CodeObjectCreateExpression(cref, parameters));
-            }
-            else
-                statement =
-                    new CodeAssignStatement(
-                        new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), name),
-                        new CodeObjectCreateExpression(type, parameters));
             return statement;
         }
 
