@@ -108,16 +108,11 @@
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="SolutionBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="UnitTest.cs" />
     <Compile Include="xsd\ArrayOfArray.Designer.cs" />
     <Compile Include="xsd\Choice.designer.cs" />
     <Compile Include="xsd\CircularClassReference.Designer.cs" />
-    <Compile Include="xsd\dvd.designer.cs" />
+    <Compile Include="xsd\DvDXML\dvd.designer.cs" />
     <Compile Include="xsd\Gender.cs">
       <DependentUpon>Gender.xsd</DependentUpon>
     </Compile>
@@ -138,7 +133,6 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
     <Content Include="img15.jpg" />
@@ -149,11 +143,11 @@
       <LastGenOutput>ChoiceSequence1.Designer.cs</LastGenOutput>
     </Content>
     <Content Include="xsd\CircularClassReference.xsd" />
-    <Content Include="xsd\dvd.xsd">
+    <Content Include="xsd\DvDXML\dvd.xsd">
       <SubType>
       </SubType>
     </Content>
-    <Content Include="xsd\Actor.xsd" />
+    <Content Include="xsd\DvDXML\Actor.xsd" />
     <Content Include="xsd\Circular.xsd" />
     <Content Include="xsd\hierarchy.xsd">
       <SubType>Designer</SubType>
@@ -161,7 +155,7 @@
     <None Include="xsd\Choice.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="xsd\dvd.xsx">
+    <None Include="xsd\DvDXML\dvd.xsx">
       <DependentUpon>dvd.xsd</DependentUpon>
     </None>
     <Content Include="xsd\Gender.xsd" />
@@ -169,6 +163,9 @@
     <Content Include="xsd\ReproSchema.xsd" />
     <Content Include="xsd\StackOverFlow.xsd" />
     <Content Include="xsd\TestAnnotations.xsd" />
+    <None Include="xsd\DvDXML\dvdtheque.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="xsd\hexBinary.xsd">
       <SubType>Designer</SubType>
     </None>
